@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:35:39 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/05 15:46:36 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/02/14 16:41:46 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,5 @@
 # include <exception>
 # include <stdexcept>
 # include <iostream>
-# include "User.hpp"
-
-void create_user(int socket, std::string cmd);
-
+# include "Server.hpp"
 #endif

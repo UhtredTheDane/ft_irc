@@ -1,17 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/14 16:31:03 by agengemb          #+#    #+#             */
-/*   Updated: 2024/02/16 02:57:41 by agengemb         ###   ########.fr       */
+/*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
+/*   Updated: 2024/03/05 16:19:51 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/main.hpp"
-#include <strings.h>
+#ifndef SERVER_HPP
+# define SERVER_HPP
+ #include <strings.h>
 #include <sys/types.h>
 #include <iostream>
 #include <cstdlib>
@@ -22,15 +23,20 @@
 #include <fcntl.h>
 #include <vector>
 
-int main(int argc, char **argv)
+class Server
 {
-	if (argc != 3)
-	{
-		std::cout << "Usage: ./ircserv port password" << std::endl;
-		return (1);
-	}
-	Server serv(atoi(argv[1]), argv[2]);
-	serv.run_server();
+  public:
+    Server(int port, std::string password);
+    void run_server();
+    void check_connection();
+    void check_incoming_package();
 
-	return (0);
-}
+  private:
+    int fd_socket;
+    std::string password;
+    int port;
+    int num_connexion;
+    struct sockaddr_in serv_addr;
+    std::vector<pollfd> *poll_fds;
+};
+#endif
