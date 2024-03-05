@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/05 16:21:11 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/05 17:44:26 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ void Server::check_incoming_package()
 					{
 						std::string str_buffer(buffer);
 						std::cout << "buffer: " << str_buffer << std::endl;
+						create_user(it->fd, str_buffer);
 					}
 					bytes_nb = recv(it->fd, buffer, 1024, 0);
 				}

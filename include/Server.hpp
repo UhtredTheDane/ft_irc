@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/05 16:19:51 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/05 17:44:43 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,7 @@ class Server
     struct sockaddr_in serv_addr;
     std::vector<pollfd> *poll_fds;
 };
+
+void create_user(int socket, std::string cmd);
+
 #endif
