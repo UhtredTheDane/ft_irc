@@ -21,6 +21,23 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <vector>
+#include <signal.h>
+
+void sigint_handler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		std::cout << "Signal ok" << std::endl;
+	}
+}
+
+void set_signal()
+{
+	struct sigaction action;
+	bzero(&action, sizeof(action));
+	action.sa_handler = &sigint_handler;
+	sigaction(SIGINT, &action, NULL);
+}
 
 int main(int argc, char **argv)
 {
