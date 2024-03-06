@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:35:39 by agengemb          #+#    #+#             */
-/*   Updated: 2024/02/14 16:41:46 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/05 17:46:22 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,5 +17,7 @@
 # include <exception>
 # include <stdexcept>
 # include <iostream>
+# include "User.hpp"
 # include "Server.hpp"
+
 #endif
