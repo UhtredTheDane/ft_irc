@@ -6,12 +6,12 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/06 18:19:47 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/07 17:05:31 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef USER_H
-#define USER_H
+#ifndef USER_HPP
+#define USER_HPP
 
 # include <string>
 # include <cstring>
@@ -23,7 +23,8 @@
 # include <iterator>
 # include <algorithm>
 # include "Server.hpp"
-
+# include "Server_msg.hpp"
+class Server_msg;
 class User
 {
     private:
