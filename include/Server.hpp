@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/06 14:03:39 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/05 17:44:43 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class Server
 {
   public:
     Server(int port, std::string password);
+    ~Server(void);
     void run_server();
     void check_connection();
     void check_incoming_package();

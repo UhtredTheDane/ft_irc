@@ -6,11 +6,14 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/06 16:02:04 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/05 17:44:26 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
+#include <signal.h>
+
+extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
@@ -38,6 +41,16 @@ Server::Server(int port, std::string password)
 	}
 	poll_fds->at(0).fd = this->fd_socket;
 	poll_fds->at(0).events = POLLIN;
+}
+
+Server::~Server(void)
+{
+	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end(); ++it)
+	{
+		close(it->fd);
+	}
+	delete poll_fds;
+	close(fd_socket);
 }
 
 void Server::check_connection()
@@ -101,17 +114,13 @@ void Server::check_incoming_package()
 					bytes_nb = recv(it->fd, buffer, 1024, 0);
 				}
 			}
-			// for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end() ; ++it)
-			// {
-			// 	std::cout << it->fd << std::endl;
-			// }
 		}			
 	}
 }
 
 void Server::run_server()
 {
-	while (1)
+	while (!close_serv)
 	{
 		std::vector<pollfd> &test = *poll_fds;
 		int request_nb;

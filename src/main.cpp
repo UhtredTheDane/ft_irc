@@ -21,6 +21,25 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <vector>
+#include <signal.h>
+
+bool close_serv = false;
+
+void sigint_handler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		close_serv = true;
+	}
+}
+
+void set_signal(void)
+{
+	struct sigaction action;
+	bzero(&action, sizeof(action));
+	action.sa_handler = &sigint_handler;
+	sigaction(SIGINT, &action, NULL);
+}
 
 int main(int argc, char **argv)
 {
@@ -29,8 +48,8 @@ int main(int argc, char **argv)
 		std::cout << "Usage: ./ircserv port password" << std::endl;
 		return (1);
 	}
+	set_signal();
 	Server serv(atoi(argv[1]), argv[2]);
 	serv.run_server();
-
 	return (0);
 }
