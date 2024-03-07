@@ -6,14 +6,14 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/05 16:21:45 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/06 18:19:48 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/User.hpp"
 
 User::User(int socket) : socket(socket), nickname(""), username( ""),
-	hostname(""), servername(""), realname("")
+	hostname(""), servername(""), realname(""), identifier("")
 {
 	// update_identifier();
 }
@@ -30,6 +30,40 @@ User::~User()
 	// close( this->socket );
 }
 
+int User::get_socket(void) const
+{
+	return(this->socket);
+}
+
+std::string const & User::get_hostname(void) const
+{
+	return(this->hostname);
+}
+
+std::string const & User::get_nickname(void) const
+{
+	return(this->nickname);
+}
+
+std::string const & User::get_realname(void) const
+{
+	return(this->realname);
+}
+
+std::string const & User::get_username(void) const
+{
+	return(this->username);
+}
+
+std::string const & User::get_servername(void) const
+{
+	return(this->servername);
+}
+
+std::string const & User::get_identifier(void) const
+{
+	return(this->identifier);
+}
 
 void User::set_hostname(std::string hostname)
 {
@@ -54,4 +88,8 @@ void User::set_username(std::string username)
 void User::set_servername(std::string servername)
 {
 	this->servername = servername;
+}
+void User::set_identifier(void)
+{
+	this->identifier = this->nickname + "!" + this->username + "@" + this->hostname;
 }

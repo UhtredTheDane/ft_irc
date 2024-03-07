@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/05 17:44:43 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/06 14:03:39 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,6 @@ class Server
     std::vector<pollfd> *poll_fds;
 };
 
-void create_user(int socket, std::string cmd);
+void create_user(int socket, std::string cmd, std::vector<pollfd> *poll_fds);
 
 #endif

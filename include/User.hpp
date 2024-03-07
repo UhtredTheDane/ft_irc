@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/05 16:21:48 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/06 18:19:47 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <sstream>
 # include <iterator>
 # include <algorithm>
-
+# include "Server.hpp"
 
 class User
 {
@@ -33,7 +33,8 @@ class User
 		std::string hostname;
         std::string servername;
 		std::string realname;
-		bool isPasswordValid;
+		std::string identifier;
+		// bool isPasswordValid;
     
 	public:
 
@@ -44,6 +45,8 @@ class User
 		std::string const & get_realname( void ) const;
 		std::string const & get_hostname( void ) const;
         std::string const & get_servername( void ) const;
+		std::string const & get_identifier( void ) const;
+		int get_socket( void ) const;
 		
 		void show_userinfo();
     	void set_nickname( std::string nickname );
@@ -51,6 +54,7 @@ class User
 		void set_realname( std::string realname );
 		void set_hostname( std::string hostname );
 		void set_servername( std::string hostname );
+		void set_identifier( void );
 };
 
 #endif

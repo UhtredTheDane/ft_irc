@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/05 17:44:26 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/06 16:02:04 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ Server::Server(int port, std::string password)
 	listen(this->fd_socket, 5);
 
 	
-	this->poll_fds = new std::vector<struct pollfd>(1);
+	this->poll_fds = new std::vector<struct pollfd>(10);
 	for (std::vector<pollfd>::iterator it = this->poll_fds->begin(); it != this->poll_fds->end(); ++it)
 	{
 		bzero(&(*it), sizeof(pollfd));
@@ -96,15 +96,15 @@ void Server::check_incoming_package()
 					{
 						std::string str_buffer(buffer);
 						std::cout << "buffer: " << str_buffer << std::endl;
-						create_user(it->fd, str_buffer);
+						create_user(it->fd, str_buffer, poll_fds);
 					}
 					bytes_nb = recv(it->fd, buffer, 1024, 0);
 				}
 			}
-			for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end() ; ++it)
-			{
-				std::cout << it->fd << std::endl;
-			}
+			// for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end() ; ++it)
+			// {
+			// 	std::cout << it->fd << std::endl;
+			// }
 		}			
 	}
 }
