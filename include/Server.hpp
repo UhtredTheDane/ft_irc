@@ -12,7 +12,9 @@
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
- #include <strings.h>
+
+#include "User.hpp"
+#include <strings.h>
 #include <sys/types.h>
 #include <iostream>
 #include <cstdlib>
@@ -22,7 +24,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <vector>
+#include <list>
 
+class User;
 class Server
 {
   public:
@@ -39,8 +43,10 @@ class Server
     int num_connexion;
     struct sockaddr_in serv_addr;
     std::vector<pollfd> *poll_fds;
+    std::list<User> *user_list;
+    std::list<User>::iterator findUser(int fd);
 };
 
-void create_user(int socket, std::string cmd, std::vector<pollfd> *poll_fds);
+User *create_user(int socket, std::string cmd);
 
 #endif

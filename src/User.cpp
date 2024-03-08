@@ -27,6 +27,7 @@ void User::show_userinfo()
 }
 User::~User()
 {
+	std::cout << "Destruction du User : " << this->nickname << std::endl;
 	// close( this->socket );
 }
 

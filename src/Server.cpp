@@ -35,6 +35,7 @@ Server::Server(int port, std::string password)
 
 	
 	this->poll_fds = new std::vector<struct pollfd>(10);
+	this->user_list = new std::list<User>();
 	for (std::vector<pollfd>::iterator it = this->poll_fds->begin(); it != this->poll_fds->end(); ++it)
 	{
 		bzero(&(*it), sizeof(pollfd));
@@ -83,6 +84,8 @@ void Server::check_incoming_package()
 {
 	char buffer[1024];
 	int bytes_nb;
+	User *tmp;
+
 	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end(); ++it)
 	{
 		if (it->fd != 0 && it->revents & POLLIN)
@@ -93,7 +96,7 @@ void Server::check_incoming_package()
 			{
 				std::cout << "a user leaved the server" << std::endl;
 				close(it->fd);
-				it->fd = 0;
+				user_list->erase(findUser(it->fd));
 				--num_connexion;
 			}
 			else
@@ -109,12 +112,22 @@ void Server::check_incoming_package()
 					{
 						std::string str_buffer(buffer);
 						std::cout << "buffer: " << str_buffer << std::endl;
-						create_user(it->fd, str_buffer, poll_fds);
+						tmp = create_user(it->fd, str_buffer);
+						if(tmp)
+						{
+							// std::cout << "oui baguette" << std::endl;
+							//tmp->show_userinfo();
+							user_list->push_back(*tmp);
+						}
 					}
 					bytes_nb = recv(it->fd, buffer, 1024, 0);
 				}
 			}
 		}			
+	}
+	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
+	{
+		std::cout << it->get_socket() << std::endl ;
 	}
 }
 
@@ -131,4 +144,14 @@ void Server::run_server()
 			check_incoming_package();
 		}
 	}
+}
+
+std::list<User>::iterator Server::findUser(int fd)
+{
+	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
+	{
+		if(it->get_socket() == fd)
+			return it;
+	}
+	return (user_list->end());
 }
