@@ -13,7 +13,7 @@
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD
 NAME = ircserv
-SRC= src/main.cpp src/User.cpp src/Create_user.cpp src/Server.cpp
+SRC= src/main.cpp src/User.cpp src/Create_user.cpp src/Server.cpp src/Server_msg.cpp
 OBJ= $(SRC:.cpp=.o)
 DEP= ${OBJ:.o=.d}
 
