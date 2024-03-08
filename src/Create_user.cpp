@@ -48,6 +48,4 @@ void create_user(int socket, std::string cmd, std::vector<pollfd> *poll_fds)
     user1.show_userinfo();
     send(socket, msg.c_str(), msg_len, 0);
     }
-    
-
 }

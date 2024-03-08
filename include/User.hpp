@@ -28,6 +28,7 @@ class User
 {
     private:
         int socket;
+	int index_socket;
         std::string nickname;
 		std::string username;
 		std::string hostname;
