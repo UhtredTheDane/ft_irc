@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/15 03:30:41 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/15 04:03:44 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,31 +84,28 @@ void Server::check_connection()
 
 void Server::connexion(int fd, std::string& request)
 {
-	int cmpt = 0;
-
+	(void) fd;
 	std::stringstream coco(request);
 	std::vector<std::string> split_line;
 	std::string word;
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-	std::cout << cmpt << " et " << split_line[0] << std::endl;
-	if (cmpt == 0 && !split_line[0].compare("PASS"))
+	if (!split_line[0].compare("PASS"))
 	{
 		std::cout << "PASS pas fait\n";
 	}
-	else if (cmpt == 1 && !split_line[0].compare("NICK"))
+	else if (!split_line[0].compare("NICK"))
 		user.set_nickname(split_line[1]);
-	else if (cmpt == 2 && !split_line[0].compare("USER"))
+	else if (!split_line[0].compare("USER"))
 	{
 		user.set_username(split_line[1]);
 		user.set_hostname(split_line[2]);
 		user.set_servername(split_line[3]);
 		user.set_realname(split_line[3]);
+		user.show_userinfo();
 	}
 	else
 		std::cout << "error connection request\n";
-	++cmpt;
-	bzero(buffer, 1024);
 }
 
 void Server::request_handler(int fd, std::string& request)
@@ -120,7 +117,7 @@ void Server::request_handler(int fd, std::string& request)
 	}
 	else
 	{
-		connexion(fd, request);
+		this->connexion(fd, request);
 	}
 }
 
@@ -145,7 +142,7 @@ void Server::check_incoming_package()
 				}
 				std::string str_buffer(buffer);
 //				std::cout << str_buffer << std::endl;
-				request_handler(it->fd, str_buffer);
+				this->request_handler(it->fd, str_buffer);
 				bzero(buffer, 1024);
 			}
 		}			
