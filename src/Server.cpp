@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/15 04:03:44 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/15 04:11:47 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,20 @@ void Server::check_connection()
 	}
 }
 
+void Server::reply(int socket)
+{
+    std::string msg = user.get_servername() + " ";
+    msg += "003 ";
+    msg += user.get_nickname();
+    msg += " :Welcome to our irc server ";
+    msg += user.get_identifier();
+    msg += "\r\n";
+    int msg_len = msg.length();
+    send(socket, msg.c_str(), msg_len, 0);
+}
+
 void Server::connexion(int fd, std::string& request)
 {
-	(void) fd;
 	std::stringstream coco(request);
 	std::vector<std::string> split_line;
 	std::string word;
@@ -102,7 +113,7 @@ void Server::connexion(int fd, std::string& request)
 		user.set_hostname(split_line[2]);
 		user.set_servername(split_line[3]);
 		user.set_realname(split_line[3]);
-		user.show_userinfo();
+		reply(fd);
 	}
 	else
 		std::cout << "error connection request\n";
@@ -141,7 +152,6 @@ void Server::check_incoming_package()
 					break;
 				}
 				std::string str_buffer(buffer);
-//				std::cout << str_buffer << std::endl;
 				this->request_handler(it->fd, str_buffer);
 				bzero(buffer, 1024);
 			}
