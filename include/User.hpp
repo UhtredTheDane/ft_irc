@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/15 03:22:04 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:14:35 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ class User
     
 	public:
 	User(void);
+	//buffer a mettre en prive
+		std::string buffer;
         User(int socket);
     	virtual ~User();
     	std::string const & get_nickname( void ) const;

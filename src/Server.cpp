@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/15 04:11:47 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:28:23 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,14 +121,17 @@ void Server::connexion(int fd, std::string& request)
 
 void Server::request_handler(int fd, std::string& request)
 {
-
-	if (request.compare("CAP LS\r\n") == 0)
+	(void) fd;
+	std::string buf = "pouet";
+	if (request.find(buf, 0) != std::string::npos)
 	{
-		user.set_socket(fd);
+		this->user.buffer += request;
+		std::cout << "|" << this->user.buffer << "|" << std::endl;
+		//traitement
 	}
 	else
 	{
-		this->connexion(fd, request);
+		this->user.buffer += request;
 	}
 }
 
