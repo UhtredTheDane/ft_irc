@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/17 15:51:39 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/17 15:57:41 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ class Server
     int port;
     int num_connexion;
     struct sockaddr_in serv_addr;
-    std::vector<pollfd> *poll_fds;
     std::list<User> *user_list;
     std::list<User>::iterator findUser(int fd);
 };

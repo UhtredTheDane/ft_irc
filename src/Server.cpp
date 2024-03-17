@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/17 15:53:35 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/17 16:06:58 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,46 +130,67 @@ void Server::request_handler(int fd, std::string& request)
 	else
 	{
 	//this->connexion(fd, request);
-	if(tmp)
-	{
+	// if(tmp)
+	// {
 		// std::cout << "oui baguette" << std::endl;
 		//tmp->show_userinfo();
-		user_list->push_back(*tmp);
+		//user_list->push_back(*tmp);
 		this->connexion(fd, request);
 	}
-	}
+	// }
 }
 
 void Server::check_incoming_package()
 {
 	char buffer[1024];
 	int bytes_nb;
-
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end(); ++it)
-	{
-		if (it->fd != 0 && it->revents & POLLIN)
+	
+	if(user_list.empty())
+	{	
+		if (it->socket != 0 && it->poll_fd->revents & POLLIN)
 		{
-			while ((bytes_nb = recv(it->fd, buffer, 1024, 0)) != -1)
+			while ((bytes_nb = recv(it->socket, buffer, 1024, 0)) != -1)
 			{	
 				if(bytes_nb == 0)
 				{
 					std::cout << "a user leaved the server" << std::endl;
-					close(it->fd);
-					it->fd = 0;
-					user_list->erase(findUser(it->fd));
+					close(it->socket);
+					it->socket = 0;
+					// user_list->erase(findUser(it->socket));
 					--num_connexion;
 					break;
 				}
 				std::string str_buffer(buffer);
-				this->request_handler(it->fd, str_buffer);
+				this->request_handler(it->socket, str_buffer);
+				bzero(buffer, 1024);
+			}
+		}	
+	}
+	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
+	{
+		if (it->socket != 0 && it->poll_fd->revents & POLLIN)
+		{
+			while ((bytes_nb = recv(it->socket, buffer, 1024, 0)) != -1)
+			{	
+				if(bytes_nb == 0)
+				{
+					std::cout << "a user leaved the server" << std::endl;
+					close(it->socket);
+					it->socket = 0;
+					user_list->erase(findUser(it->socket));
+					--num_connexion;
+					break;
+				}
+				std::string str_buffer(buffer);
+				this->request_handler(it->socket, str_buffer);
 				bzero(buffer, 1024);
 			}
 		}			
 	}
-	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
-	{
-		std::cout << it->get_socket() << std::endl ;
-	}
+	// for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
+	// {
+	// 	std::cout << it->get_socket() << std::endl ;
+	// }
 }
 
 void Server::run_server()
