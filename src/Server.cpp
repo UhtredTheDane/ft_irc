@@ -19,14 +19,16 @@ extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
-	this->user = User();
     this->port = port;
     this->password = password;
 	this->num_connexion = 0;
+
     //Configuration du socket du serveur
 	this->fd_socket = socket(AF_INET, SOCK_STREAM, 0); // sys/socket.h
+
 	//rendre la socket serveur non bloquante
 	fcntl(this->fd_socket, F_SETFL, fcntl(this->fd_socket, F_GETFL) | O_NONBLOCK);
+
 	//struct sockaddr_in serv_addr; //netinet/in.h
 	bzero(&(this->serv_addr), sizeof(this->serv_addr));
 	this->serv_addr.sin_family = AF_INET;
@@ -35,25 +37,10 @@ Server::Server(int port, std::string password)
 	if (bind(this->fd_socket, (struct sockaddr *)&(this->serv_addr), sizeof(this->serv_addr)) < 0)
 		std::cout << "lancer une erreur" << std::endl;
 	listen(this->fd_socket, 5);
-
-	
-	this->poll_fds = new std::vector<struct pollfd>(10);
-	this->user_list = new std::list<User>();
-	for (std::vector<pollfd>::iterator it = this->poll_fds->begin(); it != this->poll_fds->end(); ++it)
-	{
-		bzero(&(*it), sizeof(pollfd));
-	}
-	poll_fds->at(0).fd = this->fd_socket;
-	poll_fds->at(0).events = POLLIN;
 }
 
 Server::~Server(void)
 {
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end(); ++it)
-	{
-		close(it->fd);
-	}
-	delete poll_fds;
 	close(fd_socket);
 }
 
@@ -64,25 +51,13 @@ void Server::check_connection()
 	if ((fd_client = accept(this->fd_socket, (struct sockaddr *) &(this->serv_addr), (socklen_t*)&addrlen)) != -1)
 	{
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
-		std::cout << "Une connexion" << std::endl;	
-		for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end() ; ++it)
-		{
-			if(it->fd == 0)
-			{
-				std::cout << "adding new client " << std::endl;
-				it->fd = fd_client;
-				it->events = POLLIN | POLLOUT;
-				break;
-			}
-		}
+		std::cout << "Une connexion" << std::endl;
+		std::cout << fd_client << "\n";
+		user_list.push_back(new User(fd_client));
 		++num_connexion;
-	}
-	else
-	{
-		//std::cout << "error accept" << std::endl;
-	}
+	}	
 }
-
+/*
 void Server::reply(int socket)
 {
     std::string msg = user.get_servername() + " ";
@@ -94,7 +69,8 @@ void Server::reply(int socket)
     int msg_len = msg.length();
     send(socket, msg.c_str(), msg_len, 0);
 }
-
+*/
+/*
 void Server::connexion(int fd, std::string& request)
 {
 	std::stringstream coco(request);
@@ -118,8 +94,8 @@ void Server::connexion(int fd, std::string& request)
 	}
 	else
 		std::cout << "error connection request\n";
-}
-
+}*/
+/*
 void Server::request_handler(int fd, std::string& request)
 {
 	User *tmp = 0;
@@ -139,34 +115,14 @@ void Server::request_handler(int fd, std::string& request)
 	}
 	// }
 }
+*/
 
 void Server::check_incoming_package()
 {
 	char buffer[1024];
 	int bytes_nb;
-	
-	if(user_list.empty())
-	{	
-		if (it->socket != 0 && it->poll_fd->revents & POLLIN)
-		{
-			while ((bytes_nb = recv(it->socket, buffer, 1024, 0)) != -1)
-			{	
-				if(bytes_nb == 0)
-				{
-					std::cout << "a user leaved the server" << std::endl;
-					close(it->socket);
-					it->socket = 0;
-					// user_list->erase(findUser(it->socket));
-					--num_connexion;
-					break;
-				}
-				std::string str_buffer(buffer);
-				this->request_handler(it->socket, str_buffer);
-				bzero(buffer, 1024);
-			}
-		}	
-	}
-	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
+		
+	for (std::list<User>::iterator it = user_list.begin(); it != user_list.end(); ++it)
 	{
 		if (it->socket != 0 && it->poll_fd->revents & POLLIN)
 		{
@@ -197,17 +153,26 @@ void Server::run_server()
 {
 	while (!close_serv)
 	{
-		std::vector<pollfd> &test = *poll_fds;
+		struct pollfd test;
+		test.fd = fd_socket;
+		test.events = POLLIN;
 		int request_nb;
-		request_nb = poll(test.data(), this->num_connexion + 1, -1);
+		request_nb = poll(&test, this->num_connexion + 1, -1);
 		if (request_nb >= 1)
 		{
 			check_connection();
+			if (!user_list.empty())
+			{
+				for (std::list<User*>::iterator it = user_list.begin(); it != user_list.end(); ++it)
+				{
+					std::cout << (*it)->get_socket() << std::endl;
+				}
+			}
 			check_incoming_package();
 		}
 	}
 }
-
+/*
 std::list<User>::iterator Server::findUser(int fd)
 {
 	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
@@ -216,4 +181,4 @@ std::list<User>::iterator Server::findUser(int fd)
 			return it;
 	}
 	return (user_list->end());
-}
+}*/

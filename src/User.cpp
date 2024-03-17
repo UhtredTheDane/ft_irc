@@ -20,6 +20,8 @@ User::User(void) : socket(-1), nickname(""), username( ""),
 User::User(int socket) : socket(socket), nickname(""), username( ""),
 	hostname(""), servername(""), realname(""), identifier("")
 {
+	poll_fd.fd = socket;
+	poll_fd.events = POLLIN | POLLOUT;
 	// update_identifier();
 }
 void User::show_userinfo()
@@ -32,7 +34,7 @@ void User::show_userinfo()
 }
 User::~User()
 {
-	std::cout << "Destruction du User : " << this->nickname << std::endl;
+	std::cout << "Destruction du User : " << this->socket << std::endl;
 	// close( this->socket );
 }
 

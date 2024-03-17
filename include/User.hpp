@@ -22,6 +22,7 @@
 # include <sstream>
 # include <iterator>
 # include <algorithm>
+# include <poll.h>
 class User
 {
     private:
@@ -32,7 +33,7 @@ class User
         std::string servername;
 		std::string realname;
 		std::string identifier;
-		struct pollfd poll_fds;
+		struct pollfd poll_fd;
 		// bool isPasswordValid;
     
 	public:
