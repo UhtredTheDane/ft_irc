@@ -6,12 +6,12 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/07 17:05:31 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/17 15:46:26 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef USER_HPP
-#define USER_HPP
+#ifndef USER_H
+# define USER_H
 
 # include <string>
 # include <cstring>
@@ -22,9 +22,6 @@
 # include <sstream>
 # include <iterator>
 # include <algorithm>
-# include "Server.hpp"
-# include "Server_msg.hpp"
-class Server_msg;
 class User
 {
     private:
@@ -38,7 +35,7 @@ class User
 		// bool isPasswordValid;
     
 	public:
-
+	User(void);
         User(int socket);
     	virtual ~User();
     	std::string const & get_nickname( void ) const;
@@ -48,6 +45,7 @@ class User
         std::string const & get_servername( void ) const;
 		std::string const & get_identifier( void ) const;
 		int get_socket( void ) const;
+		void set_socket(int fd);
 		
 		void show_userinfo();
     	void set_nickname( std::string nickname );

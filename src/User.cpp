@@ -6,11 +6,16 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/06 18:19:48 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/15 03:21:42 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/User.hpp"
+User::User(void) : socket(-1), nickname(""), username( ""),
+	hostname(""), servername(""), realname(""), identifier("")
+{
+	// update_identifier();
+}
 
 User::User(int socket) : socket(socket), nickname(""), username( ""),
 	hostname(""), servername(""), realname(""), identifier("")
@@ -35,6 +40,12 @@ int User::get_socket(void) const
 {
 	return(this->socket);
 }
+
+void User::set_socket(int fd)
+{
+	this->socket = fd;
+}
+
 
 std::string const & User::get_hostname(void) const
 {

@@ -6,14 +6,16 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/05 17:44:43 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/17 15:51:39 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+#include <list>
 #include "User.hpp"
+#include <vector>
 #include <strings.h>
 #include <sys/types.h>
 #include <iostream>
@@ -23,8 +25,6 @@
 #include <poll.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <vector>
-#include <list>
 
 class User;
 class Server
@@ -35,8 +35,11 @@ class Server
     void run_server();
     void check_connection();
     void check_incoming_package();
-
+	  void request_handler(int fd, std::string &request);
+	  void connexion(int fd, std::string& request);
+	  void reply(int socket);
   private:
+    User user;
     int fd_socket;
     std::string password;
     int port;
