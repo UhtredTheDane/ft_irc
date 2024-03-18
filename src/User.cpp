@@ -12,7 +12,7 @@
 
 #include "../include/User.hpp"
 User::User(void) : socket(-1), nickname(""), username( ""),
-	hostname(""), servername(""), realname(""), identifier("")
+	hostname(""), servername(""), realname(""), identifier(""), isRegistered(0)
 {
 	// update_identifier();
 }
@@ -43,6 +43,16 @@ int User::get_socket(void) const
 void User::set_socket(int fd)
 {
 	this->socket = fd;
+}
+
+int User::get_isRegistered(void) const
+{
+	return(this->isRegistered);
+}
+
+void User::set_isRegistered(int i)
+{
+	this->isRegistered = i;
 }
 
 

@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 #include "User.hpp"
+#include "Server_msg.hpp"
 #include <vector>
 #include <strings.h>
 #include <sys/types.h>
@@ -25,18 +26,18 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-
 class Server
 {
   public:
+    Server_msg msg;
     Server(int port, std::string password);
     ~Server(void);
     void run_server();
     void check_connection();
     void check_incoming_package();
-	void request_handler(int fd, std::string &request);
-	void connexion(int fd, std::string& request);
-	void reply(int socket);
+	  void request_handler(int fd, std::string &request);
+	  void connexion(int fd, std::string& request);
+	  void reply(int socket);
   private:
     User user;
     int fd_socket;
