@@ -19,7 +19,6 @@ extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
-	this->user = User();
     this->port = port;
     this->password = password;
 	this->num_connexion = 0;
@@ -38,7 +37,6 @@ Server::Server(int port, std::string password)
 
 	
 	this->poll_fds = new std::vector<struct pollfd>(10);
-	this->user_list = new std::list<User>();
 	for (std::vector<pollfd>::iterator it = this->poll_fds->begin(); it != this->poll_fds->end(); ++it)
 	{
 		bzero(&(*it), sizeof(pollfd));
@@ -83,6 +81,7 @@ void Server::check_connection()
 	}
 }
 
+/*
 void Server::reply(int socket)
 {
     std::string msg = user.get_servername() + " ";
@@ -94,6 +93,7 @@ void Server::reply(int socket)
     int msg_len = msg.length();
     send(socket, msg.c_str(), msg_len, 0);
 }
+
 
 void Server::connexion(int fd, std::string& request)
 {
@@ -119,24 +119,15 @@ void Server::connexion(int fd, std::string& request)
 	else
 		std::cout << "error connection request\n";
 }
+*/
 
 void Server::request_handler(int fd, std::string& request)
 {
-	User *tmp = 0;
+	User *tmp;
 	if (request.compare("CAP LS\r\n") == 0)
 	{
-		user.set_socket(fd);
-	}
-	else
-	{
-	//this->connexion(fd, request);
-	if(tmp)
-	{
-		// std::cout << "oui baguette" << std::endl;
-		//tmp->show_userinfo();
-		user_list->push_back(*tmp);
-		this->connexion(fd, request);
-	}
+		tmp = new User();
+		users_map.insert(fd, tmp);
 	}
 }
 
@@ -156,7 +147,7 @@ void Server::check_incoming_package()
 					std::cout << "a user leaved the server" << std::endl;
 					close(it->fd);
 					it->fd = 0;
-					user_list->erase(findUser(it->fd));
+					users_map->erase(it->fd);
 					--num_connexion;
 					break;
 				}
@@ -165,10 +156,6 @@ void Server::check_incoming_package()
 				bzero(buffer, 1024);
 			}
 		}			
-	}
-	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
-	{
-		std::cout << it->get_socket() << std::endl ;
 	}
 }
 
@@ -185,14 +172,4 @@ void Server::run_server()
 			check_incoming_package();
 		}
 	}
-}
-
-std::list<User>::iterator Server::findUser(int fd)
-{
-	for (std::list<User>::iterator it = user_list->begin(); it != user_list->end(); ++it)
-	{
-		if(it->get_socket() == fd)
-			return it;
-	}
-	return (user_list->end());
 }

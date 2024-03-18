@@ -13,7 +13,6 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-#include <list>
 #include "User.hpp"
 #include <vector>
 #include <strings.h>
@@ -25,6 +24,7 @@
 #include <poll.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <map>
 
 class User;
 class Server
@@ -38,16 +38,15 @@ class Server
 	  void request_handler(int fd, std::string &request);
 	  void connexion(int fd, std::string& request);
 	  void reply(int socket);
+
   private:
-    User user;
     int fd_socket;
     std::string password;
     int port;
     int num_connexion;
     struct sockaddr_in serv_addr;
     std::vector<pollfd> *poll_fds;
-    std::list<User> *user_list;
-    std::list<User>::iterator findUser(int fd);
+    std::map<int, User*> users_map;
 };
 
 User *create_user(int socket, std::string cmd);
