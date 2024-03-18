@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/17 15:58:06 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/17 15:46:26 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <sstream>
 # include <iterator>
 # include <algorithm>
-# include <poll.h>
 class User
 {
     private:
@@ -33,7 +32,6 @@ class User
         std::string servername;
 		std::string realname;
 		std::string identifier;
-		struct pollfd poll_fd;
 		// bool isPasswordValid;
     
 	public:

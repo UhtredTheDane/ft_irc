@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/17 15:57:41 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/17 15:51:39 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,19 +34,20 @@ class Server
     ~Server(void);
     void run_server();
     void check_connection();
-    //void check_incoming_package();
-	  //void request_handler(int fd, std::string &request);
+    void check_incoming_package();
+	  void request_handler(int fd, std::string &request);
 	  void connexion(int fd, std::string& request);
 	  void reply(int socket);
-
   private:
+    User user;
     int fd_socket;
     std::string password;
     int port;
     int num_connexion;
     struct sockaddr_in serv_addr;
-    std::list<User*> user_list;
-   // std::list<User>::iterator findUser(int fd);
+    std::vector<pollfd> *poll_fds;
+    std::list<User> *user_list;
+    std::list<User>::iterator findUser(int fd);
 };
 
 User *create_user(int socket, std::string cmd);
