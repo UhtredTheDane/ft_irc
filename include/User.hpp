@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/17 15:46:26 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/03/18 15:45:45 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 class User
 {
     private:
-        int socket;
         std::string nickname;
 		std::string username;
 		std::string hostname;
@@ -36,7 +35,6 @@ class User
     
 	public:
 	User(void);
-        User(int socket);
     	virtual ~User();
     	std::string const & get_nickname( void ) const;
 		std::string const & get_username( void ) const;
@@ -44,8 +42,6 @@ class User
 		std::string const & get_hostname( void ) const;
         std::string const & get_servername( void ) const;
 		std::string const & get_identifier( void ) const;
-		int get_socket( void ) const;
-		void set_socket(int fd);
 		
 		void show_userinfo();
     	void set_nickname( std::string nickname );

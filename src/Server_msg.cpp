@@ -1,5 +1,6 @@
 #include "../include/Server_msg.hpp"
 
+/*
 std::string Server_msg::welcome_msg(User user)
 {
 	std::string msg = ":irc.42.com ";
@@ -72,4 +73,4 @@ std::string Server_msg::pong_msg(User user)
 	msg += user.get_socket();
     msg += "\r\n";
 	return(msg);
-}
+}*/
