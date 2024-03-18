@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/18 17:52:20 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 19:21:29 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class Server
     void check_incoming_package();
 	  void request_handler(int client_socket, std::string &request);
 	  void connexion(int client_socket, User* user, std::string& request);
-	  void reply(int socket);
+	  void reply(User *user, int client_socket);
   private:
     int fd_socket;
     std::string password;

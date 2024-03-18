@@ -9,23 +9,13 @@ class User;
 class Server_msg{
 	public:
 
-			std::string welcome_msg(User user);
-			std::string yourhost_msg(User user);
-			std::string created_msg(User user);
-			std::string myinfo_msg(User user);
-			std::string whois_msg(User user);
-			std::string ping_msg(User user);
-			std::string pong_msg(User user);
-
-
-
-			void welcome_msg(User user);
-			void yourhost_msg(User user);
-			void created_msg(User user);
-			void myinfo_msg(User user);
-			void whois_msg(User user);
-			void ping_msg(User user);
-			void pong_msg(User user);
+			void welcome_msg(User* user, int client_socket);
+			void yourhost_msg(User* user, int client_socket);
+			void created_msg(User* user, int client_socket);
+			void myinfo_msg(User* user, int client_socket);
+			void whois_msg(User* user, int client_socket);
+			void ping_msg(int client_socket);
+			void pong_msg(int client_socket);
 	private:
 };
 

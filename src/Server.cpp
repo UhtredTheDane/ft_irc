@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/18 17:56:21 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 19:21:54 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Server::Server(int port, std::string password)
 	fcntl(fd_socket, F_SETFL, fcntl(fd_socket, F_GETFL) | O_NONBLOCK);
 	
 	//struct sockaddr_in serv_addr; //netinet/in.h
-	bzero(&(serv_addr), sizeof(>serv_addr));
+	bzero(&(serv_addr), sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -75,14 +75,13 @@ void Server::check_connection()
 	}
 }
 
-void Server::reply(int socket)
+void Server::reply(User *user, int client_socket)
 {
-	(void) socket;
-	msg.welcome_msg(user);
-	msg.yourhost_msg(user);
-	msg.created_msg(user);
-	msg.myinfo_msg(user);
-	msg.whois_msg(user);
+	msg.welcome_msg(user, client_socket);
+	msg.yourhost_msg(user, client_socket);
+	msg.created_msg(user, client_socket);
+	msg.myinfo_msg(user, client_socket);
+	msg.whois_msg(user, client_socket);
 }
 
 void Server::connexion(int client_socket, User* user, std::string& request)
@@ -111,8 +110,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		user->set_hostname(split_line[2]);
 		user->set_servername(split_line[3]);
 		user->set_realname(split_line[3]);
-		user->set_socket(client_socket);
-		reply(client_socket);
+		reply(user, client_socket);
 		user->set_isRegistered(2);
 	
 	}
@@ -129,7 +127,7 @@ void Server::request_handler(int client_socket, std::string& request)
 	size_t delim_pos;
 
 	user = users_map.at(client_socket);
-	if (request.find(buf, 0) != std::string::npos)
+	if (request.find(delimiter, 0) != std::string::npos)
 	{
 		user->buffer += request;
 		while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)

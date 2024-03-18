@@ -6,14 +6,15 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/18 17:46:12 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 19:06:14 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/User.hpp"
-User::User(void) : buffer(""), nickname(""), username( ""),
+User::User(void) : nickname(""), username( ""),
 	hostname(""), servername(""), realname(""), identifier("")
 {
+	buffer = "";
 	// update_identifier();
 }
 
