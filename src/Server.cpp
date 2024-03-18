@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/18 17:38:35 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:56:21 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
-	this->port = port;
-	this->password = password;
+	this->msg = Server_msg();
+    this->port = port;
+    this->password = password;
 	this->num_connexion = 0;
 	
 	//Configuration du socket du serveur
@@ -75,57 +76,80 @@ void Server::check_connection()
 	}
 }
 
-/*
-   void Server::reply(int socket)
-   {
-   std::string msg = user.get_servername() + " ";
-   msg += "003 ";
-   msg += user.get_nickname();
-   msg += " :Welcome to our irc server ";
-   msg += user.get_identifier();
-   msg += "\r\n";
-   int msg_len = msg.length();
-   send(socket, msg.c_str(), msg_len, 0);
-   }
+void Server::reply(int socket)
+{
+	(void) socket;
+	this->msg.welcome_msg(user);
+	this->msg.yourhost_msg(user);
+	this->msg.created_msg(user);
+	this->msg.myinfo_msg(user);
+	this->msg.whois_msg(user);
+}
 
+void Server::connexion(int fd, std::string& request)
+{
+	// std::cout << "|" << request << "|" << std::endl;
+	std::stringstream coco(request);
+	std::vector<std::string> split_line;
+	std::string word;
+	while (getline(coco, word, ' '))
+		split_line.push_back(word);
+	if (user.get_isRegistered() == 0 && !request.compare("CAP LS"))
+	{
+		std::cout << "test\n";
+		this->user.set_isRegistered(1);
+	}
+	else if(user.get_isRegistered() == 1)
+	{
+	if (!split_line[0].compare("PASS"))
+	{
+		std::cout << "PASS valide\n";
+	}
+	else if (!split_line[0].compare("NICK"))
+		user.set_nickname(split_line[1]);
+	else if (!split_line[0].compare("USER") && !user.get_nickname().empty())
+	{
+		user.set_username(split_line[1]);
+		user.set_hostname(split_line[2]);
+		user.set_servername(split_line[3]);
+		user.set_realname(split_line[3]);
+		user.set_socket(fd);
+		reply(fd);
+		this->user.set_isRegistered(2);
+	
+	}
+	}
+	else
+		 std::cout << "|" << request << "|" << std::endl;
 
-   void Server::connexion(int fd, std::string& request)
-   {
-   std::stringstream coco(request);
-   std::vector<std::string> split_line;
-   std::string word;
-   while (getline(coco, word, ' '))
-   split_line.push_back(word);
-   if (!split_line[0].compare("PASS"))
-   {
-   std::cout << "PASS pas fait\n";
-   }
-   else if (!split_line[0].compare("NICK"))
-   user.set_nickname(split_line[1]);
-   else if (!split_line[0].compare("USER"))
-   {
-   user.set_username(split_line[1]);
-   user.set_hostname(split_line[2]);
-   user.set_servername(split_line[3]);
-   user.set_realname(split_line[3]);
-   reply(fd);
-   }
-   else
-   std::cout << "error connection request\n";
-   }
-   */
+}
 
 void Server::request_handler(int fd, std::string& request)
 {
+	
 	User *tmp;
-	std::stringstream coco(request);
-	std::string line;
-	getline(coco, line, '\n');
-
-	if (line.compare("CAP LS\r") == 0)
+	(void) fd;
+	std::string buf = "\r\n";
+	if (request.find(buf, 0) != std::string::npos)
 	{
 		tmp = new User();
 		users_map.insert(std::pair<int, User*>(fd, tmp));
+
+		this->user.buffer += request;
+		std::string delimiter = "\r\n";
+		std::string token;
+		// std::vector<std::string> split_line;
+		while(this->user.buffer.find(delimiter) != std::string::npos)
+		{
+			token = this->user.buffer.substr(0, this->user.buffer.find(delimiter));
+			this->user.buffer.erase(0, this->user.buffer.find(delimiter) + delimiter.length());
+			connexion(fd, token);
+		}
+		// //traitement
+	}
+	else
+	{
+		this->user.buffer += request;
 	}
 }
 

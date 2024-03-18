@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/18 17:05:39 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:52:20 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 #include "User.hpp"
+#include "Server_msg.hpp"
 #include <vector>
 #include <strings.h>
 #include <sys/types.h>
@@ -30,6 +31,7 @@ class User;
 class Server
 {
   public:
+    Server_msg msg;
     Server(int port, std::string password);
     ~Server(void);
     void run_server();
@@ -38,7 +40,6 @@ class Server
 	  void request_handler(int fd, std::string &request);
 	  void connexion(int fd, std::string& request);
 	  void reply(int socket);
-
   private:
     int fd_socket;
     std::string password;
@@ -46,9 +47,6 @@ class Server
     int num_connexion;
     struct sockaddr_in serv_addr;
     std::vector<pollfd> *poll_fds;
-    std::map<int, User*> users_map;
 };
-
-User *create_user(int socket, std::string cmd);
 
 #endif

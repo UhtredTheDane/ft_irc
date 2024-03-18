@@ -6,7 +6,8 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/18 15:45:45 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:51:38 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:14:35 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +32,13 @@ class User
         std::string servername;
 		std::string realname;
 		std::string identifier;
-		// bool isPasswordValid;
+		bool isPasswordValid;
+		int isRegistered;
     
 	public:
 	User(void);
+	//buffer a mettre en prive
+		std::string buffer;
     	virtual ~User();
     	std::string const & get_nickname( void ) const;
 		std::string const & get_username( void ) const;
@@ -42,6 +46,7 @@ class User
 		std::string const & get_hostname( void ) const;
         std::string const & get_servername( void ) const;
 		std::string const & get_identifier( void ) const;
+		int get_isRegistered( void ) const;
 		
 		void show_userinfo();
     	void set_nickname( std::string nickname );
@@ -50,6 +55,7 @@ class User
 		void set_hostname( std::string hostname );
 		void set_servername( std::string hostname );
 		void set_identifier( void );
+		void set_isRegistered( int i );
 };
 
 #endif

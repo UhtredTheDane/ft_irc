@@ -2,6 +2,7 @@
 #ifndef SERVER_MSG_HPP
 # define SERVER_MSG_HPP
 
+#include <sys/socket.h>
 # include "User.hpp"
 class User;
 
@@ -18,6 +19,13 @@ class Server_msg{
 
 
 
+			void welcome_msg(User user);
+			void yourhost_msg(User user);
+			void created_msg(User user);
+			void myinfo_msg(User user);
+			void whois_msg(User user);
+			void ping_msg(User user);
+			void pong_msg(User user);
 	private:
 };
 

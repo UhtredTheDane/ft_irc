@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/18 15:46:36 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:46:12 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,16 @@ void User::show_userinfo()
 User::~User()
 {
 	std::cout << "Destruction du User : " << this->nickname << std::endl;
+}
+
+int User::get_isRegistered(void) const
+{
+	return(this->isRegistered);
+}
+
+void User::set_isRegistered(int i)
+{
+	this->isRegistered = i;
 }
 
 std::string const & User::get_hostname(void) const
