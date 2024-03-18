@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/User.hpp"
-User::User(void) : nickname(""), username( ""),
+User::User(void) : buffer(""), nickname(""), username( ""),
 	hostname(""), servername(""), realname(""), identifier("")
 {
 	// update_identifier();
@@ -19,55 +19,55 @@ User::User(void) : nickname(""), username( ""),
 
 void User::show_userinfo()
 {
-	std::cout << "nickname : " << this->nickname << std::endl;
-	std::cout << "username : " << this->username << std::endl;
-	std::cout << "hostname : " << this->hostname << std::endl;
-	std::cout << "servername : " << this->servername << std::endl;
-	std::cout << "realname : " << this->realname << std::endl;
+	std::cout << "nickname : " << nickname << std::endl;
+	std::cout << "username : " << username << std::endl;
+	std::cout << "hostname : " << hostname << std::endl;
+	std::cout << "servername : " << servername << std::endl;
+	std::cout << "realname : " << realname << std::endl;
 }
 User::~User()
 {
-	std::cout << "Destruction du User : " << this->nickname << std::endl;
+	std::cout << "Destruction du User : " << nickname << std::endl;
 }
 
 int User::get_isRegistered(void) const
 {
-	return(this->isRegistered);
+	return(isRegistered);
 }
 
 void User::set_isRegistered(int i)
 {
-	this->isRegistered = i;
+	isRegistered = i;
 }
 
 std::string const & User::get_hostname(void) const
 {
-	return(this->hostname);
+	return(hostname);
 }
 
 std::string const & User::get_nickname(void) const
 {
-	return(this->nickname);
+	return(nickname);
 }
 
 std::string const & User::get_realname(void) const
 {
-	return(this->realname);
+	return(realname);
 }
 
 std::string const & User::get_username(void) const
 {
-	return(this->username);
+	return(username);
 }
 
 std::string const & User::get_servername(void) const
 {
-	return(this->servername);
+	return(servername);
 }
 
 std::string const & User::get_identifier(void) const
 {
-	return(this->identifier);
+	return(identifier);
 }
 
 void User::set_hostname(std::string hostname)
@@ -96,5 +96,5 @@ void User::set_servername(std::string servername)
 }
 void User::set_identifier(void)
 {
-	this->identifier = this->nickname + "!" + this->username + "@" + this->hostname;
+	this->identifier = nickname + "!" + username + "@" + hostname;
 }

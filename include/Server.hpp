@@ -37,16 +37,16 @@ class Server
     void run_server();
     void check_connection();
     void check_incoming_package();
-	  void request_handler(int fd, std::string &request);
-	  void connexion(int fd, std::string& request);
+	  void request_handler(int client_socket, std::string &request);
+	  void connexion(int client_socket, User* user, std::string& request);
 	  void reply(int socket);
   private:
     int fd_socket;
     std::string password;
     int port;
-    int num_connexion;
     struct sockaddr_in serv_addr;
     std::vector<pollfd> *poll_fds;
+    std::map<int, User*> users_map;
 };
 
 #endif
