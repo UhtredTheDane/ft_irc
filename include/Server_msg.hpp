@@ -15,7 +15,9 @@ class Server_msg{
 			void myinfo_msg(User* user, int client_socket);
 			void whois_msg(User* user, int client_socket);
 			void ping_msg(int client_socket);
-			void pong_msg(int client_socket);
+			void pong_msg(User* user, int client_socket);
+			void join_msg(User* user, int client_socket, std::string& channel, std::vector<User*>* users);
+			void mode_msg(User* user, int client_socket, std::string& channel);
 	private:
 };
 

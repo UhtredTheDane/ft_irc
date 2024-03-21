@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/18 19:21:54 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/21 08:36:34 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,22 @@
 #include <string>
 #include <sstream>
 
+#include <stdexcept>
+
 extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
 	msg = Server_msg();
-    this->port = port;
-    this->password = password;
-	
+	this->port = port;
+	this->password = password;
+
 	//Configuration du socket du serveur
 	fd_socket = socket(AF_INET, SOCK_STREAM, 0); // sys/socket.h
-	
+
 	//rendre la socket serveur non bloquante
 	fcntl(fd_socket, F_SETFL, fcntl(fd_socket, F_GETFL) | O_NONBLOCK);
-	
+
 	//struct sockaddr_in serv_addr; //netinet/in.h
 	bzero(&(serv_addr), sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -81,7 +83,7 @@ void Server::reply(User *user, int client_socket)
 	msg.yourhost_msg(user, client_socket);
 	msg.created_msg(user, client_socket);
 	msg.myinfo_msg(user, client_socket);
-	msg.whois_msg(user, client_socket);
+	//msg.whois_msg(user, client_socket);
 }
 
 void Server::connexion(int client_socket, User* user, std::string& request)
@@ -89,6 +91,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	std::stringstream coco(request);
 	std::vector<std::string> split_line;
 	std::string word;
+
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
 	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
@@ -98,25 +101,67 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	}
 	else if(user->get_isRegistered() == 1)
 	{
-	if (!split_line[0].compare("PASS"))
-	{
-		std::cout << "PASS valide\n";
+		if (!split_line[0].compare("PASS"))
+		{
+			std::cout << "PASS valide\n";
+		}
+		else if (!split_line[0].compare("NICK"))
+		{
+			if (users_map.size() != 1)
+				user->set_nickname("_" + split_line[1]);
+			else
+				user->set_nickname(split_line[1]);
+		}
+		else if (!split_line[0].compare("USER") && !user->get_nickname().empty())
+		{
+				user->set_username(split_line[1]);
+				user->set_hostname(split_line[2]);
+				user->set_servername(split_line[3]);
+				user->set_realname(split_line[3]);
+				reply(user, client_socket);
+				user->set_isRegistered(2);
+		}
 	}
-	else if (!split_line[0].compare("NICK"))
-		user->set_nickname(split_line[1]);
-	else if (!split_line[0].compare("USER") && !user->get_nickname().empty())
+	else if (!split_line[0].compare("PING"))
 	{
-		user->set_username(split_line[1]);
-		user->set_hostname(split_line[2]);
-		user->set_servername(split_line[3]);
-		user->set_realname(split_line[3]);
-		reply(user, client_socket);
-		user->set_isRegistered(2);
-	
+		msg.pong_msg(user, client_socket);
 	}
+	else if (!split_line[0].compare("JOIN"))
+	{
+		try
+		{	
+			std::cout << user->get_username() << std::endl;
+			Channel* curent_chan = channels.at(split_line[1]);
+			curent_chan->add_user(user);
+			msg.join_msg(user, client_socket, split_line[1], curent_chan->get_users());
+		}
+		catch (std::out_of_range& oor)
+		{
+			Channel* new_chan = new Channel(split_line[1], user);
+			channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
+			msg.join_msg(user, client_socket, split_line[1], new_chan->get_users());
+		}
+	}
+	else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
+	{
+		msg.mode_msg(user, client_socket, split_line[1]);
+	}
+	else if (!split_line[0].compare("PRIVMSG"))
+	{
+		try
+		{
+		Channel *curent_chan = channels.at(split_line[1]); 
+			Message msg(split_line[2], user);
+			curent_chan->add_message(&msg);
+		}
+		catch (std::out_of_range& oor)
+		{
+		}
+
+
 	}
 	else
-		 std::cout << "|" << request << "|" << std::endl;
+		std::cout << "|" << request << "|" << std::endl;
 }
 
 void Server::request_handler(int client_socket, std::string& request)
