@@ -17,3 +17,7 @@ Message::Message(std::string& msg, User *user)
 	this->msg = msg;
 	this->user = user;
 }
+std::string Message::get_msg(void)
+{
+	return(this->msg);
+}

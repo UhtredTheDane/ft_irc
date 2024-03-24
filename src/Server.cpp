@@ -120,6 +120,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_realname(split_line[3]);
 				reply(user, client_socket);
 				user->set_isRegistered(2);
+				user->socket = client_socket;
 		}
 	}
 	else if (!split_line[0].compare("PING"))
@@ -153,12 +154,23 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		Channel *curent_chan = channels.at(split_line[1]); 
 			Message msg(split_line[2], user);
 			curent_chan->add_message(&msg);
+			std::string c_msg;
+			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+			{
+				if(*it != user)
+				{
+				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_theme()+ " " + msg.get_msg() + "\r\n";
+				std::cout << c_msg << std::endl;
+				send((*it)->socket, c_msg.c_str(), c_msg.length(), 0);
+				}
+			it++;
+			}
+//			send(client_socket, msg.get_msg().c_str(), msg.get_msg().length(), 0);
+
 		}
 		catch (std::out_of_range& oor)
 		{
 		}
-
-
 	}
 	else
 		std::cout << "|" << request << "|" << std::endl;

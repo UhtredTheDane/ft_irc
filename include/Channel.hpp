@@ -31,6 +31,7 @@ class Channel
 		~Channel(void);
 		void add_user(User *user);
 		void add_message(Message *message);
+		std::string get_theme( void );
 		std::vector<User*>* get_users(void);
 };
 #endif

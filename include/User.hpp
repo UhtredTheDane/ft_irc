@@ -39,6 +39,7 @@ class User
 	User(void);
 	//buffer a mettre en prive
 		std::string buffer;
+		int socket;
     	virtual ~User();
     	std::string const & get_nickname( void ) const;
 		std::string const & get_username( void ) const;

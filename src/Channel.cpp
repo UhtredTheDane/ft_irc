@@ -33,6 +33,10 @@ void Channel::add_message(Message* msg)
 	msgs.push_back(msg);
 }
 
+std::string Channel::get_theme(void)
+{
+	return(this->theme);
+}
 std::vector<User*>* Channel::get_users(void)
 {
 	return (&users);

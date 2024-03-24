@@ -22,6 +22,7 @@ class Message
 		std::string msg;
 		User *user;
 	public:
+	std::string get_msg(void);
 		Message(std::string& msg, User *user);
 };
 #endif
