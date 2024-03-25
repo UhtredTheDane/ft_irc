@@ -22,9 +22,11 @@ class Channel
 	private:
 		//mod a rajouter
 		std::string theme;
+		std::string name;
 		std::vector<User*> admin_users;
 		std::vector<User*> users;
 		std::vector<Message*> msgs;
+		
 	public:
 		Channel(void);
 		Channel(std::string& theme, User* admin_user);
@@ -32,6 +34,7 @@ class Channel
 		void add_user(User *user);
 		void add_message(Message *message);
 		std::string get_theme( void );
+		std::string get_name( void );
 		std::vector<User*>* get_users(void);
 };
 #endif

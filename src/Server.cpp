@@ -14,7 +14,6 @@
 #include <signal.h>
 #include <string>
 #include <sstream>
-
 #include <stdexcept>
 
 extern bool close_serv;
@@ -77,16 +76,16 @@ void Server::check_connection()
 	}
 }
 
-void Server::reply(User *user, int client_socket)
+void Server::reply(User *user)
 {
-	msg.welcome_msg(user, client_socket);
-	msg.yourhost_msg(user, client_socket);
-	msg.created_msg(user, client_socket);
-	msg.myinfo_msg(user, client_socket);
+	msg.welcome_msg(user);
+	msg.yourhost_msg(user);
+	msg.created_msg(user);
+	msg.myinfo_msg(user);
 	//msg.whois_msg(user, client_socket);
 }
 
-void Server::connexion(int client_socket, User* user, std::string& request)
+void Server::connexion(User* user, std::string& request)
 {
 	std::stringstream coco(request);
 	std::vector<std::string> split_line;
@@ -118,14 +117,14 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_hostname(split_line[2]);
 				user->set_servername(split_line[3]);
 				user->set_realname(split_line[3]);
-				reply(user, client_socket);
+				reply(user);
 				user->set_isRegistered(2);
 				user->socket = client_socket;
 		}
 	}
 	else if (!split_line[0].compare("PING"))
 	{
-		msg.pong_msg(user, client_socket);
+		msg.pong_msg(user);
 	}
 	else if (!split_line[0].compare("JOIN"))
 	{
@@ -134,24 +133,24 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			std::cout << user->get_username() << std::endl;
 			Channel* curent_chan = channels.at(split_line[1]);
 			curent_chan->add_user(user);
-			msg.join_msg(user, client_socket, split_line[1], curent_chan->get_users());
+			msg.join_msg(user, curent_chan);
 		}
 		catch (std::out_of_range& oor)
 		{
 			Channel* new_chan = new Channel(split_line[1], user);
 			channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
-			msg.join_msg(user, client_socket, split_line[1], new_chan->get_users());
+			msg.join_msg(user, new_chan);
 		}
 	}
 	else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 	{
-		msg.mode_msg(user, client_socket, split_line[1]);
+		msg.mode_msg(user, split_line[1]);
 	}
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
 		try
 		{
-		Channel *curent_chan = channels.at(split_line[1]); 
+			Channel *curent_chan = channels.at(split_line[1]); 
 			Message msg(split_line[2], user);
 			curent_chan->add_message(&msg);
 			std::string c_msg;

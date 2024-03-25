@@ -12,9 +12,9 @@
 
 #include "../include/Channel.hpp"
 
-Channel::Channel(std::string& theme, User* user_admin)
+Channel::Channel(std::string& name, User* user_admin)
 {
-	this->theme = theme;
+	this->name = name;
 	this->admin_users.push_back(user_admin);
 	users.push_back(user_admin);
 }
@@ -37,6 +37,12 @@ std::string Channel::get_theme(void)
 {
 	return(this->theme);
 }
+
+std::string Channel::get_name(void)
+{
+	return(this->name);
+}
+
 std::vector<User*>* Channel::get_users(void)
 {
 	return (&users);

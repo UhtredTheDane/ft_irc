@@ -34,13 +34,15 @@ class User
 		std::string identifier;
 		bool isPasswordValid;
 		int isRegistered;
+		int socket;
     
 	public:
 	User(void);
 	//buffer a mettre en prive
 		std::string buffer;
-		int socket;
     	virtual ~User();
+		int const get_socket( void ) const;
+
     	std::string const & get_nickname( void ) const;
 		std::string const & get_username( void ) const;
 		std::string const & get_realname( void ) const;
@@ -50,6 +52,7 @@ class User
 		int get_isRegistered( void ) const;
 		
 		void show_userinfo();
+		void set_socket(int socket);
     	void set_nickname( std::string nickname );
     	void set_username( std::string username );
 		void set_realname( std::string realname );

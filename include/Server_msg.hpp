@@ -9,15 +9,15 @@ class User;
 class Server_msg{
 	public:
 
-			void welcome_msg(User* user, int client_socket);
-			void yourhost_msg(User* user, int client_socket);
-			void created_msg(User* user, int client_socket);
-			void myinfo_msg(User* user, int client_socket);
-			void whois_msg(User* user, int client_socket);
-			void ping_msg(int client_socket);
-			void pong_msg(User* user, int client_socket);
-			void join_msg(User* user, int client_socket, std::string& channel, std::vector<User*>* users);
-			void mode_msg(User* user, int client_socket, std::string& channel);
+			void welcome_msg(User* user);
+			void yourhost_msg(User* user);
+			void created_msg(User* user);
+			void myinfo_msg(User* user);
+			void whois_msg(User* user);
+			void ping_msg(User* user);
+			void pong_msg(User* user);
+			void join_msg(User *user, Channel* channel);
+			void mode_msg(User* user, Channel* channel);
 	private:
 };
 

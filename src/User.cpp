@@ -31,6 +31,11 @@ User::~User()
 	std::cout << "Destruction du User : " << nickname << std::endl;
 }
 
+int const User::get_socket(void) const;
+{
+	return (socket);
+}
+
 int User::get_isRegistered(void) const
 {
 	return(isRegistered);
@@ -69,6 +74,11 @@ std::string const & User::get_servername(void) const
 std::string const & User::get_identifier(void) const
 {
 	return(identifier);
+}
+
+void User::set_socket(int socket)
+{
+	this->socket = socket;
 }
 
 void User::set_hostname(std::string hostname)

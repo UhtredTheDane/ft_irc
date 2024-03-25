@@ -40,8 +40,8 @@ class Server
 		void check_connection();
 		void check_incoming_package();
 		void request_handler(int client_socket, std::string &request);
-		void connexion(int client_socket, User* user, std::string& request);
-		void reply(User *user, int client_socket);
+		void connexion(User* user, std::string& request);
+		void reply(User *user);
 	private:
 		int fd_socket;
 		std::string password;
