@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/25 18:50:43 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:54:03 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,9 +116,9 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_hostname(split_line[2]);
 				user->set_servername(split_line[3]);
 				user->set_realname(split_line[3]);
+				user->set_socket(client_socket);
 				reply(user);
 				user->set_isRegistered(2);
-				user->set_socket(client_socket);
 		}
 	}
 	else if (!split_line[0].compare("PING"))
