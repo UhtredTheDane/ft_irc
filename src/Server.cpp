@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/21 08:36:34 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:50:43 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ void Server::check_connection()
 	if ((fd_client = accept(fd_socket, (struct sockaddr *) &(serv_addr), (socklen_t*)&addrlen)) != -1)
 	{
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
-		std::cout << "Une connexion" << std::endl;	
 		std::cout << "adding new client " << std::endl;
 		pollfd new_pollfd;
 		new_pollfd.events = POLLIN | POLLOUT;
@@ -85,7 +84,7 @@ void Server::reply(User *user)
 	//msg.whois_msg(user, client_socket);
 }
 
-void Server::connexion(User* user, std::string& request)
+void Server::connexion(int client_socket, User* user, std::string& request)
 {
 	std::stringstream coco(request);
 	std::vector<std::string> split_line;
@@ -93,9 +92,9 @@ void Server::connexion(User* user, std::string& request)
 
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
+	std::cout << "|" << request << "|" << std::endl;
 	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
 	{
-		std::cout << "test\n";
 		user->set_isRegistered(1);
 	}
 	else if(user->get_isRegistered() == 1)
@@ -119,7 +118,7 @@ void Server::connexion(User* user, std::string& request)
 				user->set_realname(split_line[3]);
 				reply(user);
 				user->set_isRegistered(2);
-				user->socket = client_socket;
+				user->set_socket(client_socket);
 		}
 	}
 	else if (!split_line[0].compare("PING"))
@@ -144,7 +143,14 @@ void Server::connexion(User* user, std::string& request)
 	}
 	else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 	{
-		msg.mode_msg(user, split_line[1]);
+		try
+		{
+			Channel* target_chan = channels.at(split_line[1]);
+			msg.mode_msg(user, target_chan);
+		}
+		catch (std::out_of_range& oor)
+		{
+		}
 	}
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
@@ -160,12 +166,10 @@ void Server::connexion(User* user, std::string& request)
 				{
 				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_theme()+ " " + msg.get_msg() + "\r\n";
 				std::cout << c_msg << std::endl;
-				send((*it)->socket, c_msg.c_str(), c_msg.length(), 0);
+				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
 				}
 			it++;
 			}
-//			send(client_socket, msg.get_msg().c_str(), msg.get_msg().length(), 0);
-
 		}
 		catch (std::out_of_range& oor)
 		{

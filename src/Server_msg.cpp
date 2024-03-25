@@ -96,10 +96,10 @@ void Server_msg::join_msg(User *user, Channel* channel)
 	
 	msg += ":" + user->get_servername();
 	msg += " 353 " + user->get_nickname() + " = " + channel->get_name() + " :@";
-	for (std::vector<User *>::iterator it = users->begin(); it != users->end(); ++it)
+	for (std::vector<User *>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
 	{
 		msg += (*it)->get_nickname();
-		if (it + 1 != users->end())
+		if (it + 1 != channel->get_users()->end())
 			msg += " ";
 	}
 	msg += "\r\n";
@@ -117,6 +117,6 @@ void Server_msg::mode_msg(User* user, Channel* channel)
 	msg += " 324 " + user->get_username() + " " + channel->get_name() + " +" ;
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 

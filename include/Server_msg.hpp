@@ -2,8 +2,9 @@
 #ifndef SERVER_MSG_HPP
 # define SERVER_MSG_HPP
 
-#include <sys/socket.h>
+# include <sys/socket.h>
 # include "User.hpp"
+# include "Channel.hpp"
 class User;
 
 class Server_msg{
