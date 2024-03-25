@@ -17,14 +17,20 @@
 # include "User.hpp"
 # include "Message.hpp"
 
+enum Chanmod { i = 1 , t = 2 , k = 3 , o = 4 , l = 5};
+
 class Channel
 {
 	private:
 		//mod a rajouter
 		std::string theme;
+		std::string password;
+		int limit_user;
+		int mask;
 		std::vector<User*> admin_users;
 		std::vector<User*> users;
 		std::vector<Message*> msgs;
+		std::string name;
 	public:
 		Channel(void);
 		Channel(std::string& theme, User* admin_user);
@@ -33,5 +39,9 @@ class Channel
 		void add_message(Message *message);
 		std::string get_theme( void );
 		std::vector<User*>* get_users(void);
+		void update_mod(User *user, std::vector<std::string> line);
+		void remove_mod(User *user, Chanmod modif);
+		void set_mod(User *user, Chanmod modif );
+		std::string getName();
 };
 #endif

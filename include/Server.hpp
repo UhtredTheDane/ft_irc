@@ -41,6 +41,7 @@ class Server
 		void check_incoming_package();
 		void request_handler(int client_socket, std::string &request);
 		void connexion(int client_socket, User* user, std::string& request);
+		void invite(User *user,std::vector<std::string> line);
 		void reply(User *user, int client_socket);
 	private:
 		int fd_socket;

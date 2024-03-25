@@ -93,7 +93,10 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	std::string word;
 
 	while (getline(coco, word, ' '))
+	{
+		std::cout << word << std::endl;
 		split_line.push_back(word);
+	}
 	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
 	{
 		std::cout << "test\n";
@@ -151,7 +154,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	{
 		try
 		{
-		Channel *curent_chan = channels.at(split_line[1]); 
+			Channel *curent_chan = channels.at(split_line[1]);
 			Message msg(split_line[2], user);
 			curent_chan->add_message(&msg);
 			std::string c_msg;
@@ -170,6 +173,21 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		}
 		catch (std::out_of_range& oor)
 		{
+		}
+	}
+	else if(!split_line[0].compare("INVITE"))
+	{
+		
+	}
+	else if(!split_line[0].compare("MODE"))
+	{
+		if(channels.find(split_line[1]) == channels.end())
+		{
+			//ERROR CHANNEL NOT FOUND
+		}
+		else
+		{
+			channels[split_line[1]]->update_mod(user,split_line);
 		}
 	}
 	else
@@ -246,4 +264,14 @@ void Server::run_server()
 			check_incoming_package();
 		}
 	}
+}
+
+void Server::invite(User *user,std::vector<std::string> line)
+{
+	std::string msg;
+
+
+	msg = ":" + user->get_nickname() + " INVITE " + line[1] + " " +  line[2] + " " + "\r\n";
+	send(user->socket, msg.c_str(), msg.length(), 0);
+
 }
