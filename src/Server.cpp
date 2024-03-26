@@ -84,6 +84,16 @@ void Server::reply(User *user)
 	//msg.whois_msg(user, client_socket);
 }
 
+bool is_on_serv(std::string& nickname)
+{
+	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
+	{
+		if (it->second->get_nickname() == split_line[1])
+			return (true)
+	}
+	return (false);
+}
+
 void Server::connexion(int client_socket, User* user, std::string& request)
 {
 	std::stringstream coco(request);
@@ -105,10 +115,9 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		}
 		else if (!split_line[0].compare("NICK"))
 		{
-			if (users_map.size() != 1)
-				user->set_nickname("_" + split_line[1]);
-			else
-				user->set_nickname(split_line[1]);
+			while (is_on_serv(split_line[1]))
+				split_line[1] += "_";
+			user->set_nickname(split_line[1]);
 		}
 		else if (!split_line[0].compare("USER") && !user->get_nickname().empty())
 		{
