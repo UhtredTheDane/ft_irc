@@ -18,6 +18,7 @@ Channel::Channel(std::string& name, User* user_admin)
 	this->admin_users.push_back(user_admin);
 	users.push_back(user_admin);
 }
+
 Channel::~Channel(void)
 {
 
