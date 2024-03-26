@@ -167,7 +167,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 							{
 								c_msg = ":" + user->get_nickname() + " KICK " + curent_chan->get_theme() + "\r\n";
 								std::cout << "je suis dans kick " << c_msg << std::endl;
-								send((*it)->socket, c_msg.c_str(), c_msg.length(), 0);
+								send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
 								break;
 							}
 						it2++;
