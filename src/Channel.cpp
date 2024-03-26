@@ -41,3 +41,8 @@ std::vector<User*>* Channel::get_users(void)
 {
 	return (&users);
 }
+
+std::vector<User*>* Channel::get_admins(void)
+{
+	return (&admin_users);
+}

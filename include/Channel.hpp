@@ -33,5 +33,7 @@ class Channel
 		void add_message(Message *message);
 		std::string get_theme( void );
 		std::vector<User*>* get_users(void);
+		std::vector<User*>* get_admins(void);
+
 };
 #endif
