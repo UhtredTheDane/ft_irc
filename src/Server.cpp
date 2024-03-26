@@ -90,10 +90,8 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	std::vector<std::string> split_line;
 	std::string word;
 
-	std::cout << request << std::endl;
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-	std::cout << "|" << request << "|" << std::endl;
 	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
 	{
 		user->set_isRegistered(1);
@@ -155,19 +153,20 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	}
 	else if (!split_line[0].compare("KICK"))
 	{
+		std::cout << request << std::endl;
 		Channel *curent_chan = channels.at(split_line[1]);
 		for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 		{
 			if(user == *it)
 			{
-				std::string c_msg;
+				std::string k_msg;
 				for (std::vector<User*>::iterator it2 = curent_chan->get_users()->begin(); it2 != curent_chan->get_users()->end();)
 					{
 						if((*it2)->get_nickname() == split_line[3])
 							{
-								c_msg = ":" + user->get_nickname() + " KICK " + curent_chan->get_theme() + "\r\n";
-								std::cout << "je suis dans kick " << c_msg << std::endl;
-								send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+								k_msg = ":" + user->get_nickname() + " KICK " + curent_chan->get_name() + "\r\n";
+								std::cout << "je suis dans kick " << k_msg << std::endl;
+								send((*it)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
 								break;
 							}
 						it2++;
@@ -189,7 +188,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			{
 				if(*it != user)
 				{
-				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_theme()+ " " + msg.get_msg() + "\r\n";
+				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
 				std::cout << c_msg << std::endl;
 				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
 				}
