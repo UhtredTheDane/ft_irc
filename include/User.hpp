@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/18 17:51:38 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:22:02 by agengemb         ###   ########.fr       */
 /*   Updated: 2024/03/17 17:14:35 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -34,13 +34,15 @@ class User
 		std::string identifier;
 		bool isPasswordValid;
 		int isRegistered;
+		int socket;
     
 	public:
 	User(void);
 	//buffer a mettre en prive
 		std::string buffer;
-		int socket;
     	virtual ~User();
+		int get_socket( void ) const;
+
     	std::string const & get_nickname( void ) const;
 		std::string const & get_username( void ) const;
 		std::string const & get_realname( void ) const;
@@ -50,6 +52,7 @@ class User
 		int get_isRegistered( void ) const;
 		
 		void show_userinfo();
+		void set_socket(int socket);
     	void set_nickname( std::string nickname );
     	void set_username( std::string username );
 		void set_realname( std::string realname );

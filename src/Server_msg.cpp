@@ -1,6 +1,6 @@
 #include "../include/Server_msg.hpp"
 
-void Server_msg::welcome_msg(User* user, int client_socket)
+void Server_msg::welcome_msg(User* user)
 {
 	std::string msg = ":irc.42.com ";
 	msg += "001 ";
@@ -9,10 +9,10 @@ void Server_msg::welcome_msg(User* user, int client_socket)
 	msg += user->get_identifier();
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::yourhost_msg(User* user, int client_socket)
+void Server_msg::yourhost_msg(User* user)
 {
 	std::string msg = ":irc.42.com ";
 	msg += "002 ";
@@ -22,10 +22,10 @@ void Server_msg::yourhost_msg(User* user, int client_socket)
 	msg += ", running version 0.02";
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::created_msg(User* user, int client_socket)
+void Server_msg::created_msg(User* user)
 {
 	std::string msg = ":irc.42.com ";
 	msg += "003 ";
@@ -33,10 +33,10 @@ void Server_msg::created_msg(User* user, int client_socket)
 	msg += " :This server was created 16-03-24 ";
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::myinfo_msg(User* user, int client_socket)
+void Server_msg::myinfo_msg(User* user)
 {
 	std::string msg = ":irc.42.com ";
 	msg += "004 ";
@@ -45,10 +45,10 @@ void Server_msg::myinfo_msg(User* user, int client_socket)
 	msg += " :0.02 Bla blabla ";
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::whois_msg(User* user, int client_socket)
+void Server_msg::whois_msg(User* user)
 {
 	std::string msg;
 	msg += "311 ";
@@ -58,21 +58,23 @@ void Server_msg::whois_msg(User* user, int client_socket)
 	msg += " : " + user->get_realname();
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::ping_msg(int client_socket)
+void Server_msg::ping_msg(User* user)
 {
 	std::string msg;
+	int client_socket = user->get_socket();
 	msg += "PING ";
 	msg += client_socket;
 	msg += "\r\n";
 	int msg_len = msg.length();
 	send(client_socket, msg.c_str(), msg_len, 0);
 }
-
-void Server_msg::pong_msg(User* user, int client_socket)
+ 
+void Server_msg::pong_msg(User* user)
 {
+	int client_socket = user->get_socket();
 	std::string msg = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost ";
 	msg += "PONG localhost " ;
 	msg += client_socket;
@@ -81,39 +83,40 @@ void Server_msg::pong_msg(User* user, int client_socket)
 	send(client_socket, msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::join_msg(User *user, int client_socket, std::string& channel, std::vector<User*>* users)
+void Server_msg::join_msg(User *user, Channel* channel)
 {
 	std::string msg;
-	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + channel ;
+	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + channel->get_name();
 	msg += "\r\n";
+
 /*	
-	msg += ":" + user->get_servername();
+	msg += ":" + user->get_servername()
 	msg += " 332 " + channel + " :yugioh";
 	msg += "\r\n";*/
 	
 	msg += ":" + user->get_servername();
-	msg += " 353 " + user->get_nickname() + " = " + channel + " :@";
-	for (std::vector<User *>::iterator it = users->begin(); it != users->end(); ++it)
+	msg += " 353 " + user->get_nickname() + " = " + channel->get_name() + " :@";
+	for (std::vector<User *>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
 	{
 		msg += (*it)->get_nickname();
-		if (it + 1 != users->end())
+		if (it + 1 != channel->get_users()->end())
 			msg += " ";
 	}
 	msg += "\r\n";
 
 	msg += ":" + user->get_servername();
-	msg += " 366 " + user->get_nickname() + " " + channel + " :End of NAMES list";
+	msg += " 366 " + user->get_nickname() + " " + channel->get_name() + " :End of NAMES list";
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::mode_msg(User* user, int client_socket, std::string& channel)
+void Server_msg::mode_msg(User* user, Channel* channel)
 {
 	std::string msg = ":" + user->get_servername();
-	msg += " 324 " + user->get_username() + " " + channel + " +" ;
+	msg += " 324 " + user->get_username() + " " + channel->get_name() + " +" ;
 	msg += "\r\n";
 	int msg_len = msg.length();
-	send(client_socket, msg.c_str(), msg_len, 0);
+	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 

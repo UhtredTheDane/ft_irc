@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/18 19:06:14 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:23:18 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,11 @@ void User::show_userinfo()
 User::~User()
 {
 	std::cout << "Destruction du User : " << nickname << std::endl;
+}
+
+int User::get_socket(void) const
+{
+	return (socket);
 }
 
 int User::get_isRegistered(void) const
@@ -69,6 +74,11 @@ std::string const & User::get_servername(void) const
 std::string const & User::get_identifier(void) const
 {
 	return(identifier);
+}
+
+void User::set_socket(int socket)
+{
+	this->socket = socket;
 }
 
 void User::set_hostname(std::string hostname)

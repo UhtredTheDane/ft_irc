@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/21 08:36:34 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:54:03 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include <signal.h>
 #include <string>
 #include <sstream>
-
 #include <stdexcept>
 
 extern bool close_serv;
@@ -63,7 +62,6 @@ void Server::check_connection()
 	if ((fd_client = accept(fd_socket, (struct sockaddr *) &(serv_addr), (socklen_t*)&addrlen)) != -1)
 	{
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
-		std::cout << "Une connexion" << std::endl;	
 		std::cout << "adding new client " << std::endl;
 		pollfd new_pollfd;
 		new_pollfd.events = POLLIN | POLLOUT;
@@ -77,12 +75,12 @@ void Server::check_connection()
 	}
 }
 
-void Server::reply(User *user, int client_socket)
+void Server::reply(User *user)
 {
-	msg.welcome_msg(user, client_socket);
-	msg.yourhost_msg(user, client_socket);
-	msg.created_msg(user, client_socket);
-	msg.myinfo_msg(user, client_socket);
+	msg.welcome_msg(user);
+	msg.yourhost_msg(user);
+	msg.created_msg(user);
+	msg.myinfo_msg(user);
 	//msg.whois_msg(user, client_socket);
 }
 
@@ -95,9 +93,9 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	std::cout << request << std::endl;
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
+	std::cout << "|" << request << "|" << std::endl;
 	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
 	{
-		std::cout << "test\n";
 		user->set_isRegistered(1);
 	}
 	else if(user->get_isRegistered() == 1)
@@ -119,14 +117,14 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_hostname(split_line[2]);
 				user->set_servername(split_line[3]);
 				user->set_realname(split_line[3]);
-				reply(user, client_socket);
+				user->set_socket(client_socket);
+				reply(user);
 				user->set_isRegistered(2);
-				user->socket = client_socket;
 		}
 	}
 	else if (!split_line[0].compare("PING"))
 	{
-		msg.pong_msg(user, client_socket);
+		msg.pong_msg(user);
 	}
 	else if (!split_line[0].compare("JOIN"))
 	{
@@ -135,18 +133,25 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			std::cout << user->get_username() << std::endl;
 			Channel* curent_chan = channels.at(split_line[1]);
 			curent_chan->add_user(user);
-			msg.join_msg(user, client_socket, split_line[1], curent_chan->get_users());
+			msg.join_msg(user, curent_chan);
 		}
 		catch (std::out_of_range& oor)
 		{
 			Channel* new_chan = new Channel(split_line[1], user);
 			channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
-			msg.join_msg(user, client_socket, split_line[1], new_chan->get_users());
+			msg.join_msg(user, new_chan);
 		}
 	}
 	else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 	{
-		msg.mode_msg(user, client_socket, split_line[1]);
+		try
+		{
+			Channel* target_chan = channels.at(split_line[1]);
+			msg.mode_msg(user, target_chan);
+		}
+		catch (std::out_of_range& oor)
+		{
+		}
 	}
 	else if (!split_line[0].compare("KICK"))
 	{
@@ -176,7 +181,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	{
 		try
 		{
-		Channel *curent_chan = channels.at(split_line[1]); 
+			Channel *curent_chan = channels.at(split_line[1]); 
 			Message msg(split_line[2], user);
 			curent_chan->add_message(&msg);
 			std::string c_msg;
@@ -186,12 +191,10 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				{
 				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_theme()+ " " + msg.get_msg() + "\r\n";
 				std::cout << c_msg << std::endl;
-				send((*it)->socket, c_msg.c_str(), c_msg.length(), 0);
+				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
 				}
 			it++;
 			}
-//			send(client_socket, msg.get_msg().c_str(), msg.get_msg().length(), 0);
-
 		}
 		catch (std::out_of_range& oor)
 		{
