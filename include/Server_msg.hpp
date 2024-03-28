@@ -19,6 +19,7 @@ class Server_msg{
 			void pong_msg(User* user);
 			void join_msg(User *user, Channel* channel);
 			void mode_msg(User* user, Channel* channel);
+			void leave_msg(User* user, Channel* channel);
 	private:
 };
 

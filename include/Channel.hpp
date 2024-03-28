@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 16:17:28 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/21 08:39:23 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/28 01:30:19 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Channel
 		Channel(std::string& theme, User* admin_user);
 		~Channel(void);
 		void add_user(User *user);
+		void delete_user(User* to_delete);
 		void add_message(Message *message);
 		std::string get_theme( void );
 		std::string get_name( void );

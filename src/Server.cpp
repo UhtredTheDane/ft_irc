@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/26 17:27:21 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/28 02:07:30 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,9 +138,19 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		try
 		{	
 			std::cout << user->get_username() << std::endl;
-			Channel* curent_chan = channels.at(split_line[1]);
-			curent_chan->add_user(user);
-			msg.join_msg(user, curent_chan);
+			Channel* current_chan = channels.at(split_line[1]);
+			current_chan->add_user(user);
+			msg.join_msg(user, current_chan);
+
+			std::string join_msg;
+			join_msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + current_chan->get_name();
+			join_msg += "\r\n";
+			for (std::vector<User*>::iterator it = current_chan->get_users()->begin(); it != current_chan->get_users()->end(); ++it)
+			{
+				if (user != *it)
+					send((*it)->get_socket(), join_msg.c_str(), join_msg.length(), 0);
+			}
+
 		}
 		catch (std::out_of_range& oor)
 		{
@@ -184,20 +194,19 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			it++;
 		}
 	}
-
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
 		try
 		{
-			Channel *curent_chan = channels.at(split_line[1]); 
+			Channel *current_chan = channels.at(split_line[1]); 
 			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
+			current_chan->add_message(&msg);
 			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+			for (std::vector<User*>::iterator it = current_chan->get_users()->begin(); it != current_chan->get_users()->end();)
 			{
 				if(*it != user)
 				{
-				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
+				c_msg = ":" + user->get_nickname() + " PRIVMSG " + current_chan->get_name()+ " " + msg.get_msg() + "\r\n";
 				std::cout << c_msg << std::endl;
 				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
 				}
@@ -208,6 +217,21 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		{
 		}
 	}
+	else if (!split_line[0].compare("PART"))
+	{
+		
+		std::cout << "|" << request << "|" << std::endl;
+		try
+		{
+			Channel *current_chan = channels.at(split_line[1]); 
+			msg.leave_msg(user, current_chan);
+			current_chan->delete_user(user);
+		}
+		catch (std::out_of_range& oor)
+		{
+		}
+	}
+
 	else
 		std::cout << "|" << request << "|" << std::endl;
 }
