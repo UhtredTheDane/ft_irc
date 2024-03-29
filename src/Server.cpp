@@ -125,6 +125,8 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_servername(split_line[3]);
 				user->set_realname(split_line[3]);
 				user->set_socket(client_socket);
+				user->set_identifier();
+				// user.show_userinfo(user);
 				reply(user);
 				user->set_isRegistered(2);
 		}
@@ -171,11 +173,10 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				std::string k_msg;
 				for (std::vector<User*>::iterator it2 = curent_chan->get_users()->begin(); it2 != curent_chan->get_users()->end();)
 					{
-						if((*it2)->get_nickname() == split_line[3])
+						if((*it2)->get_nickname() == split_line[2])
 							{
-								k_msg = ":" + user->get_nickname() + " KICK " + curent_chan->get_name() + "\r\n";
-								std::cout << "je suis dans kick " << k_msg << std::endl;
-								send((*it)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
+								k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
+								send((*it2)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
 								break;
 							}
 						it2++;
@@ -187,8 +188,11 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
+
 		try
 		{
+			if(split_line[1][0] == '#')
+			{
 			Channel *curent_chan = channels.at(split_line[1]); 
 			Message msg(split_line[2], user);
 			curent_chan->add_message(&msg);
@@ -197,11 +201,27 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			{
 				if(*it != user)
 				{
-				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
+				c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
 				std::cout << c_msg << std::endl;
 				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
 				}
 			it++;
+			}
+			}
+			else
+			{
+
+			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
+			{
+				if (it->second->get_nickname() == split_line[1])
+				{
+					std::string p_msg;
+					p_msg = ":" + user->get_identifier() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
+					std::cout << p_msg << std::endl;
+					send(it->first, p_msg.c_str(), p_msg.length(), 0);
+					break;
+				}
+			}
 			}
 		}
 		catch (std::out_of_range& oor)
