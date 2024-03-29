@@ -21,6 +21,8 @@ class Server_msg{
 			void mode_msg(User* user, Channel* channel);
 			void leave_msg(User* user, Channel* channel);
 	private:
+		std::vector<std::string> request_database = {"PING", "JOIN", "MODE", "KICK", "PRIVMSG", "PART"};
+		std::vector<void (Server::*)> request_ptr;
 };
 
 

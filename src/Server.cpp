@@ -131,7 +131,11 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_isRegistered(2);
 		}
 	}
-	else if (!split_line[0].compare("PING"))
+
+	
+
+
+	if (!split_line[0].compare("PING"))
 	{
 		msg.pong_msg(user);
 	}
