@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 16:14:33 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/21 08:45:08 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/28 01:31:48 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,18 @@ Channel::~Channel(void)
 void Channel::add_user(User *user)
 {
 	users.push_back(user);
+}
+
+void Channel::delete_user(User* to_delete)
+{
+	for (std::vector<User*>::iterator it = users.begin(); it != users.end(); ++it)
+	{
+		if (to_delete->get_socket() == (*it)->get_socket())
+		{
+			users.erase(it);
+			break;
+		}
+	}
 }
 
 void Channel::add_message(Message* msg)

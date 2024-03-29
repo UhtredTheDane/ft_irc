@@ -120,3 +120,15 @@ void Server_msg::mode_msg(User* user, Channel* channel)
 	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
+void Server_msg::leave_msg(User* user, Channel* channel)
+{
+	std::string msg = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost PART ";
+	msg += channel->get_name();
+	std::string str = channel->get_name();
+	str[0] = ':';
+	msg += " " + str + "\r\n";
+	int msg_len = msg.length();
+	
+	for (std::vector<User*>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
+		send((*it)->get_socket(), msg.c_str(), msg_len, 0);
+}
