@@ -14,7 +14,6 @@ Server_msg::Server_msg()
 void Server_msg::processing_request(int client_socket, User* user, std::string& request)
 {
 	std::stringstream coco(request);
-	std::vector<std::string> split_line;
 	std::string word;
 
 	while (getline(coco, word, ' '))
@@ -54,12 +53,12 @@ void Server_msg::processing_request(int client_socket, User* user, std::string& 
 
 	for (int i = 0; i < 6; ++i)
 	{
-		if (!split_line[0].compare(request_type[i])
+		if (!split_line[0].compare(request_types[i]))
 		{
-			*requests_ptr[i](user);
+			(this->*requests_ptr[i])(user);
 		}
 	}
-	
+	split_line.clear();
 }
 
 std::string Server_msg::get_request_type(size_t i)

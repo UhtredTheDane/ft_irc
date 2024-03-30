@@ -6,6 +6,7 @@
 # include "User.hpp"
 # include "Channel.hpp"
 # include <map>
+# include <vector>
 
 class User;
 
@@ -38,6 +39,7 @@ class Server_msg{
 		std::string request_types[6];
 		void (Server_msg::*requests_ptr[6])(User*);
 		std::map<std::string, Channel*> channels;
+		std::vector<std::string> split_line;
 };
 
 
