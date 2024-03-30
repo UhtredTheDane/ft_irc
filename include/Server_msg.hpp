@@ -10,6 +10,17 @@ class User;
 class Server_msg{
 	public:
 
+
+			void part_request(User* user);
+			void privmsg_request(User* user);
+			void kick_request(User* user);
+			void mode_request(User* user);
+			void join_request(User* user);
+			void pong_request(User* user);
+
+
+
+
 			void welcome_msg(User* user);
 			void yourhost_msg(User* user);
 			void created_msg(User* user);
@@ -21,8 +32,8 @@ class Server_msg{
 			void mode_msg(User* user, Channel* channel);
 			void leave_msg(User* user, Channel* channel);
 	private:
-		std::vector<std::string> request_database = {"PING", "JOIN", "MODE", "KICK", "PRIVMSG", "PART"};
-		std::vector<void (Server::*)> request_ptr;
+		std::string request_types[6];
+		void (Server_msg::*requests_ptr[6])(User*);
 };
 
 

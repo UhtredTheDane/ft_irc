@@ -131,9 +131,16 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_isRegistered(2);
 		}
 	}
+/*
+	void (*res_requests)(User*);
 
-	
-
+	for (int i = 0; i < 6; ++i)
+	{
+		if (!split_line[0].compare(request_types[i]))
+		{
+			res_requests = requests_ptr[i];
+		}
+	}*/
 
 	if (!split_line[0].compare("PING"))
 	{
@@ -178,7 +185,6 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	}
 	else if (!split_line[0].compare("KICK"))
 	{
-		std::cout << request << std::endl;
 		Channel *curent_chan = channels.at(split_line[1]);
 		for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 		{
@@ -199,7 +205,6 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			it++;
 		}
 	}
-
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
 
@@ -245,7 +250,6 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	else if (!split_line[0].compare("PART"))
 	{
 		
-		std::cout << "|" << request << "|" << std::endl;
 		try
 		{
 			Channel *current_chan = channels.at(split_line[1]); 
