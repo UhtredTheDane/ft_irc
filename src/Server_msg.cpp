@@ -44,14 +44,17 @@ void Server_msg::processing_request(int client_socket, User* user, std::string& 
 				user->set_socket(client_socket);
 				user->set_identifier();
 				// user.show_userinfo(user);
-				reply(user);
+				welcome_msg(user);
+				yourhost_msg(user);
+				created_msg(user);
+				myinfo_msg(user);
 				user->set_isRegistered(2);
 		}
 	}
 
 	for (int i = 0; i < 6; ++i)
 	{
-		if (!split_line[0].compare(msg.get_request_type(i)))
+		if (!split_line[0].compare(request_type[i])
 		{
 			*requests_ptr[i](user);
 		}

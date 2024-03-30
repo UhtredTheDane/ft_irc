@@ -50,7 +50,6 @@ class Server
 		struct sockaddr_in serv_addr;
 		std::vector<pollfd> *poll_fds;
 		std::map<int, User*> users_map;
-		std::map<std::string, Channel*> channels;
 };
 
 #endif

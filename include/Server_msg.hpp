@@ -5,6 +5,8 @@
 # include <sys/socket.h>
 # include "User.hpp"
 # include "Channel.hpp"
+# include <map>
+
 class User;
 
 class Server_msg{
@@ -22,7 +24,6 @@ class Server_msg{
 
 
 
-
 			void welcome_msg(User* user);
 			void yourhost_msg(User* user);
 			void created_msg(User* user);
@@ -36,6 +37,7 @@ class Server_msg{
 	private:
 		std::string request_types[6];
 		void (Server_msg::*requests_ptr[6])(User*);
+		std::map<std::string, Channel*> channels;
 };
 
 

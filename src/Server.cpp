@@ -75,15 +75,6 @@ void Server::check_connection()
 	}
 }
 
-void Server::reply(User *user)
-{
-	msg.welcome_msg(user);
-	msg.yourhost_msg(user);
-	msg.created_msg(user);
-	msg.myinfo_msg(user);
-	//msg.whois_msg(user, client_socket);
-}
-
 bool Server::is_on_serv(std::string& nickname)
 {
 	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
