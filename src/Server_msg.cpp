@@ -11,6 +11,64 @@ Server_msg::Server_msg()
 	requests_ptr[5] = &Server_msg::part_request;
 }
 
+void Server_msg::processing_request(int client_socket, User* user, std::string& request)
+{
+	std::stringstream coco(request);
+	std::vector<std::string> split_line;
+	std::string word;
+
+	while (getline(coco, word, ' '))
+		split_line.push_back(word);
+	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
+	{
+		user->set_isRegistered(1);
+	}
+	else if(user->get_isRegistered() == 1)
+	{
+		if (!split_line[0].compare("PASS"))
+		{
+			std::cout << "PASS valide\n";
+		}
+		else if (!split_line[0].compare("NICK"))
+		{
+			while (is_on_serv(split_line[1]))
+				split_line[1] += "_";
+			user->set_nickname(split_line[1]);
+		}
+		else if (!split_line[0].compare("USER") && !user->get_nickname().empty())
+		{
+				user->set_username(split_line[1]);
+				user->set_hostname(split_line[2]);
+				user->set_servername(split_line[3]);
+				user->set_realname(split_line[3]);
+				user->set_socket(client_socket);
+				user->set_identifier();
+				// user.show_userinfo(user);
+				reply(user);
+				user->set_isRegistered(2);
+		}
+	}
+
+	for (int i = 0; i < 6; ++i)
+	{
+		if (!split_line[0].compare(msg.get_request_type(i)))
+		{
+			*requests_ptr[i](user);
+		}
+	}
+	
+}
+
+std::string Server_msg::get_request_type(size_t i)
+{
+	return (request_types[i]);
+}
+
+std::string Server_msg::get_request_ptr(size_t i)
+{
+	return (request_types[i]);
+}
+
 void Server_msg::pong_request(User* user)
 {
 	pong_msg(user);
@@ -23,7 +81,7 @@ void Server_msg::join_request(User* user)
 			std::cout << user->get_username() << std::endl;
 			Channel* current_chan = channels.at(split_line[1]);
 			current_chan->add_user(user);
-			msg.join_msg(user, current_chan);
+			join_msg(user, current_chan);
 
 			std::string join_msg;
 			join_msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + current_chan->get_name();
@@ -39,7 +97,7 @@ void Server_msg::join_request(User* user)
 		{
 			Channel* new_chan = new Channel(split_line[1], user);
 			channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
-			msg.join_msg(user, new_chan);
+			join_msg(user, new_chan);
 		}
 }
 
@@ -48,7 +106,7 @@ void Server_msg::mode_request(User* user)
 		try
 		{
 			Channel* target_chan = channels.at(split_line[1]);
-			msg.mode_msg(user, target_chan);
+			mode_msg(user, target_chan);
 		}
 		catch (std::out_of_range& oor)
 		{
@@ -125,7 +183,7 @@ void Server_msg::part_request(User* user)
 		try
 		{
 			Channel *current_chan = channels.at(split_line[1]); 
-			msg.leave_msg(user, current_chan);
+			leave_msg(user, current_chan);
 			current_chan->delete_user(user);
 		}
 		catch (std::out_of_range& oor)

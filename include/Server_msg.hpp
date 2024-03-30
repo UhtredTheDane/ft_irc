@@ -10,7 +10,9 @@ class User;
 class Server_msg{
 	public:
 
-
+			std::string get_request_type(size_t i);
+			std::string get_request_ptr(size_t i);
+			void processing_request(int client_socket, User* user, std::string& request);
 			void part_request(User* user);
 			void privmsg_request(User* user);
 			void kick_request(User* user);

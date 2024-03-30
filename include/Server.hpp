@@ -40,7 +40,6 @@ class Server
 		void check_connection();
 		void check_incoming_package();
 		void request_handler(int client_socket, std::string &request);
-		void connexion(int client_socket, User* user, std::string& request);
 		bool is_on_serv(std::string& nickname);
 		void reply(User *user);
 		
