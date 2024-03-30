@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/30 00:29:36 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/03/30 02:41:39 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,12 @@ Server::Server(int port, std::string password)
 	bzero(&poll_fds->at(0), sizeof(pollfd));
 	poll_fds->at(0).fd = fd_socket;
 	poll_fds->at(0).events = POLLIN;
-	request_types = {"PING", "JOIN", "MODE", "KICK", "PRIVMSG", "PART"};
+	request_types[0] = "PING";
+	request_types[1] = "JOIN";
+	request_types[2] = "MODE";
+	request_types[3] = "KICK"; 
+	request_types[4] = "PRIVMSG";
+	request_types[5] = "PART";
 	requests_ptr[0] = &Server::pong_request;
 	requests_ptr[1] = &Server::join_request;
 	requests_ptr[2] = &Server::mode_request;
@@ -204,7 +209,7 @@ void Server::part_request(User* user)
 		}
 }
 
-void Server_msg::processing_request(int client_socket, User* user, std::string& request)
+void Server::processing_request(int client_socket, User* user, std::string& request)
 {
 	std::stringstream coco(request);
 	std::string word;
@@ -236,10 +241,10 @@ void Server_msg::processing_request(int client_socket, User* user, std::string& 
 				user->set_socket(client_socket);
 				user->set_identifier();
 				// user.show_userinfo(user);
-				welcome_msg(user);
-				yourhost_msg(user);
-				created_msg(user);
-				myinfo_msg(user);
+				msg.welcome_msg(user);
+				msg.yourhost_msg(user);
+				msg.created_msg(user);
+				msg.myinfo_msg(user);
 				user->set_isRegistered(2);
 		}
 	}
@@ -278,7 +283,7 @@ void Server::request_handler(int client_socket, std::string& request)
 		while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)
 		{
 			token = user->buffer.substr(0, delim_pos);
-			msg.processing_request(client_socket, user, token);
+			processing_request(client_socket, user, token);
 			user->buffer.erase(0, delim_pos + delimiter.length());
 		}
 	}
