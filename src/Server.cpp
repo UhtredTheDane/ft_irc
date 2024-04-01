@@ -149,6 +149,20 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 	{
 		msg.mode_msg(user, client_socket, split_line[1]);
+		std::cout << "Ze found MODE in message" << std::endl;	
+		if(channels.find(split_line[1]) == channels.end())
+		{
+			std::cout << "ERROR CHANNEL NOT FOUND" << std::endl;
+		}
+		else
+		{
+			if(channels[split_line[1]])
+				channels[split_line[1]]->update_mod(user,split_line);
+			//else
+			//{
+
+			//}
+		}
 	}
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
@@ -178,23 +192,6 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	else if(!split_line[0].compare("INVITE"))
 	{
 		
-	}
-	else if(!split_line[0].compare("MODE"))
-	{
-		if(channels.find(split_line[1]) == channels.end())
-		{
-			//ERROR CHANNEL NOT FOUND
-		}
-		else
-		{
-			/*
-			if(channels[split_line[1]])
-				//channels[split_line[1]]->update_mod(user,split_line);
-			else
-			{
-				//channel does not exist 
-			}*/
-		}
 	}
 	else
 		std::cout << "|" << request << "|" << std::endl;

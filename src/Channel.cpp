@@ -83,45 +83,52 @@ std::string Channel::getName()
 
 void Channel::update_mod(User *user, std::vector<std::string> line)
 {
+	
 	std::string options;
 	int param = -1;
-	options = line[2];
-	std::string compare = "ikolt";
-
-	if(options.size() > 2)
+	
+	std::cout << "Updating mode of a channel" << std::endl;
+	std::string compare = " ikolt ";
+	if(line.size() >= 3) 
+		options = line[2];
+	if(options.size() >= 2)
 	{
 		if (line.size() >= 4)
 		{
 			param = 3;
 		}
-		std::string::iterator current = options.begin()++;
+		std::string::iterator current = options.begin();
+		std::cout << options << std::endl;
+
 		if(options[0] == '-')
 		{
+			current++;
 			while (current != options.end())
 			{
-				if(compare.find_first_of(*current))
+				std::cout << *current << std::endl;
+				if(compare.find(*current))
 				{
 					switch (*current)
 					{
 					case 'i':
-						this->remove_mod(user,Chanmod::i);
+						this->remove_mod(user,1);
 						std::cout << "Removing invite only restriction" << std::endl;
 						break;
 					case 'k':
 						this->password = "";
-						this->remove_mod(user,Chanmod::k);
+						this->remove_mod(user,2);
 						std::cout << "Removing password restriction" << std::endl;
 						break;
 					case 'o':
-						this->take_privilege();
+						this->take_privilege(user);
 						std::cout << "Removing user privilege" << std::endl;
 						break;
 					case 'l':
-						this->remove_mod(user,Chanmod::l);
+						this->remove_mod(user,4);
 						std::cout << "Removing user limit restriction" << std::endl;
 						break;
 					case 't':
-						this->remove_mod(user,Chanmod::t);
+						this->remove_mod(user,5);
 						std::cout << "Removing topic restriction" << std::endl;
 						break;
 					}
@@ -132,21 +139,25 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 		}
 		else if(options[0] == '+')
 		{
+			current++;
 			while (current != options.end())
 			{
-				if(compare.find_first_of(*current))
+				
+				std::cout << compare.find_first_of('i') << std::endl;
+				if(compare.find(*current))
 				{
+					
 					switch (*current)
 					{
 					case 'i':
-						this->set_mod(user,Chanmod::i);
+						this->set_mod(user,1);
 						std::cout << "Set invite only restriction" << std::endl;
 						break;
 					case 'k':
 						if(line[param].c_str())
 						{
 							this->password = line[param];
-							this->set_mod(user,Chanmod::k);
+							this->set_mod(user,2);
 							param ++;
 							std::cout << "Set password restriction" << std::endl;
 						}
@@ -154,7 +165,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 					case 'o':
 						if(line[param].c_str())
 						{
-							this->give_privilege();
+							this->give_privilege(user);
 							param ++;
 							std::cout << "Set privilege to a user" << std::endl;
 						}
@@ -163,13 +174,13 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 						if(line[param].c_str())
 						{
 							this->limit_user = std::atoi(line[param].c_str());
-							this->set_mod(user,Chanmod::l);
+							this->set_mod(user,4);
 							param ++;
 							std::cout << "Set user limit restriction" << std::endl;
 						}
 						break;
 					case 't':
-						this->set_mod(user,Chanmod::t);
+						this->set_mod(user,5);
 						std::cout << "Removing topic restriction" << std::endl;
 						break;
 					}
@@ -182,4 +193,14 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 			// pas de plus ou de moins 
 		}
 	}
+}
+
+void Channel::give_privilege(User *user)
+{
+	std::cout << "giving privilege to " << user->get_nickname() << std::endl;
+}
+
+void Channel::take_privilege(User *user)
+{
+	std::cout << "taking privilege to " << user->get_nickname() << std::endl;
 }

@@ -17,10 +17,11 @@
 # include "User.hpp"
 # include "Message.hpp"
 
-enum Chanmod { i = 1 , t = 2 , k = 3 , o = 4 , l = 5};
 
 class Channel
 {
+	enum Chanmod { i = 1 , k = 2 , o = 3 , l = 4 , t = 5};
+
 	private:
 		//mod a rajouter
 		std::string theme;
@@ -40,8 +41,8 @@ class Channel
 		std::string get_theme( void );
 		std::vector<User*>* get_users(void);
 		void update_mod(User *user, std::vector<std::string> line);
-		void give_privilege();
-		void take_privilege();
+		void give_privilege(User *user);
+		void take_privilege(User *user);
 		void remove_mod(User *user, int modif);
 		void set_mod(User *user, int modif );
 		std::string getName();
