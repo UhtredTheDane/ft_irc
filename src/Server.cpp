@@ -187,7 +187,13 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		}
 		else
 		{
-			channels[split_line[1]]->update_mod(user,split_line);
+			/*
+			if(channels[split_line[1]])
+				//channels[split_line[1]]->update_mod(user,split_line);
+			else
+			{
+				//channel does not exist 
+			}*/
 		}
 	}
 	else
