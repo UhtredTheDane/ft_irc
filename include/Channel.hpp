@@ -41,10 +41,12 @@ class Channel
 		std::string get_theme( void );
 		std::vector<User*>* get_users(void);
 		void update_mod(User *user, std::vector<std::string> line);
-		void give_privilege(User *user);
-		void take_privilege(User *user);
-		void remove_mod(User *user, int modif);
-		void set_mod(User *user, int modif );
+		int give_privilege(User *user,std::string name);
+		int take_privilege(User *user,std::string name);
+		int remove_mod(User *user, int modif);
+		int set_mod(User *user, int modif );
+		User *findUserByName(std::vector<User *> v,std::string name);
 		std::string getName();
+		int IsMod(User *user);
 };
 #endif

@@ -44,7 +44,7 @@ std::vector<User*>* Channel::get_users(void)
 {
 	return (&users);
 }
-void Channel::remove_mod(User *user, int modif)
+int Channel::remove_mod(User *user, int modif)
 {
 	std::vector<User *>::iterator it;
 	it = std::find(admin_users.begin(),admin_users.end(),user);
@@ -53,14 +53,16 @@ void Channel::remove_mod(User *user, int modif)
 		if(mask & (1 << modif))
 		{
 			mask = mask - (1 << modif);
+			return 0;
 		}
 	}
 	else
 	{
 		//gestion le user existe pas ou n'est pas mod
 	}
+	return 1;
 }
-void Channel::set_mod(User *user, int modif)
+int Channel::set_mod(User *user, int modif)
 {
 	std::vector<User *>::iterator it;
 	it = std::find(admin_users.begin(),admin_users.end(),user);
@@ -69,11 +71,15 @@ void Channel::set_mod(User *user, int modif)
 		if(!(mask & (1 << modif)))
 		{
 			mask = mask + (1 << modif);
-		} 
+			return 0;
+		}
+		else
+			return 1;
 	}
 	else
 	{
 		//gestion le user existe pas ou n'est pas mod
+		return 1;
 	}
 }
 std::string Channel::getName()
@@ -111,25 +117,55 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 					switch (*current)
 					{
 					case 'i':
-						this->remove_mod(user,1);
-						std::cout << "Removing invite only restriction" << std::endl;
+						if(!this->remove_mod(user,1))
+						{
+							std::cout << "Removing invite only restriction" << std::endl;
+						}	
+						else 
+						{
+							//user a pas les droits ou le mod est deja off
+						}
 						break;
 					case 'k':
-						this->password = "";
-						this->remove_mod(user,2);
-						std::cout << "Removing password restriction" << std::endl;
+						
+						if(!this->remove_mod(user,2))
+						{
+							this->password = "";
+							std::cout << "Removing password restriction" << std::endl;
+						}
+						else
+						{
+							//user a pas les droits ou le mod est deja off
+						}
+						
 						break;
 					case 'o':
-						this->take_privilege(user);
-						std::cout << "Removing user privilege" << std::endl;
+						if(line[param].c_str() && !this->take_privilege(user ,line[param]))
+						{
+							std::cout << "Removing user privilege" << std::endl;
+							param++;
+						}
+						else
+						{
+							//impossible to remove privilege
+						} 
 						break;
 					case 'l':
-						this->remove_mod(user,4);
-						std::cout << "Removing user limit restriction" << std::endl;
+						if(!this->remove_mod(user,4))
+						{
+							std::cout << "Removing user limit restriction" << std::endl;
+						}
+						else
+						{
+							//user n'a pas les droits ou le mod est deja off
+						}
 						break;
 					case 't':
-						this->remove_mod(user,5);
-						std::cout << "Removing topic restriction" << std::endl;
+						
+						if(!this->remove_mod(user,5))
+						{
+							std::cout << "Removing topic restriction" << std::endl;
+						}
 						break;
 					}
 				}
@@ -165,7 +201,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 					case 'o':
 						if(line[param].c_str())
 						{
-							this->give_privilege(user);
+							this->give_privilege(user,line[param]);
 							param ++;
 							std::cout << "Set privilege to a user" << std::endl;
 						}
@@ -195,12 +231,72 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 	}
 }
 
-void Channel::give_privilege(User *user)
+int  Channel::give_privilege(User *user,std::string name)
 {
-	std::cout << "giving privilege to " << user->get_nickname() << std::endl;
+	User *u;
+
+	u = findUserByName(users,name);
+	std::cout << "On essaye de donner des droits a : "<< name << '"' << std::endl;
+	if(!u)
+		return(1);
+	if(findUserByName(admin_users,name))
+	{
+		std::cout << user->get_nickname() << " is already mod" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "giving privilege to " << u->get_nickname() << std::endl;
+		this->admin_users.push_back(u);
+	}
+	for(std::vector<User *>::iterator it  = admin_users.begin(); it != admin_users.end();it ++)
+	{
+			std::cout << (*it)->get_nickname() << std::endl;
+	}
+	return 0;
 }
 
-void Channel::take_privilege(User *user)
+int Channel::take_privilege(User *user,std::string name)
 {
-	std::cout << "taking privilege to " << user->get_nickname() << std::endl;
+	User *u;
+
+	u = findUserByName(admin_users,name);
+	if(admin_users.size() > 1)
+	{
+		for(std::vector<User *>::iterator it  = admin_users.begin(); it != admin_users.end();it ++)
+		{
+			if(*it == u)
+			{
+				std::cout << "taking privilege to " << user->get_nickname() << std::endl;
+				it = admin_users.erase(it);
+				return 0;
+			}
+		}
+		std::cout << u->get_nickname() << " is not a moderator of a channel" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "You tried to erase the last admin of a channel" << std::endl;
+		return 1;
+	}
+}
+User *Channel::findUserByName(std::vector<User *> v,std::string name)
+{
+	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
+	{
+			if((*it)->get_nickname() == name)
+			{
+				return *it;
+			}
+	}
+	return(NULL);
+}
+int Channel::IsMod(User *user)
+{
+	std::vector<User *>::iterator it;
+	it = std::find(admin_users.begin(),admin_users.end(),user);
+	if(it != admin_users.end())
+		return 1;
+	return 0;
 }
