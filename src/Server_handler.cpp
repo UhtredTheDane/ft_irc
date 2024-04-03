@@ -1,22 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_handler.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
+/*   Updated: 2024/04/03 17:59:24 by agengemb         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+# include "../include/Server_handler.hpp"
 
 Server_handler::Server_handler(void)
 {
-    msg = Server_msg();
+    	msg = Server_msg();
 	request_types[0] = "CAP LS";
 	request_types[1] = "PASS";
 	request_types[2] = "NICK";
 	request_types[3] = "USER";
-    request_types[4] = "PING";
+    	request_types[4] = "PING";
 	request_types[5] = "JOIN";
 	request_types[6] = "MODE";
 	request_types[7] = "KICK"; 
 	request_types[8] = "PRIVMSG";
 	request_types[9] = "PART";
 
-	requests_ptr[0] = &Server_handler::pong_request;
-	requests_ptr[1] = &Server_handler::join_request;
-	requests_ptr[2] = &Server_handler::mode_request;
-	requests_ptr[3] = &Server_handler::kick_request;
+	requests_ptr[0] = &Server_handler::capls_request;
+	requests_ptr[1] = &Server_handler::pass_request;
+	requests_ptr[2] = &Server_handler::nick_request;
+	requests_ptr[3] = &Server_handler::user_request;
 	requests_ptr[4] = &Server_handler::pong_request;
 	requests_ptr[5] = &Server_handler::join_request;
 	requests_ptr[6] = &Server_handler::mode_request;
@@ -37,9 +50,14 @@ std::map<int, User*> Server_handler::get_users(void)
 
 User* Server_handler::add_user(int fd_client)
 {
-	User* new_user = new User();
-	users_map.insert(std::pair<int, User*>(fd_client, user));
-	return (new_chan);
+	User* new_user = new User(fd_client);
+	users_map.insert(std::pair<int, User*>(fd_client, new_user));
+	return (new_user);
+}
+
+void Server_handler::delete_user(int fd_client)
+{
+	users_map.erase(fd_client);
 }
 
 Channel* Server_handler::add_channel(std::string name, User* user)
@@ -51,28 +69,34 @@ Channel* Server_handler::add_channel(std::string name, User* user)
 void Server_handler::capls_request(User* user)
 {
 	if (user->get_isRegistered() == 0)
-		user->set_isRegistered(1);
-}
-
-void Server_handler::pass_request(User* user)
-{
-	if(user->get_isRegistered() == 1)
 	{
-		std::cout << "PASS valide\n";
+		std::cout << "Salut\n";
+		user->set_isRegistered(1);
 	}
 }
 
 void Server_handler::pass_request(User* user)
 {
+	std::cout << user->get_isRegistered() << std::endl;
 	if(user->get_isRegistered() == 1)
 	{
+		std::cout << "toto\n";
+		std::cout << "PASS valide\n";
+	}
+}
+
+void Server_handler::nick_request(User* user)
+{
+	if(user->get_isRegistered() == 1)
+	{
+		std::cout << "coco\n";
 		while (is_on_serv(split_line[1]))
 				split_line[1] += "_";
 			user->set_nickname(split_line[1]);
 	}
 }
 
-void Server_handler::pass_request(User* user)
+void Server_handler::user_request(User* user)
 {
 	if(user->get_isRegistered() == 1)
 	{
@@ -80,9 +104,9 @@ void Server_handler::pass_request(User* user)
 		user->set_hostname(split_line[2]);
 		user->set_servername(split_line[3]);
 		user->set_realname(split_line[3]);
-		user->set_socket(client_socket);
 		user->set_identifier();
 		// user.show_userinfo(user);
+		std::cout << "popo\n";
 		msg.welcome_msg(user);
 		msg.yourhost_msg(user);
 		msg.created_msg(user);
@@ -117,7 +141,7 @@ void Server_handler::join_request(User* user)
 		}
 		catch (std::out_of_range& oor)
 		{
-			msg.join_msg(user, add_channel(split_line[1]));
+			msg.join_msg(user, add_channel(split_line[1], user));
 		}
 }
 
@@ -211,21 +235,19 @@ void Server_handler::part_request(User* user)
 		}
 }
 
-void Server_handler::processing_request(int client_socket, User* user, std::string& request)
+void Server_handler::processing_request(User* user, std::string& request)
 {
 	std::stringstream coco(request);
 	std::string word;
 
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-
-	
-
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
-		if (!split_line[0].compare(request_types[i]))
+		if (!request.compare(request_types[i]))
 		{
 			(this->*requests_ptr[i])(user);
+			break;
 		}
 	}
 	split_line.clear();
@@ -233,11 +255,17 @@ void Server_handler::processing_request(int client_socket, User* user, std::stri
 
 bool Server_handler::is_on_serv(std::string& nickname)
 {
+	try
+	{
     std::map<int, User*> users_map = get_users();
 	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 	{
 		if (it->second->get_nickname() == nickname)
 			return (true);
+	}
+	}
+	catch (std::out_of_range& oor)
+	{
 	}
 	return (false);
 }
@@ -250,15 +278,18 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	std::string token;
 	size_t delim_pos;
 
-    std::map<int, User*> users_map = get_users();
-	user = users_map.at(client_socket);
-	if (request.find(delimiter, 0) != std::string::npos)
+    	std::map<int, User*> users_map = get_users();
+	try
 	{
+		user = users_map.at(client_socket);
+		if (request.find(delimiter, 0) != std::string::npos)
+		{
 		user->buffer += request;
 		while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)
 		{
 			token = user->buffer.substr(0, delim_pos);
-			processing_request(client_socket, user, token);
+			std::cout << token << std::endl;
+			processing_request(user, token);
 			user->buffer.erase(0, delim_pos + delimiter.length());
 		}
 	}
@@ -266,4 +297,9 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	{
 		user->buffer += request;
 	}
+	}
+	catch(std::out_of_range& oor)
+	{
+	}
+
 }

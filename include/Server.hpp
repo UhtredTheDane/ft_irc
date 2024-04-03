@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/03 15:30:10 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:39:41 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,7 @@
 # include <netinet/in.h>
 # include <poll.h>
 # include <unistd.h>
-# include <fcntl.h>=
-
-class Server_handler;
+# include <fcntl.h>
 
 class Server
 {

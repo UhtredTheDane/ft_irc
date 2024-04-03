@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/03 15:39:48 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:37:57 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void Server::check_connection()
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
 		std::cout << "adding new client " << std::endl;
 		pollfd new_pollfd;
+		bzero(&new_pollfd, sizeof(pollfd));
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;	
 		poll_fds->push_back(new_pollfd);
@@ -79,8 +80,8 @@ void Server::check_incoming_package()
 {
 	char buffer[1024];
 	int bytes_nb;
-
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();)
+	bzero(buffer, 1024);
+	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();++it)
 	{
 		if (it->fd != fd_socket && it->revents & POLLIN)
 		{
@@ -90,7 +91,7 @@ void Server::check_incoming_package()
 				{
 					std::cout << "a user leaved the server" << std::endl;
 					close(it->fd);
-					users_map.erase(it->fd);
+					handler.delete_user(it->fd);
 					it = poll_fds->erase(it);
 					break;
 				}
@@ -99,12 +100,9 @@ void Server::check_incoming_package()
 					std::string str_buffer(buffer);
 					handler.request_handler(it->fd, str_buffer);
 					bzero(buffer, 1024);
-					++it;
 				}
 			}
 		}
-		else
-			++it;		
 	}
 }
 
