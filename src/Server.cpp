@@ -55,23 +55,6 @@ Server::~Server(void)
 	close(fd_socket);
 }
 
-std::map<std::string, Channel*> Server::get_channels(void)
-{
-	return (channels);
-}
-
-std::map<int, User*> Server::get_users(void)
-{
-	return (users_map);
-}
-
-Channel* Server::add_channel(std::string name, User* user)
-{
-	Channel* new_chan = new Channel(name, user);
-	channels.insert(std::pair<std::string, Channel*>(name, new_chan));
-	return (new_chan);
-}
-
 void Server::check_connection()
 {
 	int fd_client;
@@ -84,7 +67,7 @@ void Server::check_connection()
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;	
 		poll_fds->push_back(new_pollfd);
-		users_map.insert(std::pair<int, User*>(fd_client, new User()));
+		handler.add_user(fd_client);
 	}
 	else
 	{

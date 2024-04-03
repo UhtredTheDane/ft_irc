@@ -10,9 +10,14 @@
 
 class Server;
 
-class Server_handler{
+class Server_handler
+{
+
 	public:
-        Server_handler(Server* serv);
+
+        Server_handler(void);
+		User* add_user(int fd_client);
+		Channel* add_channel(std::string name, User* user);
         void request_handler(int client_socket, std::string &request);
 		bool is_on_serv(std::string& nickname);
 		void processing_request(int client_socket, User* user, std::string& request);
@@ -22,13 +27,15 @@ class Server_handler{
 		void mode_request(User* user);
 		void join_request(User* user);
 		void pong_request(User* user);
+
 	private:
-        
-		Server* serv;
-        	Server_msg msg;
-        	std::vector<std::string> split_line;
-        	std::string request_types[6];
-		void (Server_handler::*requests_ptr[6])(User*);
+	
+        Server_msg msg;
+        std::vector<std::string> split_line;
+        std::string request_types[10];
+		void (Server_handler::*requests_ptr[10])(User*);
+		std::map<int, User*> users_map;
+		std::map<std::string, Channel*> channels;
 
 };
 

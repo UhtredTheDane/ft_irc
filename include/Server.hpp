@@ -13,7 +13,6 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "User.hpp"
 # include "Server_handler.hpp"
 # include <vector>
 # include <strings.h>
@@ -24,11 +23,8 @@
 # include <netinet/in.h>
 # include <poll.h>
 # include <unistd.h>
-# include <fcntl.h>
-# include <map>
-# include "Channel.hpp"
+# include <fcntl.h>=
 
-class User;
 class Server_handler;
 
 class Server
@@ -39,9 +35,6 @@ class Server
 		void run_server();
 		void check_connection();
 		void check_incoming_package();
-		std::map<std::string, Channel*> get_channels(void);
-		std::map<int, User*> get_users(void);
-		Channel* add_channel(std::string name, User* user);
 
 	private:
 		Server_handler handler;
@@ -50,8 +43,6 @@ class Server
 		int port;
 		struct sockaddr_in serv_addr;
 		std::vector<pollfd> *poll_fds;
-		std::map<int, User*> users_map;
-		std::map<std::string, Channel*> channels;
 };
 
 #endif
