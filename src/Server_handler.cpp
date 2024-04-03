@@ -1,5 +1,5 @@
 
-Server_handler::Server_handler(Server& serv)
+Server_handler::Server_handler(Server* serv)
 {
     msg = Server_msg();
     this->serv = serv;
@@ -43,7 +43,7 @@ void Server_handler::join_request(User* user)
 		}
 		catch (std::out_of_range& oor)
 		{
-			msg.join_msg(user, serv.add_channel(split_line[1]));
+			msg.join_msg(user, serv->add_channel(split_line[1]));
 		}
 }
 
@@ -51,7 +51,7 @@ void Server_handler::mode_request(User* user)
 {
 		try
 		{
-			Channel* target_chan = serv.get_channels().at(split_line[1]);
+			Channel* target_chan = serv->get_channels().at(split_line[1]);
 			msg.mode_msg(user, target_chan);
 		}
 		catch (std::out_of_range& oor)
@@ -61,7 +61,7 @@ void Server_handler::mode_request(User* user)
 
 void Server_handler::kick_request(User* user)
 {
-		Channel *curent_chan = serv.get_channels().at(split_line[1]);
+		Channel *curent_chan = serv->get_channels().at(split_line[1]);
 		for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 		{
 			if(user == *it)
@@ -88,7 +88,7 @@ void Server_handler::privmsg_request(User* user)
 		{
 			if(split_line[1][0] == '#')
 			{
-				Channel *curent_chan = serv.get_channels().at(split_line[1]); 
+				Channel *curent_chan = serv->get_channels().at(split_line[1]); 
 				Message msg(split_line[2], user);
 				curent_chan->add_message(&msg);
 			std::string c_msg;
@@ -105,7 +105,7 @@ void Server_handler::privmsg_request(User* user)
 			}
 			else
 			{
-                std::map<int, User*> users_map = serv.get_users();
+                std::map<int, User*> users_map = serv->get_users();
 			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 			{
 				if (it->second->get_nickname() == split_line[1])
@@ -128,7 +128,7 @@ void Server_handler::part_request(User* user)
 {
 		try
 		{
-			Channel *current_chan = serv.get_channels().at(split_line[1]); 
+			Channel *current_chan = serv->get_channels().at(split_line[1]); 
 			msg.leave_msg(user, current_chan);
 			current_chan->delete_user(user);
 		}
@@ -189,7 +189,7 @@ void Server_handler::processing_request(int client_socket, User* user, std::stri
 
 bool Server_handler::is_on_serv(std::string& nickname)
 {
-    std::map<int, User*> users_map = serv.get_users();
+    std::map<int, User*> users_map = serv->get_users();
 	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 	{
 		if (it->second->get_nickname() == nickname)
@@ -206,7 +206,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	std::string token;
 	size_t delim_pos;
 
-    std::map<int, User*> users_map = serv.get_users();
+    std::map<int, User*> users_map = serv->get_users();
 	user = users_map.at(client_socket);
 	if (request.find(delimiter, 0) != std::string::npos)
 	{

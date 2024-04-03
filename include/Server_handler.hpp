@@ -3,14 +3,16 @@
 
 # include "User.hpp"
 # include "Channel.hpp"
-# include "Serveur.hpp"
+# include "Server.hpp"
 # include "Server_msg.hpp"
-# include "vector.hpp"
+# include <vector>
 # include "Message.hpp"
+
+class Server;
 
 class Server_handler{
 	public:
-        Server_handler(Server& serv);
+        Server_handler(Server* serv);
         void request_handler(int client_socket, std::string &request);
 		bool is_on_serv(std::string& nickname);
 		void processing_request(int client_socket, User* user, std::string& request);
@@ -21,11 +23,12 @@ class Server_handler{
 		void join_request(User* user);
 		void pong_request(User* user);
 	private:
-        Serveur* serv;
-        Server_msg msg;
-        std::vector<std::string> split_line;
-        std::string request_types[6];
-		void (Server::*requests_ptr[6])(User*);
+        
+		Server* serv;
+        	Server_msg msg;
+        	std::vector<std::string> split_line;
+        	std::string request_types[6];
+		void (Server_handler::*requests_ptr[6])(User*);
 
 };
 

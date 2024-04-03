@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/30 02:41:39 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:39:48 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
-	handler = Server_handler(*this);
+	handler = Server_handler();
 	this->port = port;
 	this->password = password;
 
@@ -64,10 +64,11 @@ std::map<int, User*> Server::get_users(void)
 {
 	return (users_map);
 }
-Channel* Server::add_channel(std::string name)
+
+Channel* Server::add_channel(std::string name, User* user)
 {
-	Channel* new_chan = new Channel(split_line[1], user);
-	channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
+	Channel* new_chan = new Channel(name, user);
+	channels.insert(std::pair<std::string, Channel*>(name, new_chan));
 	return (new_chan);
 }
 

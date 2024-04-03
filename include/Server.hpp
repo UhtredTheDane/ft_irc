@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/26 17:26:48 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:30:10 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 # include "Channel.hpp"
 
 class User;
-class Server_handler.hpp;
+class Server_handler;
 
 class Server
 {
@@ -41,7 +41,7 @@ class Server
 		void check_incoming_package();
 		std::map<std::string, Channel*> get_channels(void);
 		std::map<int, User*> get_users(void);
-		Channel* add_channel(std::string name);
+		Channel* add_channel(std::string name, User* user);
 
 	private:
 		Server_handler handler;
