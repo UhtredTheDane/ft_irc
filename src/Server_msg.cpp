@@ -1,5 +1,5 @@
 #include "../include/Server_msg.hpp"
-
+ 
 void Server_msg::welcome_msg(User* user)
 {
 	std::string msg = ":irc.42.com ";
@@ -89,11 +89,6 @@ void Server_msg::join_msg(User *user, Channel* channel)
 	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + channel->get_name();
 	msg += "\r\n";
 
-/*	
-	msg += ":" + user->get_servername()
-	msg += " 332 " + channel + " :yugioh";
-	msg += "\r\n";*/
-	
 	msg += ":" + user->get_servername();
 	msg += " 353 " + user->get_nickname() + " = " + channel->get_name() + " :@";
 	for (std::vector<User *>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)

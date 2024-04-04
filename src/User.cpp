@@ -6,15 +6,17 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/03/25 18:23:18 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:21:04 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/User.hpp"
-User::User(void) : nickname(""), username( ""),
-	hostname(""), servername(""), realname(""), identifier(""), isRegistered(0)
+User::User(int fd) : nickname(""), username( ""),
+	hostname(""), servername(""), realname(""), identifier("")
 {
 	buffer = "";
+	socket = fd;
+	isRegistered = 0;
 	// update_identifier();
 }
 
