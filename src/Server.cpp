@@ -64,8 +64,9 @@ void Server::check_connection()
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
 		std::cout << "adding new client " << std::endl;
 		pollfd new_pollfd;
+		bzero(&new_pollfd, sizeof(pollfd));
 		new_pollfd.events = POLLIN | POLLOUT;
-		new_pollfd.fd = fd_client;	
+		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
 		users_map.insert(std::pair<int, User*>(fd_client, new User()));
 	}
@@ -100,6 +101,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	std::vector<std::string> split_line;
 	std::string word;
 
+	std::cout << request << std::endl;
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
 	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
@@ -126,7 +128,6 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 				user->set_realname(split_line[3]);
 				user->set_socket(client_socket);
 				user->set_identifier();
-				// user.show_userinfo(user);
 				reply(user);
 				user->set_isRegistered(2);
 		}
@@ -195,32 +196,15 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 			it++;
 		}
 	}
-
 	else if (!split_line[0].compare("PRIVMSG"))
 	{
 
 		try
 		{
 			if(split_line[1][0] == '#')
-			{
-			Channel *curent_chan = channels.at(split_line[1]); 
-			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
-			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
-			{
-				if(*it != user)
-				{
-				c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
-				std::cout << c_msg << std::endl;
-				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-				}
-			it++;
-			}
-			}
+				msg_toall(split_line, user, " PRIVMSG ");
 			else
 			{
-
 			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 			{
 				if (it->second->get_nickname() == split_line[1])
@@ -231,6 +215,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 					send(it->first, p_msg.c_str(), p_msg.length(), 0);
 					break;
 				}
+				it++;
 			}
 			}
 		}
@@ -252,9 +237,37 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		{
 		}
 	}
+	else if (!split_line[0].compare("NICK"))
+	{
+		std::string c_msg;
+		while (is_on_serv(split_line[1]))
+			split_line[1] += "_";
+		c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
+		send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+		user->set_nickname(split_line[1]);
+		user->show_userinfo();
 
+	}
 	else
 		std::cout << "|" << request << "|" << std::endl;
+}
+
+void Server::msg_toall(std::vector<std::string> split_line, User* user, std::string t_request)
+{
+			Channel *curent_chan = channels.at(split_line[1]); 
+			Message msg(split_line[2], user);
+			curent_chan->add_message(&msg);
+			std::string c_msg;
+			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+			{
+				if(*it != user)
+				{
+				c_msg = ":" + user->get_identifier() + t_request + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
+				std::cout << c_msg << std::endl;
+				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+				}
+			it++;
+			}
 }
 
 void Server::request_handler(int client_socket, std::string& request)
@@ -284,9 +297,10 @@ void Server::request_handler(int client_socket, std::string& request)
 void Server::check_incoming_package()
 {
 	char buffer[1024];
-	int bytes_nb;
+	int bytes_nb = 0;
 
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();)
+	bzero(buffer, 1024);
+	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();++it)
 	{
 		if (it->fd != fd_socket && it->revents & POLLIN)
 		{
@@ -305,12 +319,9 @@ void Server::check_incoming_package()
 					std::string str_buffer(buffer);
 					request_handler(it->fd, str_buffer);
 					bzero(buffer, 1024);
-					++it;
 				}
 			}
-		}
-		else
-			++it;		
+		}		
 	}
 }
 

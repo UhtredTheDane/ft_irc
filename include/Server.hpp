@@ -43,6 +43,7 @@ class Server
 		void connexion(int client_socket, User* user, std::string& request);
 		bool is_on_serv(std::string& nickname);
 		void reply(User *user);
+		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
 	private:
 		int fd_socket;
 		std::string password;

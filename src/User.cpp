@@ -12,7 +12,7 @@
 
 #include "../include/User.hpp"
 User::User(void) : nickname(""), username( ""),
-	hostname(""), servername(""), realname(""), identifier("")
+	hostname(""), servername(""), realname(""), identifier(""), isRegistered(0)
 {
 	buffer = "";
 	// update_identifier();
