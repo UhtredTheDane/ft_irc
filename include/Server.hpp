@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 01:23:27 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:13:46 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include "Server_handler.hpp"
-
+# include <map>
 class Server_handler;
 
 class Server

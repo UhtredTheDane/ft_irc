@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 01:22:59 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:14:20 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ void Server::check_connection()
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
-		handler->add_user(fd_client);
+		add_user(fd_client);
 	}
 	else
 	{
@@ -137,7 +137,7 @@ void Server::check_incoming_package()
 				{
 					std::cout << "a user leaved the server" << std::endl;
 					close(it->fd);
-					handler->delete_user(it->fd);
+					delete_user(it->fd);
 					it = poll_fds->erase(it);
 					break;
 				}

@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 01:23:43 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:15:11 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void Server_handler::join_request(User* user)
 	}
 	catch (std::out_of_range& oor)
 	{
-		msg.join_msg(user, add_channel(split_line[1], user));
+		msg.join_msg(user, serv->add_channel(split_line[1], user));
 	}
 }
 
@@ -170,7 +170,7 @@ void Server_handler::privmsg_request(User* user)
 		}
 		else
 		{
-			std::map<int, User*> users_map = get_users();
+			std::map<int, User*> users_map = serv->get_users();
 			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 			{
 				if (it->second->get_nickname() == split_line[1])
