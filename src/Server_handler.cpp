@@ -118,7 +118,7 @@ void Server_handler::mode_request(User* user)
 	try
 	{
 		Channel* target_chan = serv->get_channels().at(split_line[1]);
-		msg.mode_msg(user, target_chan);
+		target_chan->update_mod(user->get_socket(),user,split_line);
 	}
 	catch (std::out_of_range& oor)
 	{
@@ -257,20 +257,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 	{
 		//msg.mode_msg(user, client_socket, split_line[1]);
-		std::cout << "We found MODE in message" << std::endl;
-		if(channels.find(split_line[1]) == channels.end())
-		{
-			std::cout << "ERROR CHANNEL NOT FOUND" << std::endl;
-		}
-		else
-		{
-			if(channels[split_line[1]])
-				channels[split_line[1]]->update_mod(client_socket,user,split_line);
-			//else
-			//{
-
-			//}
-		}
+		
 	}
 
 */
