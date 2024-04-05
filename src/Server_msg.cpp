@@ -103,6 +103,7 @@ void Server_msg::join_msg(User *user, Channel* channel)
 	msg += " 366 " + user->get_nickname() + " " + channel->get_name() + " :End of NAMES list";
 	msg += "\r\n";
 	int msg_len = msg.length();
+	std::cout << "msg :" << msg << std::endl;
 	send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 

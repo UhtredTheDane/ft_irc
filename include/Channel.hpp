@@ -51,7 +51,6 @@ class Channel
 		int remove_mod(User *user, int modif);
 		int set_mod(User *user, int modif );
 		User *findUserByName(std::vector<User *> v,std::string name);
-		std::string getName();
 		int IsMod(User *user);
 };
 #endif

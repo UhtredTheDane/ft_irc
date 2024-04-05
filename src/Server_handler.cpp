@@ -99,6 +99,7 @@ void Server_handler::join_request(User* user)
 		std::string join_msg;
 		join_msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + current_chan->get_name();
 		join_msg += "\r\n";
+		std::cout << join_msg << std::endl;
 		for (std::vector<User*>::iterator it = current_chan->get_users()->begin(); it != current_chan->get_users()->end(); ++it)
 		{
 			if (user != *it)

@@ -14,8 +14,8 @@
 
 Channel::Channel(std::string& name, User* user_admin)
 {
-	this->theme = theme;
-	this->name = theme;
+	this->theme = "";
+	this->name = name;
 	this->admin_users.push_back(user_admin);
 	users.push_back(user_admin);
 	this->mask = 0;
@@ -106,10 +106,6 @@ int Channel::set_mod(User *user, int modif)
 		//gestion le user existe pas ou n'est pas mod
 		return 1;
 	}
-}
-std::string Channel::getName()
-{
-	return this->name;
 }
 
 void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> line)
