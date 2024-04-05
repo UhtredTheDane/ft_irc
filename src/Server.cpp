@@ -60,12 +60,14 @@ void Server::check_connection()
 {
 	int fd_client;
 	int addrlen = sizeof(serv_addr);
+
 	if ((fd_client = accept(fd_socket, (struct sockaddr *) &(serv_addr), (socklen_t*)&addrlen)) != -1)
 	{
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
 		std::cout << "Une connexion" << std::endl;	
 		std::cout << "adding new client " << std::endl;
 		pollfd new_pollfd;
+		bzero(&new_pollfd, sizeof(pollfd));
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;	
 		poll_fds->push_back(new_pollfd);
@@ -148,8 +150,8 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 	}
 	else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 	{
-		msg.mode_msg(user, client_socket, split_line[1]);
-		std::cout << "Ze found MODE in message" << std::endl;	
+		//msg.mode_msg(user, client_socket, split_line[1]);
+		std::cout << "We found MODE in message" << std::endl;
 		if(channels.find(split_line[1]) == channels.end())
 		{
 			std::cout << "ERROR CHANNEL NOT FOUND" << std::endl;
@@ -157,7 +159,7 @@ void Server::connexion(int client_socket, User* user, std::string& request)
 		else
 		{
 			if(channels[split_line[1]])
-				channels[split_line[1]]->update_mod(user,split_line);
+				channels[split_line[1]]->update_mod(client_socket,user,split_line);
 			//else
 			//{
 
@@ -226,7 +228,8 @@ void Server::check_incoming_package()
 	char buffer[1024];
 	int bytes_nb;
 
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();)
+	bzero(buffer,1024);
+	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();it++)
 	{
 		if (it->fd != fd_socket && it->revents & POLLIN)
 		{
@@ -245,12 +248,9 @@ void Server::check_incoming_package()
 					std::string str_buffer(buffer);
 					request_handler(it->fd, str_buffer);
 					bzero(buffer, 1024);
-					++it;
 				}
 			}
-		}
-		else
-			++it;		
+		}		
 	}
 }
 

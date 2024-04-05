@@ -87,14 +87,20 @@ std::string Channel::getName()
 	return this->name;
 }
 
-void Channel::update_mod(User *user, std::vector<std::string> line)
+void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> line)
 {
 	
 	std::string options;
 	int param = -1;
-	
-	std::cout << "Updating mode of a channel" << std::endl;
+	std::string response;
+	std::string validoptions;
+	std::string validparam;
+
+	validparam = "";
+	validoptions = "";
+	response = "";
 	std::string compare = " ikolt ";
+
 	if(line.size() >= 3) 
 		options = line[2];
 	if(options.size() >= 2)
@@ -108,6 +114,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 
 		if(options[0] == '-')
 		{
+			validoptions += "-";
 			current++;
 			while (current != options.end())
 			{
@@ -119,6 +126,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 					case 'i':
 						if(!this->remove_mod(user,1))
 						{
+							validoptions += "i";
 							std::cout << "Removing invite only restriction" << std::endl;
 						}	
 						else 
@@ -130,6 +138,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 						
 						if(!this->remove_mod(user,2))
 						{
+							validoptions += "k";
 							this->password = "";
 							std::cout << "Removing password restriction" << std::endl;
 						}
@@ -137,11 +146,13 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 						{
 							//user a pas les droits ou le mod est deja off
 						}
-						
 						break;
 					case 'o':
 						if(line[param].c_str() && !this->take_privilege(user ,line[param]))
 						{
+							validoptions += "o";
+							validparam += line[param] + " ";
+
 							std::cout << "Removing user privilege" << std::endl;
 							param++;
 						}
@@ -153,6 +164,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 					case 'l':
 						if(!this->remove_mod(user,4))
 						{
+							validoptions += "l";
 							std::cout << "Removing user limit restriction" << std::endl;
 						}
 						else
@@ -164,6 +176,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 						
 						if(!this->remove_mod(user,5))
 						{
+							validoptions += "t";
 							std::cout << "Removing topic restriction" << std::endl;
 						}
 						break;
@@ -176,6 +189,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 		else if(options[0] == '+')
 		{
 			current++;
+			validoptions += "+";
 			while (current != options.end())
 			{
 				
@@ -186,38 +200,66 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 					switch (*current)
 					{
 					case 'i':
-						this->set_mod(user,1);
-						std::cout << "Set invite only restriction" << std::endl;
+						if(!this->set_mod(user,1))
+						{
+							validoptions += "i";
+							std::cout << "Set invite only restriction" << std::endl;
+						}
 						break;
 					case 'k':
 						if(line[param].c_str())
 						{
-							this->password = line[param];
-							this->set_mod(user,2);
-							param ++;
-							std::cout << "Set password restriction" << std::endl;
+							if(!this->set_mod(user,2))
+							{
+								validoptions += "k";
+								this->password = line[param];
+								validparam += line[param] + " ";
+								param ++;
+								std::cout << "Set password restriction" << std::endl;
+							}
 						}
 						break;
 					case 'o':
 						if(line[param].c_str())
 						{
-							this->give_privilege(user,line[param]);
-							param ++;
-							std::cout << "Set privilege to a user" << std::endl;
+							if(!this->give_privilege(user,line[param]))
+							{
+								validoptions += "o";
+								validparam += line[param] + " ";
+								param ++;
+								std::cout << "Set privilege to a user" << std::endl;
+							}
 						}
 						break;
 					case 'l':
 						if(line[param].c_str())
 						{
-							this->limit_user = std::atoi(line[param].c_str());
-							this->set_mod(user,4);
-							param ++;
-							std::cout << "Set user limit restriction" << std::endl;
+							try
+							{
+								if(!this->set_mod(user,4))
+								{
+									int nb = std::atoi(line[param].c_str());
+									std::cout << nb << "\n";
+									this->limit_user = nb ;
+									validparam += line[param] + " ";
+									param ++;
+									std::cout << "Set user limit restriction" << std::endl;
+									validoptions += "l";
+								}
+							}
+							catch(const std::exception& e)
+							{
+								std::cerr << e.what() << '\n';
+							}
 						}
 						break;
 					case 't':
-						this->set_mod(user,5);
-						std::cout << "Removing topic restriction" << std::endl;
+						
+						if(!this->set_mod(user,5))
+						{
+							validoptions += "t";
+							std::cout << "Setting topic restriction" << std::endl;
+						}
 						break;
 					}
 				}
@@ -228,6 +270,18 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 		{
 			// pas de plus ou de moins 
 		}
+		if(validoptions.size() > 1)
+		{
+			std::cout << " Sending response to a mode command" << std::endl;
+			response = ":" + user->get_servername();
+			response += " 324 " + user->get_username() + " " + line[1] + " " + validoptions + " " + validparam;
+			response += "\r\n";
+			std::cout << response << std::endl; 
+			send(clientsocket, response.c_str(), response.length(), 0);
+
+		}
+		else
+			std::cout << " No valid options " << std::endl;
 	}
 }
 

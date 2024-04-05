@@ -16,7 +16,8 @@
 # include <vector>
 # include "User.hpp"
 # include "Message.hpp"
-
+#include <sys/types.h>
+#include <sys/socket.h>
 
 class Channel
 {
@@ -40,7 +41,7 @@ class Channel
 		void add_message(Message *message);
 		std::string get_theme( void );
 		std::vector<User*>* get_users(void);
-		void update_mod(User *user, std::vector<std::string> line);
+		void update_mod(int clientsocket ,User *user, std::vector<std::string> line);
 		int give_privilege(User *user,std::string name);
 		int take_privilege(User *user,std::string name);
 		int remove_mod(User *user, int modif);
