@@ -16,17 +16,23 @@
 # include <vector>
 # include "User.hpp"
 # include "Message.hpp"
+#include <sys/types.h>
+#include <sys/socket.h>
 
 class Channel
 {
+	enum Chanmod { i = 1 , k = 2 , o = 3 , l = 4 , t = 5};
+
 	private:
 		//mod a rajouter
 		std::string theme;
-		std::string name;
+		std::string password;
+		int limit_user;
+		int mask;
 		std::vector<User*> admin_users;
 		std::vector<User*> users;
 		std::vector<Message*> msgs;
-		
+		std::string name;
 	public:
 		Channel(void);
 		Channel(std::string& theme, User* admin_user);
@@ -39,5 +45,13 @@ class Channel
 		std::vector<User*>* get_users(void);
 		std::vector<User*>* get_admins(void);
 
+		void update_mod(int clientsocket ,User *user, std::vector<std::string> line);
+		int give_privilege(User *user,std::string name);
+		int take_privilege(User *user,std::string name);
+		int remove_mod(User *user, int modif);
+		int set_mod(User *user, int modif );
+		User *findUserByName(std::vector<User *> v,std::string name);
+		std::string getName();
+		int IsMod(User *user);
 };
 #endif

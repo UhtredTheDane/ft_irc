@@ -32,7 +32,7 @@ class User
         std::string servername;
 		std::string realname;
 		std::string identifier;
-		bool isPasswordValid;
+		//bool isPasswordValid;
 		int isRegistered;
 		int socket;
     
