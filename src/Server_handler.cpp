@@ -6,14 +6,15 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/04 17:11:40 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 01:23:43 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../include/Server_handler.hpp"
 
-Server_handler::Server_handler(void)
+Server_handler::Server_handler(Server* serv)
 {
+	this->serv = serv;
 	msg = Server_msg();
 	request_types[0] = "CAP";
 	request_types[1] = "PASS";
@@ -76,10 +77,8 @@ void Server_handler::capls_request(User* user)
 
 void Server_handler::pass_request(User* user)
 {
-	std::cout << user->get_isRegistered() << std::endl;
 	if(user->get_isRegistered() == 1)
-	{
-		std::cout << "PASS valide\n";
+	{	
 	}
 }
 

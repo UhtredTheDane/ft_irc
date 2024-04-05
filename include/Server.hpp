@@ -6,14 +6,13 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/03 16:39:41 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 01:23:27 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "Server_handler.hpp"
 # include <vector>
 # include <strings.h>
 # include <sys/types.h>
@@ -24,6 +23,9 @@
 # include <poll.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include "Server_handler.hpp"
+
+class Server_handler;
 
 class Server
 {
@@ -34,7 +36,7 @@ class Server
 		void check_connection();
 		void check_incoming_package();
 	private:
-		Server_handler handler;
+		Server_handler* handler;
 		int fd_socket;
 		std::string password;
 		int port;

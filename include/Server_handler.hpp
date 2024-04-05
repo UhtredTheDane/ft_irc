@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/04 17:11:31 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 01:20:53 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,16 @@
 # include <vector>
 # include <map>
 # include "Message.hpp"
+# include "Server.hpp"
 
+class Server;
 
 class Server_handler
 {
 
 	public:
 
-		Server_handler(void);
+		Server_handler(Server* serv);
 		User* add_user(int fd_client);
 		void delete_user(int fd_client);
 		Channel* add_channel(std::string name, User* user);
@@ -49,7 +51,7 @@ class Server_handler
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
 
 	private:
-
+		Server* serv;
 		Server_msg msg;
 		std::vector<std::string> split_line;
 		std::string request_types[10];

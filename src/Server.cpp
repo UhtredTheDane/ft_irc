@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/03 17:37:57 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/05 01:22:59 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
-	handler = Server_handler();
+	handler = new Server_handler(this);
 	this->port = port;
 	this->password = password;
 
@@ -68,7 +68,7 @@ void Server::check_connection()
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
-		handler.add_user(fd_client);
+		handler->add_user(fd_client);
 	}
 	else
 	{
@@ -91,14 +91,14 @@ void Server::check_incoming_package()
 				{
 					std::cout << "a user leaved the server" << std::endl;
 					close(it->fd);
-					handler.delete_user(it->fd);
+					handler->delete_user(it->fd);
 					it = poll_fds->erase(it);
 					break;
 				}
 				else
 				{
 					std::string str_buffer(buffer);
-					handler.request_handler(it->fd, str_buffer);
+					handler->request_handler(it->fd, str_buffer);
 					bzero(buffer, 1024);
 				}
 			}
