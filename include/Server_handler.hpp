@@ -18,8 +18,6 @@
 # include "Channel.hpp"
 # include "Server_msg.hpp"
 # include <vector>
-# include <map>
-# include "Message.hpp"
 # include "Server.hpp"
 
 class Server;
@@ -30,13 +28,7 @@ class Server_handler
 	public:
 
 		Server_handler(Server* serv);
-		User* add_user(int fd_client);
-		void delete_user(int fd_client);
-		Channel* add_channel(std::string name, User* user);
-		std::map<std::string, Channel*> get_channels(void);
-		std::map<int, User*> get_users(void);
 		void request_handler(int client_socket, std::string &request);
-		bool is_on_serv(std::string& nickname);
 		void processing_request(User* user, std::string& request);
 		void capls_request(User* user);
 		void pass_request(User* user);
@@ -56,9 +48,6 @@ class Server_handler
 		std::vector<std::string> split_line;
 		std::string request_types[10];
 		void (Server_handler::*requests_ptr[10])(User*);
-		std::map<int, User*> users_map;
-		std::map<std::string, Channel*> channels;
-
 };
 
 #endif

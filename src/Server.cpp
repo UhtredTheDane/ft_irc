@@ -55,6 +55,52 @@ Server::~Server(void)
 	close(fd_socket);
 }
 
+std::map<std::string, Channel*> Server::get_channels(void)
+{
+	return (channels);
+}
+
+std::map<int, User*> Server::get_users(void)
+{
+	return (users_map);
+}
+
+User* Server::add_user(int fd_client)
+{
+	User* new_user = new User(fd_client);
+	users_map.insert(std::pair<int, User*>(fd_client, new_user));
+	return (new_user);
+}
+
+void Server::delete_user(int fd_client)
+{
+	users_map.erase(fd_client);
+}
+
+Channel* Server::add_channel(std::string name, User* user)
+{
+	Channel* new_chan = new Channel(name, user);
+	channels.insert(std::pair<std::string, Channel*>(name, new_chan));
+	return (new_chan);
+}
+
+bool Server::is_on_serv(std::string& nickname)
+{
+	try
+	{
+		std::map<int, User*> users_map = get_users();
+		for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
+		{
+			if (it->second->get_nickname() == nickname)
+				return (true);
+		}
+	}
+	catch (std::out_of_range& oor)
+	{
+	}
+	return (false);
+}
+
 void Server::check_connection()
 {
 	int fd_client;

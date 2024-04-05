@@ -30,18 +30,29 @@ class Server_handler;
 class Server
 {
 	public:
+
 		Server(int port, std::string password);
 		~Server(void);
+		User* add_user(int fd_client);
+		void delete_user(int fd_client);
+		Channel* add_channel(std::string name, User* user);
+		std::map<std::string, Channel*> get_channels(void);
+		std::map<int, User*> get_users(void);
+		bool is_on_serv(std::string& nickname);
 		void run_server();
 		void check_connection();
 		void check_incoming_package();
+
 	private:
+	
 		Server_handler* handler;
 		int fd_socket;
 		std::string password;
 		int port;
 		struct sockaddr_in serv_addr;
 		std::vector<pollfd> *poll_fds;
+		std::map<int, User*> users_map;
+		std::map<std::string, Channel*> channels;
 };
 
 #endif
