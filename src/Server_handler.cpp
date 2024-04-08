@@ -62,6 +62,16 @@ void Server_handler::nick_request(User* user)
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
 	}
+	else if(user->get_isRegistered() == 2)
+	{
+		std::string c_msg;
+		while (serv->is_on_serv(split_line[1]))
+			split_line[1] += "_";
+		c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
+		std::cout << "|" << c_msg << "|";
+		send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+		user->set_nickname(split_line[1]);
+	}
 }
 
 void Server_handler::user_request(User* user)
