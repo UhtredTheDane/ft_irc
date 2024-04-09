@@ -97,6 +97,7 @@ bool Server::is_on_serv(std::string& nickname)
 	}
 	catch (std::out_of_range& oor)
 	{
+		
 	}
 	return (false);
 }

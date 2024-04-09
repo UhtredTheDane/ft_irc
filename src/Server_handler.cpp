@@ -91,21 +91,9 @@ void Server_handler::join_request(User* user)
 {
 	try
 	{	
-		std::cout << user->get_username() << std::endl;
 		Channel* current_chan = serv->get_channels().at(split_line[1]);
 		current_chan->add_user(user);
 		msg.join_msg(user, current_chan);
-
-		std::string join_msg;
-		join_msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + current_chan->get_name();
-		join_msg += "\r\n";
-		std::cout << join_msg << std::endl;
-		for (std::vector<User*>::iterator it = current_chan->get_users()->begin(); it != current_chan->get_users()->end(); ++it)
-		{
-			if (user != *it)
-				send((*it)->get_socket(), join_msg.c_str(), join_msg.length(), 0);
-		}
-
 	}
 	catch (std::out_of_range& oor)
 	{
