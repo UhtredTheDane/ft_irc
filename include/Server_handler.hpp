@@ -13,12 +13,14 @@
 #ifndef SERVER_HANDLER_HPP
 # define SERVER_HANDLER_HPP
 
-# include "User.hpp"
+# include <exception>
+# include <vector>
 # include <string>
+# include "User.hpp"
 # include "Channel.hpp"
 # include "Server_msg.hpp"
-# include <vector>
 # include "Server.hpp"
+
 
 class Server;
 
@@ -41,6 +43,12 @@ class Server_handler
 		void join_request(User* user);
 		void pong_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
+
+		class Err_AlreadyRegistred : public std::exception
+		{
+			public:
+				virtual const char *what() const throw;
+		};
 
 	private:
 		Server* serv;

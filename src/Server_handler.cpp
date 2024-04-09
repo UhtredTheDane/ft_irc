@@ -51,7 +51,7 @@ void Server_handler::pass_request(User* user)
 {
 	if(!serv->check_password() || !user->get_isRegistered() == 1)
 	{
-		throw ()
+		throw (Serveur_handler::Err_AlreadyRegistred());
 	}
 }
 
@@ -203,7 +203,14 @@ void Server_handler::processing_request(User* user, std::string& request)
 	{
 		if (!split_line[0].compare(request_types[i]))
 		{
-			(this->*requests_ptr[i])(user);
+			try
+			{
+				(this->*requests_ptr[i])(user);
+			}
+			catch (Err_AlreadyRegistred& e)
+			{
+				msg.alreadyregistred_msg(user);
+			}
 			break;
 		}
 	}

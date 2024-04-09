@@ -21,6 +21,7 @@ class Server_msg{
 			void join_msg(User *user, Channel* channel);
 			void mode_msg(User* user, Channel* channel);
 			void leave_msg(User* user, Channel* channel);
+			void alreadyregistred_msg(User* user);
 	private:
 };
 

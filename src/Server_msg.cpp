@@ -110,3 +110,12 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 	for (std::vector<User*>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
 		send((*it)->get_socket(), msg.c_str(), msg_len, 0);
 }
+
+void Server_msg::alreadyregistred_msg(User* user)
+{
+	std::string msg;
+
+
+	msg = "462" + ":You may not reregister\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
