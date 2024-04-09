@@ -55,6 +55,11 @@ Server::~Server(void)
 	close(fd_socket);
 }
 
+bool check_password(std::string password)
+{
+	return (this->password == password);
+}
+
 std::map<std::string, Channel*> Server::get_channels(void)
 {
 	return (channels);
