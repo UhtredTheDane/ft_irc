@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 15:14:20 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/09 23:29:41 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ Server::~Server(void)
 	close(fd_socket);
 }
 
-bool check_password(std::string password)
+bool Server::check_password(std::string password)
 {
 	return (this->password == password);
 }

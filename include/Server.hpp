@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 15:13:46 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/09 23:31:20 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # include <fcntl.h>
 # include "Server_handler.hpp"
 # include <map>
+
 class Server_handler;
 
 class Server
@@ -33,6 +34,7 @@ class Server
 
 		Server(int port, std::string password);
 		~Server(void);
+		bool check_password(std::string password);
 		User* add_user(int fd_client);
 		void delete_user(int fd_client);
 		Channel* add_channel(std::string name, User* user);
@@ -42,6 +44,7 @@ class Server
 		void run_server();
 		void check_connection();
 		void check_incoming_package();
+
 	private:
 	
 		Server_handler* handler;

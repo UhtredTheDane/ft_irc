@@ -2,33 +2,29 @@
  
 void Server_msg::welcome_msg(User* user)
 {
-	std::string msg;
-
-	msg = ":irc.42.com " + "001 " + user->get_nickname() + " :Welcome to our irc server " + user->get_identifier() + "\r\n";
+	std::string msg = ":irc.42.com 001 " + user->get_nickname();
+	msg += " :Welcome to our irc server " + user->get_identifier() + "\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::yourhost_msg(User* user)
 {
-	std::string msg;
-
-	msg = ":irc.42.com " + "002 " + user->get_nickname() + "Your host is " + user->get_servername() + ", running version 0.02\r\n";
+	std::string msg = ":irc.42.com 002 " + user->get_nickname() + "Your host is "; 
+	msg += user->get_servername() + ", running version 0.02\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::created_msg(User* user)
 {
-	std::string msg;
-
-	msg = ":irc.42.com " + "003 " + user->get_nickname() + " :This server was created 16-03-24 \r\n";
+	std::string msg = ":irc.42.com 003 " + user->get_nickname();
+       	msg += " :This server was created 16-03-24 \r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::myinfo_msg(User* user)
 {
-	std::string msg;
-	
-	msg = ":irc.42.com " + "004 " + user->get_nickname() + " " + user->get_servername() + " :0.02 Bla blabla \r\n";
+	std::string msg = ":irc.42.com 004 " + user->get_nickname();
+	msg += " " + user->get_servername() + " :0.02 Bla blabla \r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -43,22 +39,20 @@ void Server_msg::whois_msg(User* user)
 
 void Server_msg::ping_msg(User* user)
 {
-	std::string msg;
 	int client_socket;
-
 	client_socket = user->get_socket();
-	msg = "PING " + client_socket + "\r\n";
+	std::string msg = "PING " + client_socket;
+	msg += "\r\n";
 	send(client_socket, msg.c_str(), msg.length(), 0);
 }
  
 void Server_msg::pong_msg(User* user)
 {
 	int client_socket;
-	std::string msg;
-
 	client_socket = user->get_socket();
-	msg = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost " + "PONG localhost " ;
-	msg += client_socket + "\r\n";
+	std::string msg = ":" + user->get_nickname() + "!" + user->get_nickname();
+	msg += "@localhost PONG localhost " + client_socket;
+	msg += "\r\n";
 	send(client_socket, msg.c_str(), msg.length(), 0);
 }
 
@@ -68,9 +62,9 @@ void Server_msg::join_msg(User *user, Channel* channel)
 	std::string msg;
 	int msg_len;
 
-	msg = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + channel->get_name() + "\r\n";
+	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + channel->get_name() + "\r\n";
 	msg_len = msg.length();
-	for (std::vector<User*>::iterator it = current_chan->get_users()->begin(); it != current_chan->get_users()->end(); ++it)
+	for (std::vector<User*>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
 	{
 			if (user != *it)
 				send((*it)->get_socket(), msg.c_str(), msg_len, 0);
@@ -101,7 +95,7 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 {
 	std::string msg;
 	
-	msg = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost PART " + channel->get_name();
+	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost PART " + channel->get_name();
 	std::string str = channel->get_name();
 	str[0] = ':';
 	msg += " " + str + "\r\n";
@@ -111,11 +105,33 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 		send((*it)->get_socket(), msg.c_str(), msg_len, 0);
 }
 
+void Server_msg::passwordincorrect_msg(User* user)
+{
+	std::string msg = ":irc.42.com 464 * :Password incorrect\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
 void Server_msg::alreadyregistred_msg(User* user)
 {
-	std::string msg;
+	std::string msg = ":irc.42.com 451 * :You may not reregister\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
 
+void Server_msg::nosuchchannel_msg(User* user)
+{
+	std::string msg = ":irc.42.com 403" + user->get_nickname() + " ";
+	msg += " :No such channel\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
 
-	msg = "462" + ":You may not reregister\r\n";
+void Server_msg::needmoreparams_msg(User* user)
+{
+	std::string msg = ":irc.42.com 461" + user->get_nickname() + " :Not enough parameters\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::notonchannel_msg(User* user)
+{
+	std::string msg = ":irc.42.com 442" + user->get_nickname() + " :You're not on that channel\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }

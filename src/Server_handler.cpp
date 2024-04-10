@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 15:15:11 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/10 16:22:12 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,10 @@ void Server_handler::capls_request(User* user)
 
 void Server_handler::pass_request(User* user)
 {
-	if(!serv->check_password() || !user->get_isRegistered() == 1)
+	if((!serv->check_password(split_line[1])) || (!user->get_isRegistered()) == 1)
 	{
-		throw (Serveur_handler::Err_AlreadyRegistred());
+		user->set_isRegistered(0);
+		throw (Server_handler::Err_PasswordIncorrect());
 	}
 }
 
@@ -62,6 +63,10 @@ void Server_handler::nick_request(User* user)
 		while (serv->is_on_serv(split_line[1]))
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
+	}
+	else
+	{
+		throw(Server_handler::Err_AlreadyRegistred());
 	}
 }
 
@@ -81,6 +86,12 @@ void Server_handler::user_request(User* user)
 		msg.myinfo_msg(user);
 		user->set_isRegistered(2);
 	}
+	else
+	{
+		throw(Server_handler::Err_AlreadyRegistred());
+	}
+
+
 }
 
 void Server_handler::pong_request(User* user)
@@ -189,6 +200,7 @@ void Server_handler::part_request(User* user)
 	}
 	catch (std::out_of_range& oor)
 	{
+	
 	}
 }
 
@@ -206,6 +218,10 @@ void Server_handler::processing_request(User* user, std::string& request)
 			try
 			{
 				(this->*requests_ptr[i])(user);
+			}
+			catch (Err_PasswordIncorrect& e)
+			{
+				msg.passwordincorrect_msg(user);
 			}
 			catch (Err_AlreadyRegistred& e)
 			{

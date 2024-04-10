@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 01:20:53 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/10 17:02:47 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,12 @@ class Server_handler
 		void pong_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
 
-		class Err_AlreadyRegistred : public std::exception
-		{
-			public:
-				virtual const char *what() const throw;
-		};
+		class Err_PasswordIncorrect : public std::exception{};
+		class Err_AlreadyRegistred : public std::exception{};
+		class Err_NoSuchChannel : public std::exception{};
+		class Err_NeedMoreParams : public std::exception{};
+		class Err_NotOnChannel : public std::exception{};
+
 
 	private:
 		Server* serv;
