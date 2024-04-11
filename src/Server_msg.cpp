@@ -117,10 +117,10 @@ void Server_msg::alreadyregistred_msg(User* user)
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
-void Server_msg::nosuchchannel_msg(User* user)
+void Server_msg::nosuchchannel_msg(User* user, std::string& channel_name)
 {
 	std::string msg = ":irc.42.com 403" + user->get_nickname() + " ";
-	msg += " :No such channel\r\n";
+	msg += channel_name + " :No such channel\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -130,8 +130,9 @@ void Server_msg::needmoreparams_msg(User* user)
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
-void Server_msg::notonchannel_msg(User* user)
+void Server_msg::notonchannel_msg(User* user, std::string& channel_name)
 {
-	std::string msg = ":irc.42.com 442" + user->get_nickname() + " :You're not on that channel\r\n";
+	std::string msg = ":irc.42.com 442" + user->get_nickname() + " ";
+	msg += channel_name + " :You're not on that channel\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }

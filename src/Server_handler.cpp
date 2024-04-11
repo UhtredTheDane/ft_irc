@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/10 16:22:12 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/10 23:54:04 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,7 @@ void Server_handler::part_request(User* user)
 	}
 	catch (std::out_of_range& oor)
 	{
-	
+		throw (Server_handler::Err_NoSuchChannel(split_line[1]));
 	}
 }
 
@@ -226,6 +226,16 @@ void Server_handler::processing_request(User* user, std::string& request)
 			catch (Err_AlreadyRegistred& e)
 			{
 				msg.alreadyregistred_msg(user);
+			}
+			catch (Err_NoSuchChannel& e)
+			{
+				std::string strtest = e.get_str();
+				msg.nosuchchannel_msg(user, strtest);
+			}
+			catch (Err_NotOnChannel& e)
+			{
+				std::string strtest = e.get_str();
+				msg.notOnChannel_msg(user, strtest);
 			}
 			break;
 		}
@@ -264,3 +274,14 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	{
 	}
 }
+
+Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NoSuchChannel::get_str(void)
+{
+	return (str);
+}
+

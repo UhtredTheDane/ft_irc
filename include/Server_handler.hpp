@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/10 17:02:47 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/10 23:52:00 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,25 @@ class Server_handler
 
 		class Err_PasswordIncorrect : public std::exception{};
 		class Err_AlreadyRegistred : public std::exception{};
-		class Err_NoSuchChannel : public std::exception{};
+		class Err_NoSuchChannel : public std::exception
+		{
+			public:
+				Err_NoSuchChannel(std::string str);
+				std::string get_str(void);
+				virtual ~Err_NoSuchChannel(void) throw(){};
+			private:
+				std::string str;
+		};
 		class Err_NeedMoreParams : public std::exception{};
-		class Err_NotOnChannel : public std::exception{};
+		class Err_NotOnChannel : public std::exception
+		{
+			public:
+				Err_NotOnChannel(std::string str);
+				std::string get_str(void);
+				virtual ~Err_NotOnChannel(void) throw(){};
+			private:
+				std::string str;
+		};
 
 
 	private:
