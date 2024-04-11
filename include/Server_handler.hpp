@@ -40,7 +40,10 @@ class Server_handler
 		void mode_request(User* user);
 		void join_request(User* user);
 		void pong_request(User* user);
+		void invite_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
+		
+		User *findUserByName(std::vector<User *> v,std::string name);
 
 	private:
 		Server* serv;

@@ -69,6 +69,8 @@ std::vector<User*>* Channel::get_admins(void)
 {
 	return (&admin_users);
 }
+
+
 int Channel::remove_mod(User *user, int modif)
 {
 	std::vector<User *>::iterator it;
@@ -367,6 +369,12 @@ User *Channel::findUserByName(std::vector<User *> v,std::string name)
 	}
 	return(NULL);
 }
+
+int Channel::IsOption(int option)
+{
+	return (mask & (1 << option));
+}
+
 int Channel::IsMod(User *user)
 {
 	std::vector<User *>::iterator it;

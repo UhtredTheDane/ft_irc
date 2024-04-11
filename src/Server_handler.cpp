@@ -26,6 +26,7 @@ Server_handler::Server_handler(Server* serv)
 	request_types[7] = "KICK"; 
 	request_types[8] = "PRIVMSG";
 	request_types[9] = "PART";
+	request_types[10] = "INVITE";
 
 	requests_ptr[0] = &Server_handler::capls_request;
 	requests_ptr[1] = &Server_handler::pass_request;
@@ -37,6 +38,7 @@ Server_handler::Server_handler(Server* serv)
 	requests_ptr[7] = &Server_handler::kick_request;
 	requests_ptr[8] = &Server_handler::privmsg_request;
 	requests_ptr[9] = &Server_handler::part_request;
+	requests_ptr[10] = &Server_handler::invite_request;
 }
 
 void Server_handler::capls_request(User* user)
@@ -62,6 +64,29 @@ void Server_handler::nick_request(User* user)
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
 	}
+}
+
+void Server_handler::invite_request(User* user)
+{
+	User *target;
+	Channel *chan;
+
+	try
+	{
+		chan = this->serv->get_channels().at(this->split_line[2]);
+		target = this->serv->findUserByName(this->split_line[1]);
+		
+		if(chan->findUserByName(chan->get_users(),this->split_line[1]) == NULL)
+		{
+			
+		}
+		
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+
 }
 
 void Server_handler::user_request(User* user)
@@ -172,6 +197,7 @@ void Server_handler::privmsg_request(User* user)
 		else
 		{
 			std::map<int, User*> users_map = serv->get_users();
+
 			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 			{
 				if (it->second->get_nickname() == split_line[1])
@@ -251,6 +277,17 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	catch(std::out_of_range& oor)
 	{
 	}
+}
+User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
+{
+	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
+	{
+			if((*it)->get_nickname() == name)
+			{
+				return *it;
+			}
+	}
+	return(NULL);
 }
 /*
 

@@ -52,5 +52,6 @@ class Channel
 		int set_mod(User *user, int modif );
 		User *findUserByName(std::vector<User *> v,std::string name);
 		int IsMod(User *user);
+		int IsOption(int option);
 };
 #endif

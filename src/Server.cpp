@@ -122,6 +122,25 @@ void Server::check_connection()
 		//std::cout << "error accept" << std::endl;
 	}
 }
+User *Server::findUserByName(std::string name)
+{
+	User * target;
+
+	target = NULL;
+	std::map<int, User*> mapUser;
+	mapUser = get_users();
+
+	for (std::map<int, User*>::iterator it = mapUser.begin(); it != mapUser.end(); ++it)
+	{
+		if (it->second->get_nickname() == name)
+		{
+			target = it->second;
+			break;
+		}
+	}
+
+	return target;
+}
 /*
 void Server::reply(User *user, int client_socket)
 {
