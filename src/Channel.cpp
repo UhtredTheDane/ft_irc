@@ -383,3 +383,24 @@ int Channel::IsMod(User *user)
 		return 1;
 	return 0;
 }
+void Channel::invite_user(User *user)
+{
+	if(!findUserByName(invite,user->get_nickname()))
+	{
+		invite.push_back(user);
+	}
+	else
+	{
+		std::cout << "User already in the channel " << std::endl;
+	}
+}
+void Channel::erase_invite(User* user)
+{
+	for(std::vector<User *>::iterator it  = invite.begin(); it != invite.end();it ++)
+	{
+			if((*it)->get_nickname() == user->get_nickname())
+			{
+				invite.erase(it);
+			}
+	}
+}

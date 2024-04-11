@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 # include "../include/Server_handler.hpp"
+#include "../include/reply_macros.hpp"
+#include "../include/reply_macros_error.hpp"
 
 Server_handler::Server_handler(Server* serv)
 {
@@ -70,21 +72,50 @@ void Server_handler::invite_request(User* user)
 {
 	User *target;
 	Channel *chan;
+	std::string msg;
 
+     /*    ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+           ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+           ERR_USERNOTINCHANNEL            ERR_NOTONCHANNEL*/
+	std::cout << "Handling an invite request" << std::endl;
 	try
 	{
-		chan = this->serv->get_channels().at(this->split_line[2]);
-		target = this->serv->findUserByName(this->split_line[1]);
-		
-		if(chan->findUserByName(chan->get_users(),this->split_line[1]) == NULL)
+		if(this->split_line.size() != 3)
 		{
-			
+			msg = ": " ;
+			msg += ERR_NEEDMOREPARAMS ;
+			msg += " " + user->get_nickname() + " " + this->raw_msg + ":Not enough parameters\r\n";
+			send(user->get_socket(),msg.c_str(),msg.length(),0);  
+		}
+		chan = this->serv->get_channels().at(this->split_line[2]);// channel exist 
+		target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
+		
+		if(!target)
+		{
+			target = this->serv->findUserByName(this->split_line[1]);//user exist 
+			if(target)
+			{
+				std::cout << "sending invite " << std::endl; 	
+				msg = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
+				chan->invite_user(target);
+				send(target->get_socket(),msg.c_str(),msg.length(),0);
+			}
+			else
+			{
+				std::cout << "target not connected to the server" << std::endl;
+			}	
+		}
+		else
+		{
+			std::cout << "user already in the channel " << std::endl;
 		}
 		
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		msg = ": ";
+		msg += ERR_NOSUCHCHANNEL " ";
+		msg +=  user->get_nickname() + " " + split_line[2] + ":No such channel\r\n";
 	}
 
 }
@@ -236,7 +267,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 11; ++i)
 	{
 		if (!split_line[0].compare(request_types[i]))
 		{
@@ -254,6 +285,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	std::string token;
 	size_t delim_pos;
 
+	this->raw_msg = request;
 	std::map<int, User*> users_map = serv->get_users();
 	try
 	{

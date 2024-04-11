@@ -48,9 +48,10 @@ class Server_handler
 	private:
 		Server* serv;
 		Server_msg msg;
+		std::string raw_msg;
 		std::vector<std::string> split_line;
-		std::string request_types[10];
-		void (Server_handler::*requests_ptr[10])(User*);
+		std::string request_types[11];
+		void (Server_handler::*requests_ptr[11])(User*);
 };
 
 #endif
