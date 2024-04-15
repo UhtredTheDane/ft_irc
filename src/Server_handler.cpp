@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/10 23:54:04 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:53:50 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,7 +235,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 			catch (Err_NotOnChannel& e)
 			{
 				std::string strtest = e.get_str();
-				msg.notOnChannel_msg(user, strtest);
+				msg.notonchannel_msg(user, strtest);
 			}
 			break;
 		}
@@ -281,6 +281,16 @@ Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
 }
 
 std::string Server_handler::Err_NoSuchChannel::get_str(void)
+{
+	return (str);
+}
+
+Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NotOnChannel::get_str(void)
 {
 	return (str);
 }

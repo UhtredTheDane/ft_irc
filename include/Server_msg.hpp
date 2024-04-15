@@ -25,7 +25,7 @@ class Server_msg{
 			void passwordincorrect_msg(User* user);
 			void nosuchchannel_msg(User* user, std::string& channel_name);
 			void needmoreparams_msg(User* user);
-			void notonchannel_msg(User* user);
+			void notonchannel_msg(User* user, std::string& channel_name);
 	private:
 };
 
