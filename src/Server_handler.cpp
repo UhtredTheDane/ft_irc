@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 15:15:11 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:53:50 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ Server_handler::Server_handler(Server* serv)
 
 void Server_handler::capls_request(User* user)
 {
-	if (!split_line[1].compare("LS") && user->get_isRegistered() == 0)
+	if (user->get_isRegistered() == 0 && !split_line[1].compare("LS"))
 	{
 		user->set_isRegistered(1);
 	}
@@ -49,8 +49,10 @@ void Server_handler::capls_request(User* user)
 
 void Server_handler::pass_request(User* user)
 {
-	if(user->get_isRegistered() == 1)
-	{	
+	if((!serv->check_password(split_line[1])) || (!user->get_isRegistered()) == 1)
+	{
+		user->set_isRegistered(0);
+		throw (Server_handler::Err_PasswordIncorrect());
 	}
 }
 
@@ -62,15 +64,18 @@ void Server_handler::nick_request(User* user)
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
 	}
-	else if(user->get_isRegistered() == 2)
+	// else if(user->get_isRegistered() == 2)
+	// {
+	// 	std::string c_msg;
+	// 	while (serv->is_on_serv(split_line[1]))
+	// 		split_line[1] += "_";
+	// 	c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
+	// 	std::cout << "|" << c_msg << "|";
+	// 	send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+	// 	user->set_nickname(split_line[1]);
+	else
 	{
-		std::string c_msg;
-		while (serv->is_on_serv(split_line[1]))
-			split_line[1] += "_";
-		c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
-		std::cout << "|" << c_msg << "|";
-		send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-		user->set_nickname(split_line[1]);
+		throw(Server_handler::Err_AlreadyRegistred());
 	}
 }
 
@@ -90,6 +95,12 @@ void Server_handler::user_request(User* user)
 		msg.myinfo_msg(user);
 		user->set_isRegistered(2);
 	}
+	else
+	{
+		throw(Server_handler::Err_AlreadyRegistred());
+	}
+
+
 }
 
 void Server_handler::pong_request(User* user)
@@ -99,27 +110,20 @@ void Server_handler::pong_request(User* user)
 
 void Server_handler::join_request(User* user)
 {
-	try
-	{	
-		std::cout << user->get_username() << std::endl;
-		Channel* current_chan = serv->get_channels().at(split_line[1]);
-		current_chan->add_user(user);
-		msg.join_msg(user, current_chan);
-
-		std::string join_msg;
-		join_msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + current_chan->get_name();
-		join_msg += "\r\n";
-		std::cout << join_msg << std::endl;
-		for (std::vector<User*>::iterator it = current_chan->get_users()->begin(); it != current_chan->get_users()->end(); ++it)
-		{
-			if (user != *it)
-				send((*it)->get_socket(), join_msg.c_str(), join_msg.length(), 0);
-		}
-
-	}
-	catch (std::out_of_range& oor)
+	std::stringstream list_name(split_line[1]);
+	std::string channel_name;
+	while (getline(list_name, channel_name, ','))
 	{
-		msg.join_msg(user, serv->add_channel(split_line[1], user));
+		try
+		{	
+			Channel* current_chan = serv->get_channels().at(channel_name);
+			current_chan->add_user(user);
+			msg.join_msg(user, current_chan);
+		}
+		catch (std::out_of_range& oor)
+		{
+			msg.join_msg(user, serv->add_channel(channel_name, user));
+		}
 	}
 }
 
@@ -184,15 +188,16 @@ void Server_handler::privmsg_request(User* user)
 
 void Server_handler::part_request(User* user)
 {
-	try
-	{
-		Channel *current_chan = serv->get_channels().at(split_line[1]); 
-		msg.leave_msg(user, current_chan);
-		current_chan->delete_user(user);
-	}
-	catch (std::out_of_range& oor)
-	{
-	}
+		try
+		{
+			Channel *current_chan = serv->get_channels().at(split_line[1]);
+			msg.leave_msg(user, current_chan);
+			current_chan->delete_user(user);
+		}
+		catch (std::out_of_range& oor)
+		{
+			throw (Server_handler::Err_NoSuchChannel(split_line[1]));
+		}
 }
 
 void Server_handler::processing_request(User* user, std::string& request)
@@ -206,7 +211,28 @@ void Server_handler::processing_request(User* user, std::string& request)
 	{
 		if (!split_line[0].compare(request_types[i]))
 		{
-			(this->*requests_ptr[i])(user);
+			try
+			{
+				(this->*requests_ptr[i])(user);
+			}
+			catch (Err_PasswordIncorrect& e)
+			{
+				msg.passwordincorrect_msg(user);
+			}
+			catch (Err_AlreadyRegistred& e)
+			{
+				msg.alreadyregistred_msg(user);
+			}
+			catch (Err_NoSuchChannel& e)
+			{
+				std::string strtest = e.get_str();
+				msg.nosuchchannel_msg(user, strtest);
+			}
+			catch (Err_NotOnChannel& e)
+			{
+				std::string strtest = e.get_str();
+				msg.notonchannel_msg(user, strtest);
+			}
 			break;
 		}
 	}
@@ -244,14 +270,24 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	{
 	}
 }
-/*
 
-else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
-	{
-		//msg.mode_msg(user, client_socket, split_line[1]);
-		
-	}
+Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
+{
+	
+}
 
-*/
+std::string Server_handler::Err_NoSuchChannel::get_str(void)
+{
+	return (str);
+}
 
+Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NotOnChannel::get_str(void)
+{
+	return (str);
+}
 

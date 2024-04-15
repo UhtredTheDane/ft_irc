@@ -6,19 +6,21 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 01:20:53 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/10 23:52:00 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HANDLER_HPP
 # define SERVER_HANDLER_HPP
 
-# include "User.hpp"
+# include <exception>
+# include <vector>
 # include <string>
+# include "User.hpp"
 # include "Channel.hpp"
 # include "Server_msg.hpp"
-# include <vector>
 # include "Server.hpp"
+
 
 class Server;
 
@@ -41,6 +43,29 @@ class Server_handler
 		void join_request(User* user);
 		void pong_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
+
+		class Err_PasswordIncorrect : public std::exception{};
+		class Err_AlreadyRegistred : public std::exception{};
+		class Err_NoSuchChannel : public std::exception
+		{
+			public:
+				Err_NoSuchChannel(std::string str);
+				std::string get_str(void);
+				virtual ~Err_NoSuchChannel(void) throw(){};
+			private:
+				std::string str;
+		};
+		class Err_NeedMoreParams : public std::exception{};
+		class Err_NotOnChannel : public std::exception
+		{
+			public:
+				Err_NotOnChannel(std::string str);
+				std::string get_str(void);
+				virtual ~Err_NotOnChannel(void) throw(){};
+			private:
+				std::string str;
+		};
+
 
 	private:
 		Server* serv;
