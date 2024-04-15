@@ -167,32 +167,14 @@ void Server_handler::privmsg_request(User* user)
 			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
 			Message msg(split_line[2], user);
 			curent_chan->add_message(&msg);
-			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
-			{
-				if(*it != user)
-				{
-					c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
-					std::cout << c_msg << std::endl;
-					send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-				}
-				it++;
-			}
+			// msg.chan_msg(user, curent_chan);
 		}
 		else
 		{
+			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
 			std::map<int, User*> users_map = serv->get_users();
-			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
-			{
-				if (it->second->get_nickname() == split_line[1])
-				{
-					std::string p_msg;
-					p_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
-					std::cout << p_msg << std::endl;
-					send(it->first, p_msg.c_str(), p_msg.length(), 0);
-					break;
-				}
-			}
+			msg.priv_msg(user, users_map, curent_chan);
+
 		}
 	}
 	catch (std::out_of_range& oor)
@@ -273,38 +255,3 @@ else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
 */
 
 
-
-
-
-// 	else if (!split_line[0].compare("NICK"))
-// 	{
-// 		std::string c_msg;
-// 		while (is_on_serv(split_line[1]))
-// 			split_line[1] += "_";
-// 		c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
-// 		send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-// 		user->set_nickname(split_line[1]);
-// 		user->show_userinfo();
-
-// 	}
-// 	else
-// 		std::cout << "|" << request << "|" << std::endl;
-// }
-
-// void Server_handler::msg_toall(std::vector<std::string> split_line, User* user, std::string t_request)
-// {
-// 			Channel *curent_chan = channels.at(split_line[1]); 
-// 			Message msg(split_line[2], user);
-// 			curent_chan->add_message(&msg);
-// 			std::string c_msg;
-// 			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
-// 			{
-// 				if(*it != user)
-// 				{
-// 				c_msg = ":" + user->get_identifier() + t_request + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
-// 				std::cout << c_msg << std::endl;
-// 				send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-// 				}
-// 			it++;
-// 			}
-// }

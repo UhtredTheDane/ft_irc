@@ -128,3 +128,39 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 	for (std::vector<User*>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
 		send((*it)->get_socket(), msg.c_str(), msg_len, 0);
 }
+
+void Server_msg::priv_msg(User* user, std::map<int, User*> users_map)
+{
+	std::string p_msg;
+	Channel *curent_chan = serv->get_channels().at(split_line[1]);
+	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+	{
+		if(*it != user)
+		{
+			p_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
+			std::cout << p_msg << std::endl;
+			send(it->first, p_msg.c_str(), p_msg.length(), 0);
+			break;
+		}
+		it++;
+	}
+	std::string p_msg;
+
+}
+
+void Server_msg::chan_msg(User* user, Channel *curent_chan)
+{
+	std::map<int, User*> users_map = serv->get_users();
+	std::string c_msg;
+	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
+	{
+		if (it->second->get_nickname() == split_line[1])
+		{
+			c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + get_msg() + "\r\n";
+			std::cout << c_msg << std::endl;
+			send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+			break;
+		}
+	}	
+
+}

@@ -5,6 +5,7 @@
 # include <sys/socket.h>
 # include "User.hpp"
 # include "Channel.hpp"
+# include <map>
 
 class User;
 
@@ -21,6 +22,9 @@ class Server_msg{
 			void join_msg(User *user, Channel* channel);
 			void mode_msg(User* user, Channel* channel);
 			void leave_msg(User* user, Channel* channel);
+			void priv_msg(User* user, std::map<int, User*> users_map, Channel *curent_chan);
+			void chan_msg(User* user, Channel *curent_chan);
+
 	private:
 };
 
