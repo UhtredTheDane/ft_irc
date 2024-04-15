@@ -165,15 +165,15 @@ void Server_handler::privmsg_request(User* user)
 		if(split_line[1][0] == '#')
 		{
 			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
-			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
-			// msg.chan_msg(user, curent_chan);
+			std::map<int, User*> users_map = serv->get_users();
+			Message c_msg(split_line[2], user);
+			curent_chan->add_message(&c_msg);
+			msg.chan_msg(user, curent_chan, split_line);
 		}
 		else
 		{
-			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
 			std::map<int, User*> users_map = serv->get_users();
-			msg.priv_msg(user, users_map, curent_chan);
+			msg.priv_msg(user, split_line, users_map);
 
 		}
 	}

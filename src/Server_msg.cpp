@@ -129,36 +129,33 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 		send((*it)->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::priv_msg(User* user, std::map<int, User*> users_map)
+void Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line)
 {
 	std::string p_msg;
-	Channel *curent_chan = serv->get_channels().at(split_line[1]);
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
 	{
 		if(*it != user)
 		{
-			p_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
+
+			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
 			std::cout << p_msg << std::endl;
-			send(it->first, p_msg.c_str(), p_msg.length(), 0);
-			break;
+			send((*it)->get_socket(), p_msg.c_str(), p_msg.length(), 0);
+
 		}
 		it++;
 	}
-	std::string p_msg;
-
 }
 
-void Server_msg::chan_msg(User* user, Channel *curent_chan)
+void Server_msg::priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map)
 {
-	std::map<int, User*> users_map = serv->get_users();
 	std::string c_msg;
 	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 	{
 		if (it->second->get_nickname() == split_line[1])
 		{
-			c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + get_msg() + "\r\n";
+			c_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
 			std::cout << c_msg << std::endl;
-			send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+			send(it->first, c_msg.c_str(), c_msg.length(), 0);
 			break;
 		}
 	}	
