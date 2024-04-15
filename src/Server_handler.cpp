@@ -101,15 +101,20 @@ void Server_handler::pong_request(User* user)
 
 void Server_handler::join_request(User* user)
 {
-	try
-	{	
-		Channel* current_chan = serv->get_channels().at(split_line[1]);
-		current_chan->add_user(user);
-		msg.join_msg(user, current_chan);
-	}
-	catch (std::out_of_range& oor)
+	std::stringstream list_name(split_line[1]);
+	std::string channel_name;
+	while (getline(list_name, channel_name, ','))
 	{
-		msg.join_msg(user, serv->add_channel(split_line[1], user));
+		try
+		{	
+			Channel* current_chan = serv->get_channels().at(channel_name);
+			current_chan->add_user(user);
+			msg.join_msg(user, current_chan);
+		}
+		catch (std::out_of_range& oor)
+		{
+			msg.join_msg(user, serv->add_channel(channel_name, user));
+		}
 	}
 }
 
