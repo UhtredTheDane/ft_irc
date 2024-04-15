@@ -197,21 +197,16 @@ void Server_handler::privmsg_request(User* user)
 
 void Server_handler::part_request(User* user)
 {
-	std::stringstream list_name(split_line[1]);
-	std::string channel_name;
-	while (getline(list_name, channel_name, ','))
-	{
 		try
 		{
-			Channel *current_chan = serv->get_channels().at(channel_name); 
+			Channel *current_chan = serv->get_channels().at(split_line[1]);
 			msg.leave_msg(user, current_chan);
 			current_chan->delete_user(user);
 		}
 		catch (std::out_of_range& oor)
 		{
-			throw (Server_handler::Err_NoSuchChannel(channel_name));
+			throw (Server_handler::Err_NoSuchChannel(split_line[1]));
 		}
-	}
 }
 
 void Server_handler::processing_request(User* user, std::string& request)
