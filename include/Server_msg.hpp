@@ -29,6 +29,9 @@ class Server_msg{
 			void nosuchchannel_msg(User* user, std::string& channel_name);
 			void needmoreparams_msg(User* user);
 			void notonchannel_msg(User* user, std::string& channel_name);
+			void nosuchnick_msg(User* user, std::string& user_name);
+			void norecipient_msg(User* user, std::string& user_name);
+			void notexttosend_msg(User* user, std::string& user_name);
 	private:
 };
 

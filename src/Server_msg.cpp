@@ -41,7 +41,8 @@ void Server_msg::ping_msg(User* user)
 {
 	int client_socket;
 	client_socket = user->get_socket();
-	std::string msg = "PING " + client_socket;
+	std::string msg = "PING ";
+	msg += client_socket;
 	msg += "\r\n";
 	send(client_socket, msg.c_str(), msg.length(), 0);
 }
@@ -51,7 +52,8 @@ void Server_msg::pong_msg(User* user)
 	int client_socket;
 	client_socket = user->get_socket();
 	std::string msg = ":" + user->get_nickname() + "!" + user->get_nickname();
-	msg += "@localhost PONG localhost " + client_socket;
+	msg += "@localhost PONG localhost ";
+	msg += client_socket;
 	msg += "\r\n";
 	send(client_socket, msg.c_str(), msg.length(), 0);
 }
@@ -166,5 +168,26 @@ void Server_msg::notonchannel_msg(User* user, std::string& channel_name)
 {
 	std::string msg = ":irc.42.com 442" + user->get_nickname() + " ";
 	msg += channel_name + " :You're not on that channel\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::nosuchnick_msg(User* user, std::string& user_name)
+{
+	std::string msg = ":irc.42.com 401" + user->get_nickname() + " ";
+	msg += user_name + " :No such nick/channel\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::norecipient_msg(User* user, std::string& user_name)
+{
+	std::string msg = ":irc.42.com 411" + user->get_nickname() + " ";
+	msg += user_name + " :No recipient given\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::notexttosend_msg(User* user, std::string& user_name)
+{
+	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
+	msg += user_name + ":No text to send\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
