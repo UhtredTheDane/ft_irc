@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/09 23:29:41 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/16 18:52:52 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,28 +134,27 @@ void Server::check_incoming_package()
 	char buffer[1024];
 	int bytes_nb;
 	bzero(buffer, 1024);
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();++it)
+	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();)
 	{
-		if (it->fd != fd_socket && it->revents & POLLIN)
-		{
-			while ((bytes_nb = recv(it->fd, buffer, 1024, 0)) != -1)
-			{	
-				if (bytes_nb == 0)
-				{
-					std::cout << "a user leaved the server" << std::endl;
-					close(it->fd);
-					delete_user(it->fd);
-					it = poll_fds->erase(it);
-					std::cout << "couou" << std::endl;
-					break;
-				}
-				else
-				{
-					std::string str_buffer(buffer);
-					handler->request_handler(it->fd, str_buffer);
-					bzero(buffer, 1024);
-				}
+		while (it->fd != fd_socket && (it->revents & POLLIN) && (bytes_nb = recv(it->fd, buffer, 1024, 0)) != -1)
+		{	
+			if (bytes_nb == 0)
+			{
+				close(it->fd);			
+				delete_user(it->fd);
+				it = poll_fds->erase(it);
+				break;
 			}
+			else
+			{
+				std::string str_buffer(buffer);
+				handler->request_handler(it->fd, str_buffer);
+				bzero(buffer, 1024);
+			}
+		}
+		if (it != poll_fds->end())
+		{
+			++it;
 		}
 	}
 }
