@@ -41,7 +41,8 @@ void Server_msg::ping_msg(User* user)
 {
 	int client_socket;
 	client_socket = user->get_socket();
-	std::string msg = "PING " + client_socket;
+	std::string msg = "PING ";
+	msg += client_socket;
 	msg += "\r\n";
 	send(client_socket, msg.c_str(), msg.length(), 0);
 }
@@ -51,7 +52,8 @@ void Server_msg::pong_msg(User* user)
 	int client_socket;
 	client_socket = user->get_socket();
 	std::string msg = ":" + user->get_nickname() + "!" + user->get_nickname();
-	msg += "@localhost PONG localhost " + client_socket;
+	msg += "@localhost PONG localhost ";
+	msg += client_socket;
 	msg += "\r\n";
 	send(client_socket, msg.c_str(), msg.length(), 0);
 }

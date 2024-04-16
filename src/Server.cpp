@@ -128,135 +128,7 @@ void Server::check_connection()
 		//std::cout << "error accept" << std::endl;
 	}
 }
-/*
-void Server::reply(User *user, int client_socket)
-{
-	msg.welcome_msg(user, client_socket);
-	msg.yourhost_msg(user, client_socket);
-	msg.created_msg(user, client_socket);
-	msg.myinfo_msg(user, client_socket);
-	//msg.whois_msg(user, client_socket);
-}
 
-void Server::connexion(int client_socket, User* user, std::string& request)
-{
-	std::stringstream coco(request);
-	std::vector<std::string> split_line;
-	std::string word;
-
-	while (getline(coco, word, ' '))
-	{
-		std::cout << word << std::endl;
-		split_line.push_back(word);
-	}
-	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
-	{
-		std::cout << "test\n";
-		user->set_isRegistered(1);
-	}
-	else if(user->get_isRegistered() == 1)
-	{
-		if (!split_line[0].compare("PASS"))
-		{
-			std::cout << "PASS valide\n";
-		}
-		else if (!split_line[0].compare("NICK"))
-		{
-			if (users_map.size() != 1)
-				user->set_nickname("_" + split_line[1]);
-			else
-				user->set_nickname(split_line[1]);
-		}
-		else if (!split_line[0].compare("USER") && !user->get_nickname().empty())
-		{
-				user->set_username(split_line[1]);
-				user->set_hostname(split_line[2]);
-				user->set_servername(split_line[3]);
-				user->set_realname(split_line[3]);
-				reply(user, client_socket);
-				user->set_isRegistered(2);
-				user->socket = client_socket;
-		}
-	}
-	else if (!split_line[0].compare("PING"))
-	{
-		msg.pong_msg(user, client_socket);
-	}
-	else if (!split_line[0].compare("JOIN"))
-	{
-		try
-		{	
-			std::cout << user->get_username() << std::endl;
-			Channel* curent_chan = channels.at(split_line[1]);
-			curent_chan->add_user(user);
-			msg.join_msg(user, client_socket, split_line[1], curent_chan->get_users());
-		}
-		catch (std::out_of_range& oor)
-		{
-			Channel* new_chan = new Channel(split_line[1], user);
-			channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
-			msg.join_msg(user, client_socket, split_line[1], new_chan->get_users());
-		}
-	}
-	
-	else if (!split_line[0].compare("PRIVMSG"))
-	{
-		try
-		{
-			Channel *curent_chan = channels.at(split_line[1]);
-			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
-			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
-			{
-				if(*it != user)
-				{
-				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_theme()+ " " + msg.get_msg() + "\r\n";
-				std::cout << c_msg << std::endl;
-				send((*it)->socket, c_msg.c_str(), c_msg.length(), 0);
-				}
-			it++;
-			}
-//			send(client_socket, msg.get_msg().c_str(), msg.get_msg().length(), 0);
-
-		}
-		catch (std::out_of_range& oor)
-		{
-		}
-	}
-	else if(!split_line[0].compare("INVITE"))
-	{
-		
-	}
-	else
-		std::cout << "|" << request << "|" << std::endl;
-}
-
-void Server::request_handler(int client_socket, std::string& request)
-{
-	User* user;
-	std::string delimiter = "\r\n";
-	std::string token;
-	size_t delim_pos;
-
-	user = users_map.at(client_socket);
-	if (request.find(delimiter, 0) != std::string::npos)
-	{
-		user->buffer += request;
-		while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)
-		{
-			token = user->buffer.substr(0, delim_pos);
-			connexion(client_socket, user, token);
-			user->buffer.erase(0, delim_pos + delimiter.length());
-		}
-	}
-	else
-	{
-		user->buffer += request;
-	}
-}
-
-*/
 void Server::check_incoming_package()
 {
 	char buffer[1024];
@@ -274,6 +146,7 @@ void Server::check_incoming_package()
 					close(it->fd);
 					delete_user(it->fd);
 					it = poll_fds->erase(it);
+					std::cout << "couou" << std::endl;
 					break;
 				}
 				else
