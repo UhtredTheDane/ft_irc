@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/04/03 16:34:01 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/17 17:05:49 by agengemb         ###   ########.fr       */
 /*   Updated: 2024/03/17 17:14:35 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -40,7 +40,7 @@ class User
 	User(int fd);
 	//buffer a mettre en prive
 		std::string buffer;
-    	virtual ~User();
+    		~User();
 		int get_socket( void ) const;
 
     	std::string const & get_nickname( void ) const;

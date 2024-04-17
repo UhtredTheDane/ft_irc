@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/16 18:52:52 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/17 17:25:20 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,12 @@ Server::~Server(void)
 	{
 		close(it->fd);
 	}
+	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		delete it->second;
+	}
 	delete poll_fds;
+	delete handler;
 	close(fd_socket);
 }
 
@@ -70,16 +75,17 @@ std::map<int, User*> Server::get_users(void)
 	return (users_map);
 }
 
-User* Server::add_user(int fd_client)
+void Server::add_user(int fd_client)
 {
 	User* new_user = new User(fd_client);
 	users_map.insert(std::pair<int, User*>(fd_client, new_user));
-	return (new_user);
 }
 
 void Server::delete_user(int fd_client)
 {
+	User* user_to_delete = users_map.at(fd_client);
 	users_map.erase(fd_client);
+	delete user_to_delete;
 }
 
 Channel* Server::add_channel(std::string name, User* user)
@@ -122,6 +128,7 @@ void Server::check_connection()
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
 		add_user(fd_client);
+		std::cout << "fd client: " << fd_client << std::endl;
 	}
 	else
 	{
@@ -153,9 +160,7 @@ void Server::check_incoming_package()
 			}
 		}
 		if (it != poll_fds->end())
-		{
 			++it;
-		}
 	}
 }
 
@@ -173,14 +178,3 @@ void Server::run_server()
 		}
 	}
 }
-
-/*
-void Server::invite(User *user,std::vector<std::string> line)
-{
-	std::string msg;
-
-
-	msg = ":" + user->get_nickname() + " INVITE " + line[1] + " " +  line[2] + " " + "\r\n";
-	send(user->socket, msg.c_str(), msg.length(), 0);
-
-}*/

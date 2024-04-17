@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:50 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/09 23:31:20 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/17 16:50:54 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Server
 		Server(int port, std::string password);
 		~Server(void);
 		bool check_password(std::string password);
-		User* add_user(int fd_client);
+		void add_user(int fd_client);
 		void delete_user(int fd_client);
 		Channel* add_channel(std::string name, User* user);
 		std::map<std::string, Channel*> get_channels(void);
