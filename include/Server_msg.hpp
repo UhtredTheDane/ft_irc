@@ -21,6 +21,11 @@ class Server_msg{
 			void join_msg(User *user, Channel* channel);
 			void mode_msg(User* user, Channel* channel);
 			void leave_msg(User* user, Channel* channel);
+			void alreadyregistred_msg(User* user);
+			void passwordincorrect_msg(User* user);
+			void nosuchchannel_msg(User* user, std::string& channel_name);
+			void needmoreparams_msg(User* user);
+			void notonchannel_msg(User* user, std::string& channel_name);
 	private:
 };
 

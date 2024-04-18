@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/05 15:14:20 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/17 17:25:20 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,18 @@ Server::~Server(void)
 	{
 		close(it->fd);
 	}
+	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		delete it->second;
+	}
 	delete poll_fds;
+	delete handler;
 	close(fd_socket);
+}
+
+bool Server::check_password(std::string password)
+{
+	return (this->password == password);
 }
 
 std::map<std::string, Channel*> Server::get_channels(void)
@@ -65,16 +75,17 @@ std::map<int, User*> Server::get_users(void)
 	return (users_map);
 }
 
-User* Server::add_user(int fd_client)
+void Server::add_user(int fd_client)
 {
 	User* new_user = new User(fd_client);
 	users_map.insert(std::pair<int, User*>(fd_client, new_user));
-	return (new_user);
 }
 
 void Server::delete_user(int fd_client)
 {
+	User* user_to_delete = users_map.at(fd_client);
 	users_map.erase(fd_client);
+	delete user_to_delete;
 }
 
 Channel* Server::add_channel(std::string name, User* user)
@@ -97,6 +108,7 @@ bool Server::is_on_serv(std::string& nickname)
 	}
 	catch (std::out_of_range& oor)
 	{
+		
 	}
 	return (false);
 }
@@ -116,6 +128,7 @@ void Server::check_connection()
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
 		add_user(fd_client);
+		std::cout << "fd client: " << fd_client << std::endl;
 	}
 	else
 	{
@@ -151,152 +164,31 @@ void Server::reply(User *user, int client_socket)
 	//msg.whois_msg(user, client_socket);
 }
 
-void Server::connexion(int client_socket, User* user, std::string& request)
-{
-	std::stringstream coco(request);
-	std::vector<std::string> split_line;
-	std::string word;
-
-	while (getline(coco, word, ' '))
-	{
-		std::cout << word << std::endl;
-		split_line.push_back(word);
-	}
-	if (user->get_isRegistered() == 0 && !request.compare("CAP LS"))
-	{
-		std::cout << "test\n";
-		user->set_isRegistered(1);
-	}
-	else if(user->get_isRegistered() == 1)
-	{
-		if (!split_line[0].compare("PASS"))
-		{
-			std::cout << "PASS valide\n";
-		}
-		else if (!split_line[0].compare("NICK"))
-		{
-			if (users_map.size() != 1)
-				user->set_nickname("_" + split_line[1]);
-			else
-				user->set_nickname(split_line[1]);
-		}
-		else if (!split_line[0].compare("USER") && !user->get_nickname().empty())
-		{
-				user->set_username(split_line[1]);
-				user->set_hostname(split_line[2]);
-				user->set_servername(split_line[3]);
-				user->set_realname(split_line[3]);
-				reply(user, client_socket);
-				user->set_isRegistered(2);
-				user->socket = client_socket;
-		}
-	}
-	else if (!split_line[0].compare("PING"))
-	{
-		msg.pong_msg(user, client_socket);
-	}
-	else if (!split_line[0].compare("JOIN"))
-	{
-		try
-		{	
-			std::cout << user->get_username() << std::endl;
-			Channel* curent_chan = channels.at(split_line[1]);
-			curent_chan->add_user(user);
-			msg.join_msg(user, client_socket, split_line[1], curent_chan->get_users());
-		}
-		catch (std::out_of_range& oor)
-		{
-			Channel* new_chan = new Channel(split_line[1], user);
-			channels.insert(std::pair<std::string, Channel*>(split_line[1], new_chan));
-			msg.join_msg(user, client_socket, split_line[1], new_chan->get_users());
-		}
-	}
-	
-	else if (!split_line[0].compare("PRIVMSG"))
-	{
-		try
-		{
-			Channel *curent_chan = channels.at(split_line[1]);
-			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
-			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
-			{
-				if(*it != user)
-				{
-				c_msg = ":" + user->get_nickname() + " PRIVMSG " + curent_chan->get_theme()+ " " + msg.get_msg() + "\r\n";
-				std::cout << c_msg << std::endl;
-				send((*it)->socket, c_msg.c_str(), c_msg.length(), 0);
-				}
-			it++;
-			}
-//			send(client_socket, msg.get_msg().c_str(), msg.get_msg().length(), 0);
-
-		}
-		catch (std::out_of_range& oor)
-		{
-		}
-	}
-	else if(!split_line[0].compare("INVITE"))
-	{
-		
-	}
-	else
-		std::cout << "|" << request << "|" << std::endl;
-}
-
-void Server::request_handler(int client_socket, std::string& request)
-{
-	User* user;
-	std::string delimiter = "\r\n";
-	std::string token;
-	size_t delim_pos;
-
-	user = users_map.at(client_socket);
-	if (request.find(delimiter, 0) != std::string::npos)
-	{
-		user->buffer += request;
-		while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)
-		{
-			token = user->buffer.substr(0, delim_pos);
-			connexion(client_socket, user, token);
-			user->buffer.erase(0, delim_pos + delimiter.length());
-		}
-	}
-	else
-	{
-		user->buffer += request;
-	}
-}
-
-*/
 void Server::check_incoming_package()
 {
 	char buffer[1024];
 	int bytes_nb;
 	bzero(buffer, 1024);
-	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();++it)
+	for (std::vector<struct pollfd>::iterator it = poll_fds->begin(); it != poll_fds->end();)
 	{
-		if (it->fd != fd_socket && it->revents & POLLIN)
-		{
-			while ((bytes_nb = recv(it->fd, buffer, 1024, 0)) != -1)
-			{	
-				if (bytes_nb == 0)
-				{
-					std::cout << "a user leaved the server" << std::endl;
-					close(it->fd);
-					delete_user(it->fd);
-					it = poll_fds->erase(it);
-					break;
-				}
-				else
-				{
-					std::string str_buffer(buffer);
-					handler->request_handler(it->fd, str_buffer);
-					bzero(buffer, 1024);
-				}
+		while (it->fd != fd_socket && (it->revents & POLLIN) && (bytes_nb = recv(it->fd, buffer, 1024, 0)) != -1)
+		{	
+			if (bytes_nb == 0)
+			{
+				close(it->fd);			
+				delete_user(it->fd);
+				it = poll_fds->erase(it);
+				break;
+			}
+			else
+			{
+				std::string str_buffer(buffer);
+				handler->request_handler(it->fd, str_buffer);
+				bzero(buffer, 1024);
 			}
 		}
+		if (it != poll_fds->end())
+			++it;
 	}
 }
 
@@ -314,14 +206,3 @@ void Server::run_server()
 		}
 	}
 }
-
-/*
-void Server::invite(User *user,std::vector<std::string> line)
-{
-	std::string msg;
-
-
-	msg = ":" + user->get_nickname() + " INVITE " + line[1] + " " +  line[2] + " " + "\r\n";
-	send(user->socket, msg.c_str(), msg.length(), 0);
-
-}*/
