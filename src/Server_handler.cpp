@@ -68,6 +68,15 @@ void Server_handler::nick_request(User* user)
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
 	}
+	// else if(user->get_isRegistered() == 2)
+	// {
+	// 	std::string c_msg;
+	// 	while (serv->is_on_serv(split_line[1]))
+	// 		split_line[1] += "_";
+	// 	c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
+	// 	std::cout << "|" << c_msg << "|";
+	// 	send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+	// 	user->set_nickname(split_line[1]);
 	else
 	{
 		throw(Server_handler::Err_AlreadyRegistred());
@@ -177,7 +186,7 @@ void Server_handler::mode_request(User* user)
 	try
 	{
 		Channel* target_chan = serv->get_channels().at(split_line[1]);
-		target_chan->update_mod(user->get_socket(),user,split_line);
+		target_chan->update_mod(user,split_line);
 	}
 	catch (std::out_of_range& oor)
 	{
@@ -214,35 +223,16 @@ void Server_handler::privmsg_request(User* user)
 		if(split_line[1][0] == '#')
 		{
 			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
-			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
-			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
-			{
-				if(*it != user)
-				{
-					c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
-					std::cout << c_msg << std::endl;
-					send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-				}
-				it++;
-			}
+			std::map<int, User*> users_map = serv->get_users();
+			Message c_msg(split_line[2], user);
+			curent_chan->add_message(&c_msg);
+			msg.chan_msg(user, curent_chan, split_line);
 		}
 		else
 		{
 			std::map<int, User*> users_map = serv->get_users();
+			msg.priv_msg(user, split_line, users_map);
 
-			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
-			{
-				if (it->second->get_nickname() == split_line[1])
-				{
-					std::string p_msg;
-					p_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
-					std::cout << p_msg << std::endl;
-					send(it->first, p_msg.c_str(), p_msg.length(), 0);
-					break;
-				}
-			}
 		}
 	}
 	catch (std::out_of_range& oor)

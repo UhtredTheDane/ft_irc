@@ -109,6 +109,38 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 		send((*it)->get_socket(), msg.c_str(), msg_len, 0);
 }
 
+void Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line)
+{
+	std::string p_msg;
+	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+	{
+		if(*it != user)
+		{
+
+			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
+			std::cout << p_msg << std::endl;
+			send((*it)->get_socket(), p_msg.c_str(), p_msg.length(), 0);
+
+		}
+		it++;
+	}
+}
+
+void Server_msg::priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map)
+{
+	std::string c_msg;
+	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
+	{
+		if (it->second->get_nickname() == split_line[1])
+		{
+			c_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
+			std::cout << c_msg << std::endl;
+			send(it->first, c_msg.c_str(), c_msg.length(), 0);
+			break;
+		}
+	}	
+
+}
 void Server_msg::passwordincorrect_msg(User* user)
 {
 	std::string msg = ":irc.42.com 464 * :Password incorrect\r\n";
@@ -190,5 +222,24 @@ void Server_msg::err_useronchannel_msg(User* user,std::string& channel_name, std
 	msg += ERR_USERONCHANNEL " ";
 	msg += user->get_nickname() + " ";
 	msg += nick +" " + channel_name+ " :is already on channel\r\n";
+}
+void Server_msg::nosuchnick_msg(User* user, std::string& user_name)
+{
+	std::string msg = ":irc.42.com 401" + user->get_nickname() + " ";
+	msg += user_name + " :No such nick/channel\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::norecipient_msg(User* user, std::string& user_name)
+{
+	std::string msg = ":irc.42.com 411" + user->get_nickname() + " ";
+	msg += user_name + " :No recipient given\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::notexttosend_msg(User* user, std::string& user_name)
+{
+	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
+	msg += user_name + ":No text to send\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
