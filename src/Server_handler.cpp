@@ -166,13 +166,11 @@ void Server_handler::privmsg_request(User* user)
 {
 	try
 	{
+		if(split_line.size() < 3)
+			throw(Server_handler::Err_NeedMoreParams());
 		if(split_line[1][0] == '#')
 		{
-			Channel *curent_chan = serv->get_channels().at(split_line[1]);
-			if(curent_chan == NULL)
-			{
-				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
-			}
+			Channel *curent_chan = serv->get_channels().at(split_line[1]);	
 			std::map<int, User*> users_map = serv->get_users();
 			Message c_msg(split_line[2], user);
 			curent_chan->add_message(&c_msg);
@@ -193,6 +191,7 @@ void Server_handler::privmsg_request(User* user)
 	}
 	catch (std::out_of_range& oor)
 	{
+		throw(Server_handler::Err_CannotSendToChan(split_line[1]));
 	}
 }
 
@@ -252,6 +251,10 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				std::string strtest = e.get_str();
 				msg.nosuchnick_msg(user, strtest);;
+			}
+			catch (Err_NeedMoreParams& e)
+			{
+				msg.needmoreparams_msg(user);;
 			}
 			break;
 		}
