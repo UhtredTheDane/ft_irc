@@ -191,3 +191,10 @@ void Server_msg::notexttosend_msg(User* user, std::string& user_name)
 	msg += user_name + ":No text to send\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
+
+void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
+{
+	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
+	msg += channel_name + ":Cannot send to channel\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}

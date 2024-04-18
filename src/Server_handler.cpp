@@ -168,7 +168,11 @@ void Server_handler::privmsg_request(User* user)
 	{
 		if(split_line[1][0] == '#')
 		{
-			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
+			Channel *curent_chan = serv->get_channels().at(split_line[1]);
+			if(curent_chan == NULL)
+			{
+				throw(Server_handler::Err_CannotSendToChan());
+			}
 			std::map<int, User*> users_map = serv->get_users();
 			Message c_msg(split_line[2], user);
 			curent_chan->add_message(&c_msg);
@@ -232,6 +236,11 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				std::string strtest = e.get_str();
 				msg.notonchannel_msg(user, strtest);
+			}
+			catch (Err_CannotSendToChan& e)
+			{
+				std::string strtest = e.get_str();
+				msg.notonchannel_msg(user, strtest);;
 			}
 			break;
 		}
