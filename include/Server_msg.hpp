@@ -22,8 +22,8 @@ class Server_msg{
 			void join_msg(User *user, Channel* channel);
 			void mode_msg(User* user, Channel* channel);
 			void leave_msg(User* user, Channel* channel);
-			void chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line);
-			void priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map);
+			int chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line);
+			int priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map);
 			void alreadyregistred_msg(User* user);
 			void passwordincorrect_msg(User* user);
 			void nosuchchannel_msg(User* user, std::string& channel_name);

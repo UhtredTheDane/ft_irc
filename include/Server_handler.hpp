@@ -56,6 +56,15 @@ class Server_handler
 				std::string str;
 		};
 		class Err_NeedMoreParams : public std::exception{};
+		class Err_NoSuchNick : public std::exception
+		{
+			public:
+				Err_NoSuchNick(std::string str);
+				std::string get_str(void);
+				virtual ~Err_NoSuchNick(void) throw(){};
+			private:
+				std::string str;
+		};
 		class Err_CannotSendToChan: public std::exception
 		{
 				public:

@@ -171,18 +171,24 @@ void Server_handler::privmsg_request(User* user)
 			Channel *curent_chan = serv->get_channels().at(split_line[1]);
 			if(curent_chan == NULL)
 			{
-				throw(Server_handler::Err_CannotSendToChan());
+				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
 			}
 			std::map<int, User*> users_map = serv->get_users();
 			Message c_msg(split_line[2], user);
 			curent_chan->add_message(&c_msg);
-			msg.chan_msg(user, curent_chan, split_line);
+			if(msg.chan_msg(user, curent_chan, split_line) == -1)
+			{
+				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
+			};
 		}
 		else
 		{
 			std::map<int, User*> users_map = serv->get_users();
-			msg.priv_msg(user, split_line, users_map);
-
+			msg.priv_msg(user, split_line, users_map);	
+			if(split_line[1].empty()||msg.priv_msg(user, split_line, users_map) == -1)
+			{
+				throw(Server_handler::Err_NoSuchNick(split_line[1]));
+			}
 		}
 	}
 	catch (std::out_of_range& oor)
@@ -240,7 +246,12 @@ void Server_handler::processing_request(User* user, std::string& request)
 			catch (Err_CannotSendToChan& e)
 			{
 				std::string strtest = e.get_str();
-				msg.notonchannel_msg(user, strtest);;
+				msg.cannotsendtochan_msg(user, strtest);;
+			}
+			catch (Err_NoSuchNick& e)
+			{
+				std::string strtest = e.get_str();
+				msg.nosuchnick_msg(user, strtest);;
 			}
 			break;
 		}
@@ -289,6 +300,27 @@ std::string Server_handler::Err_NoSuchChannel::get_str(void)
 {
 	return (str);
 }
+
+Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_CannotSendToChan::get_str(void)
+{
+	return (str);
+}
+
+Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NoSuchNick::get_str(void)
+{
+	return (str);
+}
+
 
 Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
 {
