@@ -69,6 +69,8 @@ std::vector<User*>* Channel::get_admins(void)
 {
 	return (&admin_users);
 }
+
+
 int Channel::remove_mod(User *user, int modif)
 {
 	std::vector<User *>::iterator it;
@@ -110,7 +112,9 @@ int Channel::set_mod(User *user, int modif)
 
 void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> line)
 {
-	
+	/* ERR_NEEDMOREPARAMS              ERR_KEYSET
+           ERR_NOCHANMODES                 ERR_CHANOPRIVSNEEDED
+           ERR_USERNOTINCHANNEL            ERR_UNKNOWNMODE*/
 	std::string options;
 	int param = -1;
 	std::string response;
@@ -122,13 +126,17 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 	response = "";
 	std::string compare = " ikolt ";
 
-	if(line.size() >= 3) 
+	if(line.size() >= 3)
 		options = line[2];
 	if(options.size() >= 2)
 	{
 		if (line.size() >= 4)
 		{
 			param = 3;
+		}
+		else
+		{
+			//not enough param
 		}
 		std::string::iterator current = options.begin();
 		std::cout << options << std::endl;
@@ -291,7 +299,7 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 		{
 			// pas de plus ou de moins 
 		}
-		if(validoptions.size() > 1)
+		if(validoptions.size() >= 1)
 		{
 			std::cout << " Sending response to a mode command" << std::endl;
 			response = ":" + user->get_servername();
@@ -367,6 +375,12 @@ User *Channel::findUserByName(std::vector<User *> v,std::string name)
 	}
 	return(NULL);
 }
+
+int Channel::IsOption(int option)
+{
+	return (mask & (1 << option));
+}
+
 int Channel::IsMod(User *user)
 {
 	std::vector<User *>::iterator it;
@@ -374,4 +388,35 @@ int Channel::IsMod(User *user)
 	if(it != admin_users.end())
 		return 1;
 	return 0;
+}
+
+int Channel::IsInChannel(User *user)
+{
+	std::vector<User *>::iterator it;
+	it = std::find(users.begin(),admin_users.end(),user);
+	if(it != users.end())
+		return 1;
+	return 0;
+}
+
+void Channel::invite_user(User *user)
+{
+	if(!findUserByName(invite,user->get_nickname()))
+	{
+		invite.push_back(user);
+	}
+	else
+	{
+		std::cout << "User already in the channel " << std::endl;
+	}
+}
+void Channel::erase_invite(User* user)
+{
+	for(std::vector<User *>::iterator it  = invite.begin(); it != invite.end();it ++)
+	{
+			if((*it)->get_nickname() == user->get_nickname())
+			{
+				invite.erase(it);
+			}
+	}
 }

@@ -44,7 +44,7 @@ class Server
 		void run_server();
 		void check_connection();
 		void check_incoming_package();
-
+		User *findUserByName(std::string name);
 	private:
 	
 		Server_handler* handler;

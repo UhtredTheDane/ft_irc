@@ -42,7 +42,10 @@ class Server_handler
 		void mode_request(User* user);
 		void join_request(User* user);
 		void pong_request(User* user);
+		void invite_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
+		
+		User *findUserByName(std::vector<User *> v,std::string name);
 
 		class Err_PasswordIncorrect : public std::exception{};
 		class Err_AlreadyRegistred : public std::exception{};
@@ -88,9 +91,10 @@ class Server_handler
 	private:
 		Server* serv;
 		Server_msg msg;
+		std::string raw_msg;
 		std::vector<std::string> split_line;
-		std::string request_types[10];
-		void (Server_handler::*requests_ptr[10])(User*);
+		std::string request_types[11];
+		void (Server_handler::*requests_ptr[11])(User*);
 };
 
 #endif
