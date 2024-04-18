@@ -68,6 +68,15 @@ void Server_handler::nick_request(User* user)
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
 	}
+	// else if(user->get_isRegistered() == 2)
+	// {
+	// 	std::string c_msg;
+	// 	while (serv->is_on_serv(split_line[1]))
+	// 		split_line[1] += "_";
+	// 	c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
+	// 	std::cout << "|" << c_msg << "|";
+	// 	send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
+	// 	user->set_nickname(split_line[1]);
 	else
 	{
 		throw(Server_handler::Err_AlreadyRegistred());
@@ -213,35 +222,26 @@ void Server_handler::privmsg_request(User* user)
 	{
 		if(split_line[1][0] == '#')
 		{
-			Channel *curent_chan = serv->get_channels().at(split_line[1]); 
-			Message msg(split_line[2], user);
-			curent_chan->add_message(&msg);
-			std::string c_msg;
-			for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+			Channel *curent_chan = serv->get_channels().at(split_line[1]);
+			if(curent_chan == NULL)
 			{
-				if(*it != user)
-				{
-					c_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + msg.get_msg() + "\r\n";
-					std::cout << c_msg << std::endl;
-					send((*it)->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-				}
-				it++;
+				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
 			}
+			std::map<int, User*> users_map = serv->get_users();
+			Message c_msg(split_line[2], user);
+			curent_chan->add_message(&c_msg);
+			if(msg.chan_msg(user, curent_chan, split_line) == -1)
+			{
+				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
+			};
 		}
 		else
 		{
 			std::map<int, User*> users_map = serv->get_users();
-
-			for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
+			msg.priv_msg(user, split_line, users_map);	
+			if(split_line[1].empty()||msg.priv_msg(user, split_line, users_map) == -1)
 			{
-				if (it->second->get_nickname() == split_line[1])
-				{
-					std::string p_msg;
-					p_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
-					std::cout << p_msg << std::endl;
-					send(it->first, p_msg.c_str(), p_msg.length(), 0);
-					break;
-				}
+				throw(Server_handler::Err_NoSuchNick(split_line[1]));
 			}
 		}
 	}
@@ -296,6 +296,16 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				std::string strtest = e.get_str();
 				msg.notonchannel_msg(user, strtest);
+			}
+			catch (Err_CannotSendToChan& e)
+			{
+				std::string strtest = e.get_str();
+				msg.cannotsendtochan_msg(user, strtest);;
+			}
+			catch (Err_NoSuchNick& e)
+			{
+				std::string strtest = e.get_str();
+				msg.nosuchnick_msg(user, strtest);;
 			}
 			break;
 		}
@@ -356,6 +366,27 @@ std::string Server_handler::Err_NoSuchChannel::get_str(void)
 {
 	return (str);
 }
+
+Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_CannotSendToChan::get_str(void)
+{
+	return (str);
+}
+
+Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NoSuchNick::get_str(void)
+{
+	return (str);
+}
+
 
 Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
 {

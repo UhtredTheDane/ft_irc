@@ -124,7 +124,7 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 	validparam = "";
 	validoptions = "";
 	response = "";
-	std::string compare = "ikolt";
+	std::string compare = " ikolt ";
 
 	if(line.size() >= 3)
 		options = line[2];
@@ -299,7 +299,7 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 		{
 			// pas de plus ou de moins 
 		}
-		if(validoptions.size() > 1)
+		if(validoptions.size() >= 1)
 		{
 			std::cout << " Sending response to a mode command" << std::endl;
 			response = ":" + user->get_servername();
