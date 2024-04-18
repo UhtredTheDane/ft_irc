@@ -58,7 +58,16 @@ class Server_handler
 			private:
 				std::string str;
 		};
-		class Err_NeedMoreParams : public std::exception{};
+		class Err_NeedMoreParams : public std::exception
+		{
+			public:
+			User *user;
+			Err_NeedMoreParams(User *user, std::string str);
+			std::string get_str(void);
+			virtual ~Err_NeedMoreParams(void) throw(){};
+			private:
+				std::string str;
+		};
 		class Err_NoSuchNick : public std::exception
 		{
 			public:

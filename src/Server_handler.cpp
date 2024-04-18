@@ -221,7 +221,7 @@ void Server_handler::privmsg_request(User* user)
 	try
 	{
 		if(split_line.size() < 3)
-			throw(Server_handler::Err_NeedMoreParams());
+			throw(Server_handler::Err_NeedMoreParams(user, split_line[0]));
 		if(split_line[1][0] == '#')
 		{
 			Channel *curent_chan = serv->get_channels().at(split_line[1]);	
@@ -308,7 +308,8 @@ void Server_handler::processing_request(User* user, std::string& request)
 			}
 			catch (Err_NeedMoreParams& e)
 			{
-				msg.needmoreparams_msg(user);;
+				std::string strtest = e.get_str();
+				msg.needmoreparams_msg(user, strtest);
 			}
 			break;
 		}
@@ -366,6 +367,17 @@ Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
 }
 
 std::string Server_handler::Err_NoSuchChannel::get_str(void)
+{
+	return (str);
+}
+
+
+Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(User *user, std::string str) : user(user), str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NeedMoreParams::get_str(void)
 {
 	return (str);
 }
