@@ -110,7 +110,7 @@ int Channel::set_mod(User *user, int modif)
 	}
 }
 
-void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> line)
+void Channel::update_mod(User *user, std::vector<std::string> line)
 {
 	/* ERR_NEEDMOREPARAMS              ERR_KEYSET
            ERR_NOCHANMODES                 ERR_CHANOPRIVSNEEDED
@@ -124,7 +124,7 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 	validparam = "";
 	validoptions = "";
 	response = "";
-	std::string compare = "ikolt";
+	std::string compare = " ikolt ";
 
 	if(line.size() >= 3)
 		options = line[2];
@@ -133,10 +133,6 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 		if (line.size() >= 4)
 		{
 			param = 3;
-		}
-		else
-		{
-			//not enough param
 		}
 		std::string::iterator current = options.begin();
 		std::cout << options << std::endl;
@@ -302,11 +298,11 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 		if(validoptions.size() > 1)
 		{
 			std::cout << " Sending response to a mode command" << std::endl;
-			response = ":" + user->get_servername();
-			response += " 324 " + user->get_username() + " " + line[1] + " " + validoptions + " " + validparam;
+			response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
+			response += " MODE " + line[1] + " " + validoptions + " " + validparam;
 			response += "\r\n";
 			std::cout << response << std::endl; 
-			send(clientsocket, response.c_str(), response.length(), 0);
+			send(user->get_socket(), response.c_str(), response.length(), 0);
 
 		}
 		else
