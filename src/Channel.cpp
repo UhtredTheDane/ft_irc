@@ -112,7 +112,9 @@ int Channel::set_mod(User *user, int modif)
 
 void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> line)
 {
-	
+	/* ERR_NEEDMOREPARAMS              ERR_KEYSET
+           ERR_NOCHANMODES                 ERR_CHANOPRIVSNEEDED
+           ERR_USERNOTINCHANNEL            ERR_UNKNOWNMODE*/
 	std::string options;
 	int param = -1;
 	std::string response;
@@ -122,15 +124,19 @@ void Channel::update_mod(int clientsocket ,User *user, std::vector<std::string> 
 	validparam = "";
 	validoptions = "";
 	response = "";
-	std::string compare = " ikolt ";
+	std::string compare = "ikolt";
 
-	if(line.size() >= 3) 
+	if(line.size() >= 3)
 		options = line[2];
 	if(options.size() >= 2)
 	{
 		if (line.size() >= 4)
 		{
 			param = 3;
+		}
+		else
+		{
+			//not enough param
 		}
 		std::string::iterator current = options.begin();
 		std::cout << options << std::endl;
@@ -383,6 +389,16 @@ int Channel::IsMod(User *user)
 		return 1;
 	return 0;
 }
+
+int Channel::IsInChannel(User *user)
+{
+	std::vector<User *>::iterator it;
+	it = std::find(users.begin(),admin_users.end(),user);
+	if(it != users.end())
+		return 1;
+	return 0;
+}
+
 void Channel::invite_user(User *user)
 {
 	if(!findUserByName(invite,user->get_nickname()))

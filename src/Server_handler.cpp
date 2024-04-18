@@ -78,50 +78,48 @@ void Server_handler::invite_request(User* user)
 {
 	User *target;
 	Channel *chan;
-	std::string msg;
+	std::string reply;
 
-     /*    ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
-           ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
-           ERR_USERNOTINCHANNEL            ERR_NOTONCHANNEL*/
+     /*    
+           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+           ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+           ERR_CHANOPRIVSNEEDED*/
 	std::cout << "Handling an invite request" << std::endl;
 	try
 	{
 		if(this->split_line.size() != 3)
-		{
-			msg = ": " ;
-			msg += ERR_NEEDMOREPARAMS ;
-			msg += " " + user->get_nickname() + " " + this->raw_msg + ":Not enough parameters\r\n";
-			send(user->get_socket(),msg.c_str(),msg.length(),0);  
-		}
-		chan = this->serv->get_channels().at(this->split_line[2]);// channel exist 
-		target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
-		
-		if(!target)
-		{
-			target = this->serv->findUserByName(this->split_line[1]);//user exist 
-			if(target)
-			{
-				std::cout << "sending invite " << std::endl; 	
-				msg = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
-				chan->invite_user(target);
-				send(target->get_socket(),msg.c_str(),msg.length(),0);
-			}
-			else
-			{
-				std::cout << "target not connected to the server" << std::endl;
-			}	
-		}
+			msg.needmoreparams_msg(user,this->raw_msg);
 		else
 		{
-			std::cout << "user already in the channel " << std::endl;
+			chan = this->serv->get_channels().at(this->split_line[2]);//channel exist 
+			
+				target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
+				if(!target)
+				{
+					target = this->serv->findUserByName(this->split_line[1]);//user exist
+					if(target)
+					{
+						std::cout << "sending invite " << std::endl; 	
+						reply = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
+						chan->invite_user(target);
+						send(target->get_socket(),reply.c_str(),reply.length(),0);
+					}
+					else
+					{
+						std::cout << "target not connected to the server" << std::endl;
+					}	
+				}
+				else
+				{
+					std::cout << "user already in the channel " << std::endl;
+				}
+			
 		}
 		
 	}
 	catch(const std::exception& e)
 	{
-		msg = ": ";
-		msg += ERR_NOSUCHCHANNEL " ";
-		msg +=  user->get_nickname() + " " + split_line[2] + ":No such channel\r\n";
+		msg.nosuchchannel_msg(user,split_line[2]);
 	}
 
 }
@@ -312,7 +310,6 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	std::string token;
 	size_t delim_pos;
 
-	this->raw_msg = request;
 	std::map<int, User*> users_map = serv->get_users();
 	try
 	{
@@ -324,6 +321,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 			{
 				token = user->buffer.substr(0, delim_pos);
 				std::cout << token << std::endl;
+				this->raw_msg = token;
 				processing_request(user, token);
 				user->buffer.erase(0, delim_pos + delimiter.length());
 			}
@@ -348,6 +346,26 @@ User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 	}
 	return(NULL);
 }
+
+Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NoSuchChannel::get_str(void)
+{
+	return (str);
+}
+
+Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
+{
+	
+}
+
+std::string Server_handler::Err_NotOnChannel::get_str(void)
+{
+	return (str);
+}
 /*
 
 else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
@@ -365,4 +383,4 @@ std::string Server_handler::Err_NotOnChannel::get_str(void)
 {
 	return (str);
 }
-
+*/

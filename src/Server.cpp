@@ -163,7 +163,7 @@ void Server::reply(User *user, int client_socket)
 	msg.myinfo_msg(user, client_socket);
 	//msg.whois_msg(user, client_socket);
 }
-
+*/
 void Server::check_incoming_package()
 {
 	char buffer[1024];

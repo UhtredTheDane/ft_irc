@@ -22,9 +22,8 @@
 class Channel
 {
 	enum Chanmod { i = 1 , k = 2 , o = 3 , l = 4 , t = 5};
-
+	
 	private:
-		//mod a rajouter
 		std::string theme;
 		std::string password;
 		int limit_user;
@@ -54,6 +53,7 @@ class Channel
 		int set_mod(User *user, int modif );
 		User *findUserByName(std::vector<User *> v,std::string name);
 		int IsMod(User *user);
+		int IsInChannel(User *user);
 		int IsOption(int option);
 };
 #endif
