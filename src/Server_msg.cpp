@@ -161,6 +161,28 @@ void Server_msg::nosuchchannel_msg(User* user, std::string& channel_name)
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
+void Server_msg::inviteonlychan_msg(User* user, std::string& channel)
+{
+	std::string msg = ":irc.42.com 473 " + user->get_nickname() + " ";
+	msg += channel + " :Cannot join channel whithout invitation\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::channelisfull_msg(User* user, std::string& channel)
+{
+	std::string msg = ":irc.42.com 471 " + user->get_nickname() + " ";
+	msg += channel + " : Cannot join channel, it'is full(+l)\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::badchannelkey_msg(User* user, std::string& channel)
+{
+	std::string msg = ":irc.42.com 475 " + user->get_nickname() + " ";
+	msg += channel + " : Cannot join channel, bad key(+k)\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+
 void Server_msg::needmoreparams_msg(User* user, std::string& command)
 {
 	std::string msg = ":irc.42.com 461" + user->get_nickname() + " " + command + " :Not enough parameters\r\n";

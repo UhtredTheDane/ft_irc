@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/10 23:52:00 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:16:00 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 # include "Channel.hpp"
 # include "Server_msg.hpp"
 # include "Server.hpp"
-
 
 class Server;
 
@@ -57,6 +56,33 @@ class Server_handler
 				virtual ~Err_NoSuchChannel(void) throw(){};
 			private:
 				std::string str;
+		};
+		class Err_InviteOnlyChan : public std::exception
+		{
+			public:
+				Err_InviteOnlyChan(std::string channel);
+				std::string get_channel(void);
+				virtual ~Err_InviteOnlyChan(void) throw(){};
+			private:
+				std::string channel;	
+		};
+		class Err_ChannelIsFull : public std::exception
+		{
+			public:
+				Err_ChannelIsFull(std::string channel);
+				std::string get_channel(void);
+				virtual ~Err_ChannelIsFull(void) throw(){};
+			private:
+				std::string channel;	
+		};
+		class Err_BadChannelKey : public std::exception
+		{
+			public:
+				Err_BadChannelKey(std::string channel);
+				std::string get_channel(void);
+				virtual ~Err_BadChannelKey(void) throw(){};
+			private:
+				std::string channel;	
 		};
 		class Err_NeedMoreParams : public std::exception{};
 		class Err_NoSuchNick : public std::exception

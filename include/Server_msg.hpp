@@ -29,6 +29,9 @@ class Server_msg{
 			void nosuchchannel_msg(User* user, std::string& channel_name);
 			void needmoreparams_msg(User* user, std::string& command);
 			void notonchannel_msg(User* user, std::string& channel_name);
+			void inviteonlychan_msg(User* user, std::string& channel);
+			void channelisfull_msg(User* user, std::string& channel);
+			void badchannelkey_msg(User* user, std::string& channel);
 			void err_keyset_msg(User* user, std::string& channel_name);
 			void err_chanoprivneeded_msg(User* user, std::string& channel_name);
 			void err_usernotinchannel_msg(User* user, std::string& channel_name, std::string& nick);

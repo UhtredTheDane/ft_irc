@@ -6,16 +6,18 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 16:14:33 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/28 01:31:48 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:39:20 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Channel.hpp"
+# include <iostream>
 
 Channel::Channel(std::string& name, User* user_admin)
 {
 	this->theme = "";
 	this->name = name;
+	this->limit_user = 0;
 	this->admin_users.push_back(user_admin);
 	users.push_back(user_admin);
 	this->mask = 0;
@@ -64,12 +66,28 @@ std::vector<User*>* Channel::get_users(void)
 	return (&users);
 }
 
-
 std::vector<User*>* Channel::get_admins(void)
 {
 	return (&admin_users);
 }
 
+bool Channel::is_full(void)
+{
+	if (static_cast<int>(users.size()) >= limit_user)
+	{
+		return (true);
+	}
+	return (false);
+}
+
+bool Channel::check_key(std::string& key)
+{
+	std::cout << "password: " << password << " et key: " << key << std::endl;
+	bool res;
+	res = key.compare(password) == 0;
+	std::cout << "res: " << res << std::endl;
+	return (res);
+}
 
 int Channel::remove_mod(User *user, int modif)
 {

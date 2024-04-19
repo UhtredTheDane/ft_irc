@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/19 16:55:56 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:40:28 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,20 +164,39 @@ void Server_handler::pong_request(User* user)
 
 void Server_handler::join_request(User* user)
 {
+	if (split_line.size() < 2)
+	{
+		throw(Server_handler::Err_NeedMoreParams());
+	}
 	std::stringstream list_name(split_line[1]);
 	std::string channel_name;
+	Channel* current_chan;
 	while (getline(list_name, channel_name, ','))
 	{
 		try
 		{	
-			Channel* current_chan = serv->get_channels().at(channel_name);
-			current_chan->add_user(user);
-			msg.join_msg(user, current_chan);
+			current_chan = serv->get_channels().at(channel_name);
 		}
 		catch (std::out_of_range& oor)
 		{
 			msg.join_msg(user, serv->add_channel(channel_name, user));
+			return ;
 		}
+
+		if (current_chan->IsOption(1))
+		{
+			throw(Err_InviteOnlyChan(channel_name));
+		}
+		else if (current_chan->IsOption(2) && !current_chan->check_key(split_line[2]))
+		{
+			throw(Err_BadChannelKey(channel_name));
+		}
+		else if (current_chan->IsOption(4) && current_chan->is_full())
+		{
+			throw(Err_ChannelIsFull(channel_name));
+		}
+		current_chan->add_user(user);
+		msg.join_msg(user, current_chan);
 	}
 }
 
@@ -233,7 +252,7 @@ void Server_handler::privmsg_request(User* user)
 			if(msg.chan_msg(user, curent_chan, split_line) == -1)
 			{
 				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
-			};
+			}
 		}
 		else
 		{
@@ -274,6 +293,26 @@ void Server_handler::processing_request(User* user, std::string& request)
 			try
 			{
 				(this->*requests_ptr[i])(user);
+			}
+			catch (Err_InviteOnlyChan& e)
+			{
+				std::string strtest = e.get_channel();
+				msg.inviteonlychan_msg(user, strtest);
+			}
+			catch (Err_ChannelIsFull& e)
+			{
+				std::string strtest = e.get_channel();
+				msg.channelisfull_msg(user, strtest);
+			}
+			catch (Err_BadChannelKey& e)
+			{
+				std::string strtest = e.get_channel();
+				msg.badchannelkey_msg(user, strtest);
+			}
+
+			catch (Err_NeedMoreParams& e)
+			{
+				msg.needmoreparams_msg(user, split_line[0]);
 			}
 			catch (Err_PasswordIncorrect& e)
 			{
@@ -353,6 +392,36 @@ User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 	return(NULL);
 }
 
+Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel) : channel(channel)
+{
+	
+}
+
+std::string Server_handler::Err_InviteOnlyChan::get_channel(void)
+{
+	return (channel);
+}
+
+Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel) : channel(channel)
+{
+	
+}
+
+std::string Server_handler::Err_ChannelIsFull::get_channel(void)
+{
+	return (channel);
+}
+
+Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel) : channel(channel)
+{
+	
+}
+
+std::string Server_handler::Err_BadChannelKey::get_channel(void)
+{
+	return (channel);
+}
+
 Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
 {
 	
@@ -393,21 +462,3 @@ std::string Server_handler::Err_NotOnChannel::get_str(void)
 {
 	return (str);
 }
-/*
-
-else if (!split_line[0].compare("MODE") && split_line[1][0] == '#')
-	{
-		//msg.mode_msg(user, client_socket, split_line[1]);
-		
-	}
-
-Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_NotOnChannel::get_str(void)
-{
-	return (str);
-}
-*/
