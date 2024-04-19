@@ -22,8 +22,12 @@
 class Channel
 {
 	enum Chanmod { i = 1 , k = 2 , o = 3 , l = 4 , t = 5};
-	
+
 	private:
+
+		//const std::string  _options = "ikolt";
+		std::string options_types[5];
+		std::string options_ptr[5];
 		std::string theme;
 		std::string password;
 		int limit_user;
@@ -46,7 +50,7 @@ class Channel
 		std::vector<User*>* get_admins(void);
 		void invite_user(User *user);
 		void erase_invite(User* user);
-		void update_mod(int clientsocket ,User *user, std::vector<std::string> line);
+		void update_mod(User *user, std::vector<std::string> line);
 		int give_privilege(User *user,std::string name);
 		int take_privilege(User *user,std::string name);
 		int remove_mod(User *user, int modif);

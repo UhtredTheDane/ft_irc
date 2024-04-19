@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/15 15:53:50 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/19 16:55:56 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,7 @@ void Server_handler::mode_request(User* user)
 	try
 	{
 		Channel* target_chan = serv->get_channels().at(split_line[1]);
-		target_chan->update_mod(user->get_socket(),user,split_line);
+		target_chan->update_mod(user,split_line);
 	}
 	catch (std::out_of_range& oor)
 	{
@@ -238,11 +238,7 @@ void Server_handler::privmsg_request(User* user)
 		else
 		{
 			std::map<int, User*> users_map = serv->get_users();
-			msg.priv_msg(user, split_line, users_map);	
-			if(split_line[1].empty()||msg.priv_msg(user, split_line, users_map) == -1)
-			{
-				throw(Server_handler::Err_NoSuchNick(split_line[1]));
-			}
+			msg.priv_msg(user, split_line, users_map);
 		}
 	}
 	catch (std::out_of_range& oor)

@@ -35,11 +35,11 @@ class Server_msg{
 			void err_unknowmode_msg(User* user,std::string& channel_name ,std::string & option);
 			void err_nosuchnick_msg(User* user,std::string& nick);
 			void err_useronchannel_msg(User* user,std::string& channel_name, std::string& nick);
+			void cannotsendtochan_msg(User* user, std::string& channel_name);
+
 			void nosuchnick_msg(User* user, std::string& user_name);
 			void norecipient_msg(User* user, std::string& user_name);
 			void notexttosend_msg(User* user, std::string& user_name);
-			void cannotsendtochan_msg(User* user, std::string& channel_name);
-
 	private:
 };
 
