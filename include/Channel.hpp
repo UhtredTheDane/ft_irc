@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 16:17:28 by agengemb          #+#    #+#             */
-/*   Updated: 2024/03/28 01:30:19 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:10:37 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,5 +73,9 @@ class Channel
 		int IsMod(User *user);
 		int IsInChannel(User *user);
 		int IsOption(int option);
+		bool is_full(void);
+		bool check_key(std::string& key);
+			
+			
 };
 #endif
