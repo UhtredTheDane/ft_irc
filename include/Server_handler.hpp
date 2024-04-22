@@ -26,9 +26,18 @@ class Server;
 
 class Server_handler
 {
-
+	{
+	private:
+			Server* serv;
+			Server_msg msg;
+			std::string raw_msg;
+			std::vector<std::string> split_line;
+			std::string request_types[11];
+			void (Server_handler::*requests_ptr[11])(User*);
+	}
 	public:
 
+		
 		Server_handler(Server* serv);
 		void request_handler(int client_socket, std::string &request);
 		void processing_request(User* user, std::string& request);
@@ -46,7 +55,10 @@ class Server_handler
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
 		
 		User *findUserByName(std::vector<User *> v,std::string name);
+		
 
+
+	{
 		class Err_PasswordIncorrect : public std::exception{};
 		class Err_AlreadyRegistred : public std::exception{};
 		class Err_NoSuchChannel : public std::exception
@@ -58,8 +70,13 @@ class Server_handler
 			private:
 				std::string str;
 		};
-		class Err_NeedMoreParams : public std::exception{};
-		class Err_NotOnChannel : public std::exception
+		class Err_NeedMoreParams : public std::exception
+		{
+			public:
+				Err_NeedMoreParams(std::string str);
+				virtual ~Err_NeedMoreParams(void) throw(){};
+		};//ERR_NEEDMOREPARAMS         
+		class Err_NotOnChannel : public std::exception //ERR_NOTONCHANNE
 		{
 			public:
 				Err_NotOnChannel(std::string str);
@@ -68,15 +85,25 @@ class Server_handler
 			private:
 				std::string str;
 		};
-
-
-	private:
-		Server* serv;
-		Server_msg msg;
-		std::string raw_msg;
-		std::vector<std::string> split_line;
-		std::string request_types[11];
-		void (Server_handler::*requests_ptr[11])(User*);
+		class Err_nosuchnick : public std::exception
+		{
+			public:
+				Err_nosuchnick(std::string str);
+				virtual ~Err_nosuchnick(void) throw(){};
+		};
+ 	    class Err_useronchannel : public std::exception
+		{
+			public:
+				Err_useronchannel(std::string str);
+				virtual ~Err_useronchannel(void) throw(){};
+		};
+		class Err_chanoprivsneeded : public std::exception
+		{
+			public:
+				Err_chanoprivsneeded(std::string str);
+				virtual ~Err_chanoprivsneeded(void) throw(){};
+		};
+	}
 };
 
 #endif

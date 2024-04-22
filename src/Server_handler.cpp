@@ -116,11 +116,13 @@ void Server_handler::invite_request(User* user)
 					else
 					{
 						std::cout << "target not connected to the server" << std::endl;
+						throw(Server_handler::Err_NotOnChannel(user));
 					}	
 				}
 				else
 				{
 					std::cout << "user already in the channel " << std::endl;
+					throw(Server_handler::e(user));
 				}
 			
 		}
@@ -286,6 +288,18 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				std::string strtest = e.get_str();
 				msg.notonchannel_msg(user, strtest);
+			}
+			catch(Err_chanoprivsneeded& e)
+			{
+				msg.err_chanoprivneeded_msg();
+			}
+			catch(Err_nosuchnick& e)
+			{
+				msg.err_nosuchnick_msg();
+			}
+			catch(Err_useronchannel& e)
+			{
+				msg.err_useronchannel_msg()
 			}
 			break;
 		}
