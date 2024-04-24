@@ -205,7 +205,7 @@ void Server_msg::err_keyset_msg(User* user, std::string& channel_name)
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
-void Server_msg::err_chanoprivneeded_msg(User* user, std::string& channel_name)
+void Server_msg::err_chanoprivneeded_msg(User* user, std::string const& channel_name)
 {
 	std::string msg = ":irc.42.com " ;
 	msg += ERR_CHANOPRIVSNEEDED " ";
@@ -239,7 +239,7 @@ void Server_msg::err_nosuchnick_msg(User* user,std::string& nick)
 	msg += nick + " :No such nick/channel\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
-void Server_msg::err_useronchannel_msg(User* user,std::string& channel_name, std::string& nick)
+void Server_msg::err_useronchannel_msg(User* user, std::string const& channel_name, std::string const& nick)
 {
 	std::string msg = ":irc.42.com " ;
 	msg += ERR_USERONCHANNEL " ";

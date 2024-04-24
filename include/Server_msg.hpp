@@ -33,11 +33,11 @@ class Server_msg{
 			void channelisfull_msg(User* user, std::string& channel);
 			void badchannelkey_msg(User* user, std::string& channel);
 			void err_keyset_msg(User* user, std::string& channel_name);
-			void err_chanoprivneeded_msg(User* user, std::string& channel_name);
+			void err_chanoprivneeded_msg(User* user, std::string const& channel_name);
 			void err_usernotinchannel_msg(User* user, std::string& channel_name, std::string& nick);
 			void err_unknowmode_msg(User* user,std::string& channel_name ,std::string & option);
 			void err_nosuchnick_msg(User* user,std::string& nick);
-			void err_useronchannel_msg(User* user,std::string& channel_name, std::string& nick);
+			void err_useronchannel_msg(User* user,std::string const& channel_name, std::string const& nick);
 			void cannotsendtochan_msg(User* user, std::string& channel_name);
 
 			void nosuchnick_msg(User* user, std::string& user_name);

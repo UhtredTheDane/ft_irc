@@ -336,11 +336,11 @@ void Server_handler::processing_request(User* user, std::string& request)
 			}
 			catch(Err_chanoprivsneeded& e)
 			{
-				msg.err_chanoprivneeded_msg(user,user->get_nickname());
+				msg.err_chanoprivneeded_msg(user, user->get_nickname());
 			}
 			catch(Err_useronchannel& e)
 			{
-				msg.err_useronchannel_msg(user,e.getNick(),e.getChannel());
+				msg.err_useronchannel_msg(user, e.getChannel(), e.getNick());
 			}
 			catch (Err_CannotSendToChan& e)
 			{
@@ -467,18 +467,22 @@ Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
 {
 	
 }
-Server_handler::Err_useronchannel(std::string nick,std::string channel) : nick(nick),channel(channel)
+
+Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel) : channel(channel), nick(nick)
 {
 
 }	
+
 std::string Server_handler::Err_useronchannel::getNick()
 {
-	return this->nick;
+	return (nick);
 }
+
 std::string Server_handler::Err_useronchannel::getChannel()
 {
-	return this->channel;
+	return (channel);
 }
+
 std::string Server_handler::Err_NotOnChannel::get_str(void)
 {
 	return (str);

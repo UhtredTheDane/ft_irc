@@ -133,7 +133,7 @@ class Server_handler
 		class Err_useronchannel : public std::exception
 		{
 			public:
-				Err_useronchannel(std::string nick,std::string channel);
+				Err_useronchannel(std::string nick, std::string channel);
 				std::string getNick();
 				std::string getChannel();
 				virtual ~Err_useronchannel(void) throw(){};
