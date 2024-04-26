@@ -124,7 +124,7 @@ int Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::stri
 		}
 		it++;
 	}
-	return(1);
+	return(-1);
 }
 
 int Server_msg::priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map)
@@ -142,6 +142,30 @@ int Server_msg::priv_msg(User* user, std::vector<std::string> split_line, std::m
 	}
 	return(-1);
 }
+
+int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line)
+{
+	for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
+	{
+		if(user == *it)
+		{
+			std::string k_msg;
+			for (std::vector<User*>::iterator it2 = curent_chan->get_users()->begin(); it2 != curent_chan->get_users()->end();)
+			{
+				if((*it2)->get_nickname() == split_line[2])
+				{
+					k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
+					send((*it2)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
+					return(0);
+				}
+				it2++;
+			}
+		}
+		it++;
+	}
+	return(-1);
+}
+
 void Server_msg::passwordincorrect_msg(User* user)
 {
 	std::string msg = ":irc.42.com 464 * :Password incorrect\r\n";
@@ -160,6 +184,28 @@ void Server_msg::nosuchchannel_msg(User* user, std::string& channel_name)
 	msg += channel_name + " :No such channel\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
+
+void Server_msg::inviteonlychan_msg(User* user, std::string& channel)
+{
+	std::string msg = ":irc.42.com 473 " + user->get_nickname() + " ";
+	msg += channel + " :Cannot join channel whithout invitation\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::channelisfull_msg(User* user, std::string& channel)
+{
+	std::string msg = ":irc.42.com 471 " + user->get_nickname() + " ";
+	msg += channel + " : Cannot join channel, it'is full(+l)\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::badchannelkey_msg(User* user, std::string& channel)
+{
+	std::string msg = ":irc.42.com 475 " + user->get_nickname() + " ";
+	msg += channel + " : Cannot join channel, bad key(+k)\r\n";
+	send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
 
 void Server_msg::needmoreparams_msg(User* user, std::string& command)
 {
@@ -183,7 +229,7 @@ void Server_msg::err_keyset_msg(User* user, std::string& channel_name)
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
-void Server_msg::err_chanoprivneeded_msg(User* user, std::string& channel_name)
+void Server_msg::err_chanoprivneeded_msg(User* user, std::string const& channel_name)
 {
 	std::string msg = ":irc.42.com " ;
 	msg += ERR_CHANOPRIVSNEEDED " ";
@@ -217,7 +263,7 @@ void Server_msg::err_nosuchnick_msg(User* user,std::string& nick)
 	msg += nick + " :No such nick/channel\r\n";
 	send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
-void Server_msg::err_useronchannel_msg(User* user,std::string& channel_name, std::string& nick)
+void Server_msg::err_useronchannel_msg(User* user, std::string const& channel_name, std::string const& nick)
 {
 	std::string msg = ":irc.42.com " ;
 	msg += ERR_USERONCHANNEL " ";

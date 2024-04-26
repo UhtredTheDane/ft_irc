@@ -29,17 +29,20 @@ class Server_msg{
 			void nosuchchannel_msg(User* user, std::string& channel_name);
 			void needmoreparams_msg(User* user, std::string& command);
 			void notonchannel_msg(User* user, std::string& channel_name);
+			void inviteonlychan_msg(User* user, std::string& channel);
+			void channelisfull_msg(User* user, std::string& channel);
+			void badchannelkey_msg(User* user, std::string& channel);
 			void err_keyset_msg(User* user, std::string& channel_name);
-			void err_chanoprivneeded_msg(User* user, std::string& channel_name);
+			void err_chanoprivneeded_msg(User* user, std::string const& channel_name);
 			void err_usernotinchannel_msg(User* user, std::string& channel_name, std::string& nick);
 			void err_unknowmode_msg(User* user,std::string& channel_name ,std::string & option);
 			void err_nosuchnick_msg(User* user,std::string& nick);
-			void err_useronchannel_msg(User* user,std::string& channel_name, std::string& nick);
+			void err_useronchannel_msg(User* user,std::string const& channel_name, std::string const& nick);
+			void cannotsendtochan_msg(User* user, std::string& channel_name);
+			int  kick_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line);
 			void nosuchnick_msg(User* user, std::string& user_name);
 			void norecipient_msg(User* user, std::string& user_name);
 			void notexttosend_msg(User* user, std::string& user_name);
-			void cannotsendtochan_msg(User* user, std::string& channel_name);
-
 	private:
 };
 
