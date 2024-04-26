@@ -134,12 +134,6 @@ class Server_handler
 			private:
 				std::string str;
 		};
-		class Err_chanoprivsneeded : public std::exception
-		{
-			public:
-				Err_chanoprivsneeded(std::string str);
-				virtual ~Err_chanoprivsneeded(void) throw(){};
-		};
 		class Err_useronchannel : public std::exception
 		{
 			public:
@@ -158,6 +152,17 @@ class Server_handler
 				std::string getNick();
 				std::string getChannel();
 				virtual ~Err_UserNotInChannel(void) throw(){};
+			private :
+				std::string channel;
+				std::string nick;
+		};
+		class Err_chanoprivsneeded : public std::exception
+		{
+			public:
+				Err_chanoprivsneeded(std::string channel);
+				std::string getNick();
+				std::string getChannel();
+				virtual ~Err_chanoprivsneeded(void) throw(){};
 			private :
 				std::string channel;
 				std::string nick;

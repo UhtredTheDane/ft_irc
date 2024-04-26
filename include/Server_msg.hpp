@@ -29,6 +29,7 @@ class Server_msg{
 			void nosuchchannel_msg(User* user, std::string& channel_name);
 			void needmoreparams_msg(User* user, std::string& command);
 			void notonchannel_msg(User* user, std::string& channel_name);
+			void print_send(int client_socket, std::string msg, int length, int param);
 			void inviteonlychan_msg(User* user, std::string& channel);
 			void channelisfull_msg(User* user, std::string& channel);
 			void badchannelkey_msg(User* user, std::string& channel);

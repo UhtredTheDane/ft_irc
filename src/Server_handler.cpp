@@ -216,19 +216,39 @@ void Server_handler::mode_request(User* user)
 
 void Server_handler::kick_request(User* user)
 {
+	int i = 0;
 	try
 	{
-		Channel *curent_chan = serv->get_channels().at(split_line[1]);
 		if(split_line.size() < 3)
 			throw(Server_handler::Err_NeedMoreParams());
-		if(msg.kick_msg(user, curent_chan, split_line) == -1)
-		{
-			throw(Server_handler::Err_UserNotInChannel(curent_chan->get_name(), split_line[1]));	
-		}
-	}
-	catch (std::out_of_range& oor)
+		Channel *curent_chan = serv->get_channels().at(split_line[1]);
+	for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 	{
-		throw(Server_handler::Err_CannotSendToChan(split_line[1]));
+		if(user == *it)
+		{
+		i = 1;
+		}
+		it++;
+	}
+	if(i == 0)
+		throw(Server_handler::Err_chanoprivsneeded(curent_chan->get_name()));
+	i = 0;
+	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+	{		
+		if(user == *it)
+		{
+			i = 1;
+		}
+		it++;
+	}
+	if(i == 0)
+		throw(Server_handler::Err_NotOnChannel(this->split_line[1]));/*ERR_NOTONCHANNEL*/;
+	if(msg.kick_msg(user, curent_chan,split_line) == -1)
+			throw(Server_handler::Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
+	}
+	catch(std::out_of_range& oor)
+	{
+				throw(Server_handler::Err_NoSuchChannel(split_line[1]));
 	}
 
 }
@@ -379,7 +399,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 			while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)
 			{
 				token = user->buffer.substr(0, delim_pos);
-				std::cout << token << std::endl;
+				std::cout << "\033[34m" << token << "\033[0m" << std::endl;
 				this->raw_msg = token;
 				processing_request(user, token);
 				user->buffer.erase(0, delim_pos + delimiter.length());
@@ -516,4 +536,13 @@ std::string Server_handler::Err_UserNotInChannel::getChannel()
 std::string Server_handler::Err_NotOnChannel::get_str(void)
 {
 	return (str);
+}
+Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) : channel(channel)
+{
+	
+}
+
+std::string Server_handler::Err_chanoprivsneeded::getChannel(void)
+{
+	return (channel);
 }
