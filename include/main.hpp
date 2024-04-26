@@ -19,5 +19,6 @@
 # include <iostream>
 # include "User.hpp"
 # include "Server.hpp"
+# include "signal.hpp"
 
 #endif

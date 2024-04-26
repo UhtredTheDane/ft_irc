@@ -43,6 +43,10 @@ Server_handler::Server_handler(Server* serv)
 	requests_ptr[10] = &Server_handler::invite_request;
 }
 
+Server_msg* Server_handler::get_msg(void)
+{
+	return (&msg);
+}
 void Server_handler::capls_request(User* user)
 {
 	if (user->get_isRegistered() == 0 && !split_line[1].compare("LS"))
@@ -143,7 +147,6 @@ void Server_handler::user_request(User* user)
 		throw(Server_handler::Err_AlreadyRegistred());
 	}
 
-
 }
 
 void Server_handler::pong_request(User* user)
@@ -155,7 +158,7 @@ void Server_handler::join_request(User* user)
 {
 	if (split_line.size() < 2)
 	{
-		throw(Server_handler::Err_NeedMoreParams());
+		throw(Server_handler::Err_NeedMoreParams(split_line[0]));
 	}
 	std::stringstream list_name(split_line[1]);
 	std::string channel_name;
@@ -171,7 +174,6 @@ void Server_handler::join_request(User* user)
 			msg.join_msg(user, serv->add_channel(channel_name, user));
 			return ;
 		}
-
 		if (current_chan->IsOption(1))
 		{
 			throw(Err_InviteOnlyChan(channel_name));
@@ -207,7 +209,7 @@ void Server_handler::kick_request(User* user)
 	try
 	{
 		if(split_line.size() < 3)
-			throw(Server_handler::Err_NeedMoreParams());
+			throw(Server_handler::Err_NeedMoreParams(split_line[0]));
 		Channel *curent_chan = serv->get_channels().at(split_line[1]);
 	for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 	{
@@ -245,7 +247,7 @@ void Server_handler::privmsg_request(User* user)
 	try
 	{
 		if(split_line.size() < 3)
-			throw(Server_handler::Err_NeedMoreParams());
+			throw(Server_handler::Err_NeedMoreParams(split_line[0]));
 		if(split_line[1][0] == '#')
 		{
 			Channel *curent_chan = serv->get_channels().at(split_line[1]);	
@@ -301,62 +303,10 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				(this->*requests_ptr[i])(user);
 			}
-			catch (Err_InviteOnlyChan& e)
+			catch (ExceptionInterface& e)
 			{
-				std::string strtest = e.get_channel();
-				msg.inviteonlychan_msg(user, strtest);
+				e.handle(user, &msg);
 			}
-			catch (Err_ChannelIsFull& e)
-			{
-				std::string strtest = e.get_channel();
-				msg.channelisfull_msg(user, strtest);
-			}
-			catch (Err_BadChannelKey& e)
-			{
-				std::string strtest = e.get_channel();
-				msg.badchannelkey_msg(user, strtest);
-			}
-			catch (Err_NeedMoreParams& e)
-			{
-				msg.needmoreparams_msg(user, split_line[0]);
-			}
-			catch (Err_PasswordIncorrect& e)
-			{
-				msg.passwordincorrect_msg(user);
-			}
-			catch (Err_AlreadyRegistred& e)
-			{
-				msg.alreadyregistred_msg(user);
-			}
-			catch (Err_NoSuchChannel& e)
-			{
-				std::string strtest = e.get_str();
-				msg.nosuchchannel_msg(user, strtest);
-			}
-			catch (Err_NotOnChannel& e)
-			{
-				std::string strtest = e.get_str();
-				msg.notonchannel_msg(user, strtest);
-			}
-			catch (Err_useronchannel& e)
-			{
-				msg.err_useronchannel_msg(user, e.getChannel(), e.getNick());
-			}
-			catch(Err_UserNotInChannel& e)
-			{
-				msg.err_useronchannel_msg(user, e.getChannel(), e.getNick());
-			}
-			catch (Err_CannotSendToChan& e)
-			{
-				std::string strtest = e.get_str();
-				msg.cannotsendtochan_msg(user, strtest);;
-			}
-			catch (Err_NoSuchNick& e)
-			{
-				std::string strtest = e.get_str();
-				msg.nosuchnick_msg(user, strtest);;
-			}
-		
 			break;
 		}
 	}
@@ -395,6 +345,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	{
 	}
 }
+
 User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 {
 	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
@@ -405,6 +356,16 @@ User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 			}
 	}
 	return(NULL);
+}
+
+Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel) : channel(channel)
+{
+	
+}
+
+std::string Server_handler::Err_NeedMoreParams::get_channel(void)
+{
+	return (channel);
 }
 
 Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel) : channel(channel)
@@ -442,7 +403,7 @@ Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
 	
 }
 
-std::string Server_handler::Err_NoSuchChannel::get_str(void)
+std::string Server_handler::Err_NoSuchChannel::get_channel(void)
 {
 	return (str);
 }
@@ -452,7 +413,7 @@ Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : st
 	
 }
 
-std::string Server_handler::Err_CannotSendToChan::get_str(void)
+std::string Server_handler::Err_CannotSendToChan::get_channel(void)
 {
 	return (str);
 }
@@ -462,7 +423,7 @@ Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str)
 	
 }
 
-std::string Server_handler::Err_NoSuchNick::get_str(void)
+std::string Server_handler::Err_NoSuchNick::get_channel(void)
 {
 	return (str);
 }
@@ -483,7 +444,7 @@ std::string Server_handler::Err_useronchannel::getNick()
 	return (nick);
 }
 
-std::string Server_handler::Err_useronchannel::getChannel()
+std::string Server_handler::Err_useronchannel::get_channel()
 {
 	return (channel);
 }
@@ -498,12 +459,12 @@ std::string Server_handler::Err_UserNotInChannel::getNick()
 	return (nick);
 }
 
-std::string Server_handler::Err_UserNotInChannel::getChannel()
+std::string Server_handler::Err_UserNotInChannel::get_channel()
 {
 	return (channel);
 }
 
-std::string Server_handler::Err_NotOnChannel::get_str(void)
+std::string Server_handler::Err_NotOnChannel::get_channel(void)
 {
 	return (str);
 }
@@ -512,7 +473,7 @@ Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) 
 	
 }
 
-std::string Server_handler::Err_chanoprivsneeded::getChannel(void)
+std::string Server_handler::Err_chanoprivsneeded::get_channel(void)
 {
 	return (channel);
 }

@@ -25,6 +25,7 @@
 # include <fcntl.h>
 # include "Server_handler.hpp"
 # include <map>
+#include "signal.hpp"
 
 class Server_handler;
 
@@ -45,6 +46,7 @@ class Server
 		void check_connection();
 		void check_incoming_package();
 		User *findUserByName(std::string name);
+		
 	private:
 	
 		Server_handler* handler;
