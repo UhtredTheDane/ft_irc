@@ -23,6 +23,7 @@
 # include <sstream>
 # include <iterator>
 # include <algorithm>
+
 class User
 {
     private:
@@ -32,15 +33,15 @@ class User
         std::string servername;
 		std::string realname;
 		std::string identifier;
-		//bool isPasswordValid;
+		bool isPasswordValid;
 		int isRegistered;
 		int socket;
     
 	public:
-	User(int fd);
+		User(int fd);
 	//buffer a mettre en prive
 		std::string buffer;
-    		~User();
+    	~User();
 		int get_socket( void ) const;
 
     	std::string const & get_nickname( void ) const;
@@ -49,7 +50,9 @@ class User
 		std::string const & get_hostname( void ) const;
         std::string const & get_servername( void ) const;
 		std::string const & get_identifier( void ) const;
-		int get_isRegistered( void ) const;
+		int get_isRegistered(void) const;
+		bool get_isPasswordValid(void) const;
+		void set_isPasswordValid(bool value);
 		
 		void show_userinfo();
 		void set_socket(int socket);

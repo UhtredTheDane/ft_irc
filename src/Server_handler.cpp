@@ -58,25 +58,17 @@ void Server_handler::pass_request(User* user)
 		user->set_isRegistered(0);
 		throw (Server_handler::Err_PasswordIncorrect());
 	}
+	user->set_isPasswordValid(true);
 }
 
 void Server_handler::nick_request(User* user)
 {
-	if(user->get_isRegistered() == 1)
+	if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		while (serv->is_on_serv(split_line[1]))
 			split_line[1] += "_";
 		user->set_nickname(split_line[1]);
 	}
-	// else if(user->get_isRegistered() == 2)
-	// {
-	// 	std::string c_msg;
-	// 	while (serv->is_on_serv(split_line[1]))
-	// 		split_line[1] += "_";
-	// 	c_msg = ":" + user->get_identifier() + " NICK " + split_line[1] + "\r\n";
-	// 	std::cout << "|" << c_msg << "|";
-	// 	send(user->get_socket(), c_msg.c_str(), c_msg.length(), 0);
-	// 	user->set_nickname(split_line[1]);
 	else
 	{
 		throw(Server_handler::Err_AlreadyRegistred());
@@ -89,10 +81,6 @@ void Server_handler::invite_request(User* user)
 	Channel *chan;
 	std::string reply;
 
-     /*    
-           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
-           ERR_NOTONCHANNEL                ERR_USERONCHANNEL
-           ERR_CHANOPRIVSNEEDED*/
 	std::cout << "Handling an invite request" << std::endl;
 	try
 	{
@@ -137,14 +125,13 @@ void Server_handler::invite_request(User* user)
 
 void Server_handler::user_request(User* user)
 {
-	if(user->get_isRegistered() == 1)
+	if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		user->set_username(split_line[1]);
 		user->set_hostname(split_line[2]);
 		user->set_servername(split_line[3]);
 		user->set_realname(split_line[3]);
 		user->set_identifier();
-		// user.show_userinfo(user);
 		msg.welcome_msg(user);
 		msg.yourhost_msg(user);
 		msg.created_msg(user);
@@ -329,7 +316,6 @@ void Server_handler::processing_request(User* user, std::string& request)
 				std::string strtest = e.get_channel();
 				msg.badchannelkey_msg(user, strtest);
 			}
-
 			catch (Err_NeedMoreParams& e)
 			{
 				msg.needmoreparams_msg(user, split_line[0]);
@@ -352,11 +338,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 				std::string strtest = e.get_str();
 				msg.notonchannel_msg(user, strtest);
 			}
-			catch(Err_chanoprivsneeded& e)
-			{
-				msg.err_chanoprivneeded_msg(user, user->get_nickname());
-			}
-			catch(Err_useronchannel& e)
+			catch (Err_useronchannel& e)
 			{
 				msg.err_useronchannel_msg(user, e.getChannel(), e.getNick());
 			}
@@ -374,8 +356,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 				std::string strtest = e.get_str();
 				msg.nosuchnick_msg(user, strtest);;
 			}
-			
-			
+		
 			break;
 		}
 	}
@@ -465,17 +446,6 @@ std::string Server_handler::Err_NoSuchChannel::get_str(void)
 {
 	return (str);
 }
-
-
-// Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(User *user, std::string str) : user(user), str(str)
-// {
-	
-// }
-
-// std::string Server_handler::Err_NeedMoreParams::get_str(void)
-// {
-// 	return (str);
-// }
 
 Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str)
 {

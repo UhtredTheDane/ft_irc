@@ -11,13 +11,14 @@
 /* ************************************************************************** */
 
 #include "../include/User.hpp"
+
 User::User(int fd) : nickname(""), username( ""),
 	hostname(""), servername(""), realname(""), identifier("")
 {
 	buffer = "";
 	socket = fd;
 	isRegistered = 0;
-	// update_identifier();
+	isPasswordValid = false;
 }
 
 void User::show_userinfo()
@@ -41,6 +42,16 @@ int User::get_socket(void) const
 int User::get_isRegistered(void) const
 {
 	return(isRegistered);
+}
+
+bool User::get_isPasswordValid(void) const
+{
+	return (isPasswordValid);
+}
+
+void User::set_isPasswordValid(bool value)
+{
+	isPasswordValid = value;
 }
 
 void User::set_isRegistered(int i)
