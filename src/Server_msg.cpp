@@ -166,14 +166,14 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 
 void Server_msg::passwordincorrect_msg(User* user)
 {
-	std::string msg = ":irc.42.com 464 * :Password incorrect\r\n";
+	std::string msg = ":irc.42.com 464 :Password incorrect\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
-void Server_msg::alreadyregistred_msg(User* user)
+void Server_msg::notregistred_msg(int socket)
 {
-	std::string msg = ":irc.42.com 451 * :You may not reregister\r\n";
-	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+	std::string msg = ":irc.42.com 451 :You have not registered\r\n";
+	print_send(socket, msg.c_str(), msg.length(), 0);
 }
 
 

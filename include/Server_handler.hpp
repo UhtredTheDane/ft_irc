@@ -38,6 +38,7 @@ class Server_handler
 
 		
 		Server_handler(Server* serv);
+		Server_msg get_servermsg() const;
 		void request_handler(int client_socket, std::string &request);
 		void processing_request(User* user, std::string& request);
 		void capls_request(User* user);
@@ -59,7 +60,15 @@ class Server_handler
 
 	
 		class Err_PasswordIncorrect : public std::exception{};
-		class Err_AlreadyRegistred : public std::exception{};
+		class Err_NotRegistred : public std::exception
+		{
+			public:
+				Err_NotRegistred(int socket);
+				int get_socket(void);
+				virtual ~Err_NotRegistred(void) throw(){};
+			private:
+				int socket;
+		};
 		class Err_NoSuchChannel : public std::exception
 		{
 			public:

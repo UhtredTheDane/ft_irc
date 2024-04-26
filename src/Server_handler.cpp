@@ -45,7 +45,8 @@ Server_handler::Server_handler(Server* serv)
 
 void Server_handler::capls_request(User* user)
 {
-	if (user->get_isRegistered() == 0 && !split_line[1].compare("LS"))
+	std::cout << "bonjour" << std::endl;
+	if (user->get_isRegistered() == 0)
 	{
 		user->set_isRegistered(1);
 	}
@@ -71,7 +72,8 @@ void Server_handler::nick_request(User* user)
 	}
 	else
 	{
-		throw(Server_handler::Err_AlreadyRegistred());
+		std::cout << "nick\n";
+		throw(Server_handler::Err_NotRegistred(user->get_socket()));
 	}
 }
 
@@ -125,7 +127,9 @@ void Server_handler::invite_request(User* user)
 
 void Server_handler::user_request(User* user)
 {
-	if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
+	if(split_line.size() < 4)
+			throw(Server_handler::Err_NeedMoreParams());
+	if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		user->set_username(split_line[1]);
 		user->set_hostname(split_line[2]);
@@ -140,7 +144,8 @@ void Server_handler::user_request(User* user)
 	}
 	else
 	{
-		throw(Server_handler::Err_AlreadyRegistred());
+		std::cout << "user\n";
+		throw(Server_handler::Err_NotRegistred(user->get_socket()));
 	}
 
 
@@ -295,7 +300,13 @@ void Server_handler::processing_request(User* user, std::string& request)
 		split_line.push_back(word);
 	for (int i = 0; i < 11; ++i)
 	{
-		if (!split_line[0].compare(request_types[i]))
+		 if(i > 3 && user->get_isRegistered() != 2)
+		 {
+		 	i = 0;
+			split_line.clear();
+			throw(Server_handler::Err_NotRegistred(user->get_socket()));
+		 }
+		else if (!split_line[0].compare(request_types[i]))
 		{
 			try
 			{
@@ -323,10 +334,6 @@ void Server_handler::processing_request(User* user, std::string& request)
 			catch (Err_PasswordIncorrect& e)
 			{
 				msg.passwordincorrect_msg(user);
-			}
-			catch (Err_AlreadyRegistred& e)
-			{
-				msg.alreadyregistred_msg(user);
 			}
 			catch (Err_NoSuchChannel& e)
 			{
@@ -382,7 +389,16 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 				token = user->buffer.substr(0, delim_pos);
 				std::cout << "\033[34m" << token << "\033[0m" << std::endl;
 				this->raw_msg = token;
+				try
+				{
 				processing_request(user, token);
+				}
+				catch (Server_handler::Err_NotRegistred& e)
+				{
+					std::cout << "buffer deleted\n";
+					user->set_isRegistered(0);
+					get_servermsg().notregistred_msg(client_socket);
+				}
 				user->buffer.erase(0, delim_pos + delimiter.length());
 			}
 		}
@@ -394,6 +410,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 	catch(std::out_of_range& oor)
 	{
 	}
+
 }
 User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 {
@@ -467,6 +484,10 @@ std::string Server_handler::Err_NoSuchNick::get_str(void)
 	return (str);
 }
 
+Server_msg Server_handler::get_servermsg(void) const
+{
+	return (this->msg);
+}
 
 Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
 {
@@ -515,4 +536,14 @@ Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) 
 std::string Server_handler::Err_chanoprivsneeded::getChannel(void)
 {
 	return (channel);
+}
+
+Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) : socket(socket)
+{
+
+}	
+
+int Server_handler::Err_NotRegistred::get_socket()
+{
+	return (socket);
 }
