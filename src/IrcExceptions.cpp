@@ -7,7 +7,7 @@ void Err_PasswordIncorrect::handle(User* user, Server_msg* msg)
 
 void Err_AlreadyRegistred::handle(User* user, Server_msg* msg)
 {
-	sg->alreadyregistred_msg(user);
+	msg->alreadyregistred_msg(user);
 }
 
 Err_NotRegistred::Err_NotRegistred(int socket) 

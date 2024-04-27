@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/27 17:07:34 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/27 19:21:15 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include "Server_msg.hpp"
 # include "Server.hpp"
 # include "AException.hpp"
+# include "IrcExceptions.hpp"
 
 class Server;
 
