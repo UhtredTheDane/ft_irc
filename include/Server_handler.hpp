@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:32 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/19 22:16:00 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/27 17:07:34 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ class Server_handler
 				void handle(User* user, Server_msg* msg)
 				{
 					(void) user;
-					msg->notregistred_msg(get_socketsocket);
+					msg->notregistred_msg(get_socket());
 				};
 
 		};
@@ -180,7 +180,7 @@ class Server_handler
 				Err_useronchannel(std::string nick, std::string channel);
 				void handle(User* user, Server_msg* msg)
 				{
-					msg->err_useronchannel_msg(user, get_channel(), getNick());
+					msg->err_useronchannel_msg(user, get_channel(), get_nick());
 				};
 
 		};
@@ -190,7 +190,7 @@ class Server_handler
 				Err_UserNotInChannel(std::string nick, std::string channel);
 				void handle(User* user, Server_msg* msg)
 				{
-					msg->err_useronchannel_msg(user, get_channel(), getNick());
+					msg->err_useronchannel_msg(user, get_channel(), get_nick());
 				};
 		};
 };

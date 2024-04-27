@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/19 22:40:28 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/27 18:42:04 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,7 +314,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				(this->*requests_ptr[i])(user);
 			}
-			catch (ExceptionInterface& e)
+			catch (AException& e)
 			{
 				e.handle(user, &msg);
 			}
@@ -379,15 +379,53 @@ User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 	return(NULL);
 }
 
-Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel) : channel(channel){};
-Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel) : channel(channel){};
-Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel) : channel(channel){};
-Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel) : channel(channel){};
-Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str){};
-Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str){};
-Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str){};
-Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str){};
-Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel) : channel(channel), nick(nick){};
-Server_handler::Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel) : channel(channel), nick(nick){};
-Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) : channel(channel){};
-Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) : socket(socket){};
+Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string nick)
+{
+	this->nick = nick;
+};
+Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel)
+{
+	this->channel = channel;
+	this->nick = nick;
+};
+Server_handler::Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel)
+{
+	this->channel = channel;
+	this->nick = nick;
+};
+Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel)
+{
+	this->channel = channel;
+};
+Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) 
+{
+	this->socket = socket;
+};
