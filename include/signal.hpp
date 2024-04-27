@@ -1,31 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.cpp                                         :+:      :+:    :+:   */
+/*   signal.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/26 16:42:18 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/26 16:42:21 by agengemb         ###   ########.fr       */
+/*   Created: 2024/04/26 16:42:25 by agengemb          #+#    #+#             */
+/*   Updated: 2024/04/26 16:42:26 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/signal.hpp"
+#ifndef SIGNAL_HPP
+# define SIGNAL_HPP
 
-bool close_serv = false;
+#include <cstddef>
+# include <signal.h>
+# include <strings.h>
 
-void sigint_handler(int signal)
-{
-	if (signal == SIGINT)
-	{
-		close_serv = true;
-	}
-}
+void sigint_handler(int signal);
+void set_signal(void);
 
-void set_signal(void)
-{
-	struct sigaction action;
-	bzero(&action, sizeof(action));
-	action.sa_handler = &sigint_handler;
-	sigaction(SIGINT, &action, NULL);
-}
+#endif

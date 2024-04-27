@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
-#include <signal.h>
 #include <string>
 #include <sstream>
 #include <stdexcept>

@@ -38,7 +38,6 @@ class Server_handler
 
 		
 		Server_handler(Server* serv);
-		Server_msg get_servermsg() const;
 		void request_handler(int client_socket, std::string &request);
 		void processing_request(User* user, std::string& request);
 		void capls_request(User* user);
@@ -53,129 +52,206 @@ class Server_handler
 		void pong_request(User* user);
 		void invite_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
+User *findUserByName(std::vector<User *> v,std::string name);
+		Server_msg* get_msg(void);
 		
-		User *findUserByName(std::vector<User *> v,std::string name);
-		
+		class ExceptionInterface : std::exception {
+			public:
+    		virtual void handle(User* user, Server_msg* msg) { (void)user; (void)msg;};
+		};
+		class Err_PasswordIncorrect : public ExceptionInterface
+		{
+			public:
+				void handle(User* user, Server_msg* msg)
+				{
+					msg->passwordincorrect_msg(user);
+				};
 
-
-	
-		class Err_PasswordIncorrect : public std::exception{};
-		class Err_NotRegistred : public std::exception
+		};
+		class Err_AlreadyRegistred : public ExceptionInterface
+		{
+			public:
+				void handle(User* user, Server_msg* msg)
+				{
+					msg->alreadyregistred_msg(user);
+				};
+		};
+		class Err_NotRegistred: public ExceptionInterface
 		{
 			public:
 				Err_NotRegistred(int socket);
-				int get_socket(void);
-				virtual ~Err_NotRegistred(void) throw(){};
+				int get_socket();
+				void handle(User* user, Server_msg* msg)
+				{
+					(void) user;
+					msg->notregistred_msg(socket);
+				};
+				virtual ~Err_NotRegistred() throw(){};
 			private:
 				int socket;
 		};
-		class Err_NoSuchChannel : public std::exception
+		class Err_NeedMoreParams : public ExceptionInterface
 		{
 			public:
-				Err_NoSuchChannel(std::string str);
-				std::string get_str(void);
-				virtual ~Err_NoSuchChannel(void) throw(){};
+				Err_NeedMoreParams(std::string channel);
+				std::string get_channel(void);
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->needmoreparams_msg(user, strtest);
+				};
+				virtual ~Err_NeedMoreParams(void) throw(){};
 			private:
-				std::string str;
+				std::string channel;
 		};
-		class Err_InviteOnlyChan : public std::exception
+		class Err_InviteOnlyChan : public ExceptionInterface
 		{
 			public:
 				Err_InviteOnlyChan(std::string channel);
 				std::string get_channel(void);
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->inviteonlychan_msg(user, strtest);
+				};
 				virtual ~Err_InviteOnlyChan(void) throw(){};
 			private:
 				std::string channel;	
 		};
-		class Err_ChannelIsFull : public std::exception
+		class Err_ChannelIsFull : public ExceptionInterface
 		{
 			public:
 				Err_ChannelIsFull(std::string channel);
 				std::string get_channel(void);
-				virtual ~Err_ChannelIsFull(void) throw(){};
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->channelisfull_msg(user, strtest);
+				};
+				virtual ~Err_ChannelIsFull(void) throw() {};
 			private:
 				std::string channel;	
 		};
-		class Err_BadChannelKey : public std::exception
+		class Err_NoSuchChannel : public ExceptionInterface
+		{
+			public:
+				Err_NoSuchChannel(std::string str);
+				std::string get_channel(void);
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->nosuchchannel_msg(user, strtest);
+				};
+				virtual ~Err_NoSuchChannel(void) throw(){};
+			private:
+				std::string str;
+		};
+		class Err_BadChannelKey : public ExceptionInterface
 		{
 			public:
 				Err_BadChannelKey(std::string channel);
 				std::string get_channel(void);
-				virtual ~Err_BadChannelKey(void) throw(){};
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->badchannelkey_msg(user, strtest);
+				};
+				virtual ~Err_BadChannelKey(void) throw() {};
 			private:
 				std::string channel;	
 		};
-		class Err_NeedMoreParams : public std::exception{};
-		class Err_NoSuchNick : public std::exception
+
+		class Err_NoSuchNick : public ExceptionInterface
 		{
 			public:
 				Err_NoSuchNick(std::string str);
-				std::string get_str(void);
+				std::string get_channel(void);
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->nosuchnick_msg(user, strtest);;
+				};
 				virtual ~Err_NoSuchNick(void) throw(){};
 			private:
 				std::string str;
 		};
-		class Err_CannotSendToChan: public std::exception
+		class Err_CannotSendToChan: public ExceptionInterface
 		{
 				public:
 				Err_CannotSendToChan(std::string str);
-				std::string get_str(void);
+				std::string get_channel(void);
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->cannotsendtochan_msg(user, strtest);;
+				};
 				virtual ~Err_CannotSendToChan(void) throw(){};
 			private:
 				std::string str;
 		};
-		class Err_NotOnChannel : public std::exception
+		class Err_NotOnChannel : public ExceptionInterface
 		{
 			public:
 				Err_NotOnChannel(std::string str);
-				std::string get_str(void);
+				std::string get_channel(void);
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->notonchannel_msg(user, strtest);
+				};
 				virtual ~Err_NotOnChannel(void) throw(){};
 			private:
 				std::string str;
 		};
-		class Err_useronchannel : public std::exception
-		{
-			public:
-				Err_useronchannel(std::string nick, std::string channel);
-				std::string getNick();
-				std::string getChannel();
-				virtual ~Err_useronchannel(void) throw(){};
-			private :
-				std::string channel;
-				std::string nick;
-		};
-		class Err_UserNotInChannel : public std::exception
-		{
-			public:
-				Err_UserNotInChannel(std::string nick, std::string channel);
-				std::string getNick();
-				std::string getChannel();
-				virtual ~Err_UserNotInChannel(void) throw(){};
-			private :
-				std::string channel;
-				std::string nick;
-		};
-		class Err_chanoprivsneeded : public std::exception
+		class Err_chanoprivsneeded : public ExceptionInterface
 		{
 			public:
 				Err_chanoprivsneeded(std::string channel);
 				std::string getNick();
-				std::string getChannel();
+				std::string get_channel();
+				void handle(User* user, Server_msg* msg)
+				{
+					std::string strtest = get_channel();
+					msg->err_chanoprivneeded_msg(user, strtest);
+				};
 				virtual ~Err_chanoprivsneeded(void) throw(){};
+
 			private :
 				std::string channel;
 				std::string nick;
 		};
-		/*
-		class Err_nosuchnick : public std::exception
+		class Err_useronchannel : public ExceptionInterface
 		{
 			public:
-				Err_nosuchnick(std::string str);
-				virtual ~Err_nosuchnick(void) throw(){};
+				Err_useronchannel(std::string nick, std::string channel);
+				std::string getNick();
+				std::string get_channel();
+				void handle(User* user, Server_msg* msg)
+				{
+					msg->err_useronchannel_msg(user, get_channel(), getNick());
+				};
+				virtual ~Err_useronchannel(void) throw() {};
+
+			private :
+				std::string channel;
+				std::string nick;
 		};
- 	   
-		*/
-	
+		class Err_UserNotInChannel : public ExceptionInterface
+		{
+			public:
+				Err_UserNotInChannel(std::string nick, std::string channel);
+				std::string getNick();
+				std::string get_channel();
+				void handle(User* user, Server_msg* msg)
+				{
+					msg->err_useronchannel_msg(user, get_channel(), getNick());
+				};
+				virtual ~Err_UserNotInChannel(void) throw() {};
+
+			private :
+				std::string channel;
+				std::string nick;
+		};
 };
 
 #endif
