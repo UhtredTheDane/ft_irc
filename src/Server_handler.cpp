@@ -29,7 +29,6 @@ Server_handler::Server_handler(Server* serv)
 	request_types[8] = "PRIVMSG";
 	request_types[9] = "PART";
 	request_types[10] = "INVITE";
-
 	requests_ptr[0] = &Server_handler::capls_request;
 	requests_ptr[1] = &Server_handler::pass_request;
 	requests_ptr[2] = &Server_handler::nick_request;
@@ -51,9 +50,7 @@ void Server_handler::capls_request(User* user)
 {
 	std::cout << "bonjour" << std::endl;
 	if (user->get_isRegistered() == 0)
-	{
 		user->set_isRegistered(1);
-	}
 }
 
 void Server_handler::pass_request(User* user)
@@ -162,9 +159,7 @@ void Server_handler::pong_request(User* user)
 void Server_handler::join_request(User* user)
 {
 	if (split_line.size() < 2)
-	{
 		throw(Server_handler::Err_NeedMoreParams(split_line[0]));
-	}
 	std::stringstream list_name(split_line[1]);
 	std::string channel_name;
 	Channel* current_chan;
@@ -180,17 +175,11 @@ void Server_handler::join_request(User* user)
 			return ;
 		}
 		if (current_chan->IsOption(1))
-		{
 			throw(Err_InviteOnlyChan(channel_name));
-		}
 		else if (current_chan->IsOption(2) && !current_chan->check_key(split_line[2]))
-		{
 			throw(Err_BadChannelKey(channel_name));
-		}
 		else if (current_chan->IsOption(4) && current_chan->is_full())
-		{
 			throw(Err_ChannelIsFull(channel_name));
-		}
 		current_chan->add_user(user);
 		msg.join_msg(user, current_chan);
 	}
@@ -268,9 +257,7 @@ void Server_handler::privmsg_request(User* user)
 		{
 			std::map<int, User*> users_map = serv->get_users();
 			if(msg.priv_msg(user, split_line, users_map) == -1)
-			{
 				throw(Server_handler::Err_NoSuchNick(split_line[1]));
-			}
 		}
 	}
 	catch (std::out_of_range& oor)
@@ -357,9 +344,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 			}
 		}
 		else
-		{
 			user->buffer += request;
-		}
 	}
 	catch(std::out_of_range& oor)
 	{
@@ -370,62 +355,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 {
 	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
-	{
 			if((*it)->get_nickname() == name)
-			{
 				return *it;
-			}
-	}
 	return(NULL);
 }
-
-Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string nick)
-{
-	this->nick = nick;
-};
-Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel)
-{
-	this->channel = channel;
-	this->nick = nick;
-};
-Server_handler::Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel)
-{
-	this->channel = channel;
-	this->nick = nick;
-};
-Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel)
-{
-	this->channel = channel;
-};
-Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) 
-{
-	this->socket = socket;
-};
