@@ -379,131 +379,15 @@ User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 	return(NULL);
 }
 
-Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_NeedMoreParams::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_InviteOnlyChan::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_ChannelIsFull::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_BadChannelKey::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_NoSuchChannel::get_channel(void)
-{
-	return (str);
-}
-
-Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_CannotSendToChan::get_channel(void)
-{
-	return (str);
-}
-
-Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_NoSuchNick::get_channel(void)
-{
-	return (str);
-}
-
-Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
-{
-	
-}
-
-Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel) : channel(channel), nick(nick)
-{
-
-}	
-
-std::string Server_handler::Err_useronchannel::getNick()
-{
-	return (nick);
-}
-
-std::string Server_handler::Err_useronchannel::get_channel()
-{
-	return (channel);
-}
-
-Server_handler::Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel) : channel(channel), nick(nick)
-{
-
-}	
-
-std::string Server_handler::Err_UserNotInChannel::getNick()
-{
-	return (nick);
-}
-
-std::string Server_handler::Err_UserNotInChannel::get_channel()
-{
-	return (channel);
-}
-
-std::string Server_handler::Err_NotOnChannel::get_channel(void)
-{
-	return (str);
-}
-Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_chanoprivsneeded::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) : socket(socket)
-{
-
-}	
-
-int Server_handler::Err_NotRegistred::get_socket()
-{
-	return (socket);
-}
+Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel) : channel(channel){};
+Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel) : channel(channel){};
+Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel) : channel(channel){};
+Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel) : channel(channel){};
+Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str){};
+Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str){};
+Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str){};
+Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str){};
+Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel) : channel(channel), nick(nick){};
+Server_handler::Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel) : channel(channel), nick(nick){};
+Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) : channel(channel){};
+Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) : socket(socket){};
