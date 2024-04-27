@@ -51,6 +51,7 @@ class Server_handler
 		void join_request(User* user);
 		void pong_request(User* user);
 		void invite_request(User* user);
+		void topic_request(User* user);
 		void msg_toall(std::vector<std::string> split_line, User* user, std::string t_request);
 User *findUserByName(std::vector<User *> v,std::string name);
 		Server_msg* get_msg(void);

@@ -29,6 +29,7 @@ Server_handler::Server_handler(Server* serv)
 	request_types[8] = "PRIVMSG";
 	request_types[9] = "PART";
 	request_types[10] = "INVITE";
+	request_types[11] = "TOPIC";
 
 	requests_ptr[0] = &Server_handler::capls_request;
 	requests_ptr[1] = &Server_handler::pass_request;
@@ -41,6 +42,7 @@ Server_handler::Server_handler(Server* serv)
 	requests_ptr[8] = &Server_handler::privmsg_request;
 	requests_ptr[9] = &Server_handler::part_request;
 	requests_ptr[10] = &Server_handler::invite_request;
+	requests_ptr[11] = &Server_handler::topic_request;
 }
 
 Server_msg* Server_handler::get_msg(void)
@@ -81,6 +83,46 @@ void Server_handler::nick_request(User* user)
 	}
 }
 
+void Server_handler::topic_request(User* user)
+{
+	Channel *chan;
+	std::string arg;
+
+	std::cout << "command send : " << this->raw_msg << std::endl;
+	try
+	{
+		if(IsValidChannelName(split_line[1]))
+			chan = this->serv->get_channels().at(this->split_line[1]);
+		if(chan->IsOption(5))
+		{	
+			if(split_line.size() == 2)
+			{
+				//send the topic of the channel	
+			}
+			if(split_line.size() > 2)
+			{
+				if(split_line[2].compare(":") && split_line.size() == 3 )
+				{
+					//delete the topic 
+				}
+				else
+				{
+					
+					std::string::iterator it;
+					while()
+				}
+			}
+		}
+		else
+		{
+			//TOpic option is not on
+		}
+	}
+	catch(std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
 void Server_handler::invite_request(User* user)
 {
 	User *target;
@@ -95,29 +137,32 @@ void Server_handler::invite_request(User* user)
 		else
 		{
 			chan = this->serv->get_channels().at(this->split_line[2]);//channel exist 
-			
-				target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
-				if(!target)
+			if(!chan->IsOption(1))
+			{
+				//channel is not invite only
+			}
+			target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
+			if(!target)
+			{
+				target = this->serv->findUserByName(this->split_line[1]);//user exist
+				if(target)
 				{
-					target = this->serv->findUserByName(this->split_line[1]);//user exist
-					if(target)
-					{
-						std::cout << "sending invite " << std::endl; 	
-						reply = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
-						chan->invite_user(target);
-						send(target->get_socket(),reply.c_str(),reply.length(),0);
-					}
-					else
-					{
-						std::cout << "target not connected to the server" << std::endl;
-						throw(Server_handler::Err_NotOnChannel(this->split_line[1]));
-					}	
+					std::cout << "sending invite " << std::endl; 	
+					reply = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
+					chan->invite_user(target);
+					send(target->get_socket(),reply.c_str(),reply.length(),0);
 				}
 				else
 				{
-					std::cout << "user already in the channel " << std::endl;
-					throw(Server_handler::Err_useronchannel(this->split_line[1],this->split_line[2]));
-				}
+					std::cout << "target not connected to the server" << std::endl;
+					throw(Server_handler::Err_NotOnChannel(this->split_line[1]));
+				}	
+			}
+			else
+			{
+				std::cout << "user already in the channel " << std::endl;
+				throw(Server_handler::Err_useronchannel(this->split_line[1],this->split_line[2]));
+			}
 			
 		}
 		
@@ -300,7 +345,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-	for (int i = 0; i < 11; ++i)
+	for (int i = 0; i < 12; ++i)
 	{
 		 if(i > 3 && user->get_isRegistered() != 2)
 		 {
