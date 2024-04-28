@@ -18,6 +18,8 @@
 # include "User.hpp"
 # include "Server_msg.hpp"
 
+class Server_msg;
+
 class AException : std::exception
 {
 	public:
@@ -26,7 +28,7 @@ class AException : std::exception
         std::string& get_nick(void);
         std::string& get_cmd(void);
     	virtual void handle(User* user, Server_msg* msg) = 0;
-	virtual ~AException(void) throw(){};
+	    virtual ~AException(void) throw(){};
     protected:
         int socket;
         std::string channel;

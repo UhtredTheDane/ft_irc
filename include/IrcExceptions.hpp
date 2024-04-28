@@ -3,6 +3,9 @@
 
 # include "AException.hpp"
 
+class Server_msg;
+class AException;
+
 class Err_PasswordIncorrect : public AException
 {
 	public:

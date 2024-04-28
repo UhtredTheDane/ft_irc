@@ -18,6 +18,9 @@
 # include "Message.hpp"
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "../include/reply_macros.hpp"
+#include "../include/reply_macros_error.hpp"
+# include "Server_msg.hpp"
 
 class Channel
 {
@@ -54,13 +57,15 @@ class Channel
 		std::vector<User*>* get_users(void);
 		std::vector<User*>* get_admins(void);
 
+		
+		void set_topic(std::string topic);
 		void update_mod(User *user, std::vector<std::string> line);
 		void i_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
 		void o_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
 		void l_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
 		void k_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
 		void t_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
-		
+		void send_all(std::string str);
 		int give_privilege(User *user,std::string name);
 		int take_privilege(User *user,std::string name);
 

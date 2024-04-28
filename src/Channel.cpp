@@ -103,6 +103,7 @@ bool Channel::check_key(std::string& key)
 
 int Channel::remove_mod(User *user, int modif)
 {
+	(void)user;
 	if(mask & (1 << modif))
 	{
 		mask = mask - (1 << modif);
@@ -112,6 +113,7 @@ int Channel::remove_mod(User *user, int modif)
 }
 int Channel::set_mod(User *user, int modif)
 {
+	(void)user;
 	if(!(mask & (1 << modif)))
 	{
 		mask = mask + (1 << modif);
@@ -121,6 +123,9 @@ int Channel::set_mod(User *user, int modif)
 }
 void Channel::i_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions)
 {
+	(void)user;
+	(void)validparam;
+	(void)param;
 	if(line[2][0] == '-')
 	{
 		*validoptions += "i";
@@ -236,6 +241,8 @@ void Channel::k_request(User *user, std::vector<std::string> line,int *param,std
 }
 void Channel::t_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions)
 {
+	(void)param;
+	(void)validparam;
 	if(line[2][0] == '-')
 	{
 		if(!this->remove_mod(user,5))
@@ -269,15 +276,21 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 	validparam = "";
 	validoptions = "";
 	response = "";
-
+	if(line.size() < 3 || !IsValidChannelName(line[1]))
+		return;
 	if(!IsMod(user))
 	{
 		std::cout << user->get_nickname() << " is not mod of " << line[1] << std::endl;
-		// USER IS NOT MOD ERR_NOCHANMODES
+		// USER IS NOT MOD ERR_NOCHANMODES :ircserv.42.fr 482 lloisel_ #bob :You're not channel operator\r\n
+		std::cout << " Sending response to a mode command" << std::endl;
+		response = ":ircserv.42.fr " ;
+		response += ERR_CHANOPRIVSNEEDED;
+		response += " " + user->get_nickname()+ " "+ line[1] +" :You're not channel operator\r\n";
+		std::cout << response << std::endl; 
+		send(user->get_socket(),response.c_str(),response.length(),0);
 		return;
 	}
-	if(line.size() < 3 || !IsValidChannelName(line[1]))
-		return;
+	
 	if(!IsValidChannelName(line[1]))
 		std::cout << "Channel name is not valid" << std::endl;
 	options = line[2];
@@ -324,7 +337,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 			response += " MODE " + line[1] + " " + validoptions + " " + validparam;
 			response += "\r\n";
 			std::cout << response << std::endl; 
-			send(user->get_socket(), response.c_str(), response.length(), 0);
+			send_all(response);
 
 		}
 		else
@@ -440,5 +453,18 @@ void Channel::erase_invite(User* user)
 			{
 				invite.erase(it);
 			}
+	}
+}
+void Channel::set_topic(std::string str)
+{
+	this->theme = str;
+}
+void Channel::send_all(std::string str)
+{
+	std::vector<User*>::iterator it = this->users.begin();
+	while(it != users.end())
+	{
+		send((*it)->get_socket(),str.c_str(),str.length(),0);
+		it++;
 	}
 }

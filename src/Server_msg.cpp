@@ -2,6 +2,7 @@
 #include "../include/reply_macros.hpp"
 #include "../include/reply_macros_error.hpp"
 
+
 void Server_msg::welcome_msg(User* user)
 {
 	std::string msg = ":irc.42.com 001 " + user->get_nickname();
@@ -271,8 +272,8 @@ void Server_msg::err_unknowmode_msg(User* user,std::string& channel_name ,std::s
 void Server_msg::err_nosuchnick_msg(User* user,std::string& nick)
 {
 	std::string msg = ":irc.42.com " ;
-	msg += ERR_NOSUCHNICK " ";
-	msg += user->get_nickname() + " ";
+	msg += ERR_NOSUCHNICK;
+	msg += " " + user->get_nickname() + " ";
 	msg += nick + " :No such nick/channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }

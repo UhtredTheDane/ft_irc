@@ -29,6 +29,8 @@ Server_handler::Server_handler(Server* serv)
 	request_types[8] = "PRIVMSG";
 	request_types[9] = "PART";
 	request_types[10] = "INVITE";
+	request_types[11] = "TOPIC";
+
 	requests_ptr[0] = &Server_handler::capls_request;
 	requests_ptr[1] = &Server_handler::pass_request;
 	requests_ptr[2] = &Server_handler::nick_request;
@@ -40,6 +42,7 @@ Server_handler::Server_handler(Server* serv)
 	requests_ptr[8] = &Server_handler::privmsg_request;
 	requests_ptr[9] = &Server_handler::part_request;
 	requests_ptr[10] = &Server_handler::invite_request;
+	requests_ptr[11] = &Server_handler::topic_request;
 }
 
 Server_msg* Server_handler::get_msg(void)
@@ -79,6 +82,73 @@ void Server_handler::nick_request(User* user)
 	}
 }
 
+void Server_handler::topic_request(User* user)
+{
+	Channel *chan = NULL;
+	std::string arg;
+	std::string response = "";
+
+	std::cout << "command send : " << this->raw_msg << std::endl;
+	try
+	{
+		if(chan->IsValidChannelName(split_line[1]))
+			chan = this->serv->get_channels().at(this->split_line[1]);
+		if(chan->IsOption(5))
+		{	
+			if(split_line.size() == 2)
+			{
+				response = ":ircserv.42.fr ";
+				response += RPL_TOPIC ;
+				response += " "+ user->get_nickname() + " " + chan->get_name() + " " + chan->get_theme();
+				response += "\r\n";
+				std::cout << "Response :"<< response << std::endl; 
+				send(user->get_socket(), response.c_str(), response.length(), 0);
+				//send the topic of the channel	
+			}
+			if(split_line.size() > 2)
+			{
+				
+				if(split_line.size() == 3 && split_line[2].size() == 1) 
+				{
+					std::cout << user->get_nickname() << " asked to remove the topic" << std::endl;
+					response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
+					response += " TOPIC " + chan->get_name() + " :";
+					response += "\r\n";
+					std::cout << response << std::endl;
+					chan->send_all(response);
+					//send(user->get_socket(), response.c_str(), response.length(), 0);
+					//delete the topic 
+				}
+				else
+				{
+					std::vector<std::string>::iterator it = split_line.begin() + 2;
+					while(it != split_line.end())
+					{
+						arg += *it + " ";
+						it++;
+					}
+					chan->set_topic(arg);
+					std::cout << "Le topic " << arg << std::endl;
+					
+					response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
+					response += " TOPIC " + chan->get_name() + " " + arg;
+					response += "\r\n";
+					std::cout << response << std::endl; 
+					chan->send_all(response);
+					//send(user->get_socket(), response.c_str(), response.length(), 0);
+				}
+			}
+		}
+		else
+		{
+			std::cout << "TOpic option is not on" << std::endl;
+		}
+	}
+	catch(std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
 void Server_handler::invite_request(User* user)
 {
 	User *target;
@@ -86,45 +156,50 @@ void Server_handler::invite_request(User* user)
 	std::string reply;
 
 	std::cout << "Handling an invite request" << std::endl;
-	try
+
+	if(this->split_line.size() != 3)
+		msg.needmoreparams_msg(user,this->raw_msg);//throw need more param
+	else
 	{
-		if(this->split_line.size() != 3)
-			msg.needmoreparams_msg(user,this->raw_msg);
-		else
+		target = this->serv->findUserByName(this->split_line[1]);
+		if(!target)
+			throw(Err_NoSuchNick(split_line[1]));
+		try
 		{
 			chan = this->serv->get_channels().at(this->split_line[2]);//channel exist 
-			
-				target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
-				if(!target)
-				{
-					target = this->serv->findUserByName(this->split_line[1]);//user exist
-					if(target)
-					{
-						std::cout << "sending invite " << std::endl; 	
-						reply = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
-						chan->invite_user(target);
-						send(target->get_socket(),reply.c_str(),reply.length(),0);
-					}
-					else
-					{
-						std::cout << "target not connected to the server" << std::endl;
-						throw(Err_NotOnChannel(this->split_line[1]));
-					}	
-				}
-				else
-				{
-					std::cout << "user already in the channel " << std::endl;
-					throw(Err_useronchannel(this->split_line[1],this->split_line[2]));
-				}
-			
+		}
+		catch(const std::exception& e)
+		{
+			msg.nosuchchannel_msg(user,split_line[2]);//throw nosucchannel
+		}
+		if(!chan->IsOption(1))
+		{
+			//channel is not invite only
+		}
+		target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
+		if(!target)
+		{
+			target = this->serv->findUserByName(this->split_line[1]);//user exist
+			if(target)
+			{
+				std::cout << "sending invite " << std::endl; 	
+				reply = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
+				chan->invite_user(target);
+				send(target->get_socket(),reply.c_str(),reply.length(),0);
+			}
+			else
+			{
+				std::cout << "target not connected to the server" << std::endl;
+				throw(Err_NotOnChannel(this->split_line[1]));
+			}	
+		}
+		else
+		{
+			std::cout << "user already in the channel " << std::endl;
+			throw(Err_useronchannel(this->split_line[1],this->split_line[2]));
 		}
 		
 	}
-	catch(const std::exception& e)
-	{
-		msg.nosuchchannel_msg(user,split_line[2]);
-	}
-
 }
 
 void Server_handler::user_request(User* user)
@@ -295,7 +370,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-	for (int i = 0; i < 11; ++i)
+	for (int i = 0; i < 12; ++i)
 	{
 		 if(i > 3 && user->get_isRegistered() != 2)
 		 {

@@ -7,7 +7,9 @@
 # include "Channel.hpp"
 # include <map>
 
+
 class User;
+class Channel;
 
 class Server_msg{
 	public:
