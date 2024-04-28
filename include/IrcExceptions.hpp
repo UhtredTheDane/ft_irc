@@ -99,6 +99,18 @@ class Err_UserNotInChannel : public AException
 		Err_UserNotInChannel(std::string nick, std::string channel);
 		void handle(User* user, Server_msg* msg);
 };
+class Err_KeySet : public AException
+{
+	public:
+		Err_KeySet(std::string channel);
+		void handle(User* user, Server_msg* msg);
+};
+class Err_NoChanModes : public AException
+{
+	public:
+		Err_NoChanModes(std::string channel);
+		void handle(User* user, Server_msg* msg);
+};
 
 #endif
 

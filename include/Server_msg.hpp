@@ -48,6 +48,7 @@ class Server_msg{
 			void norecipient_msg(User* user, std::string& user_name);
 			void notexttosend_msg(User* user, std::string& user_name);
 			void nicknameinuse_msg(User* user, std::string oldnick,  std::string nick);
+			void err_nochanmodes(User* user, std::string const& channel_name);
 
 	private:
 };

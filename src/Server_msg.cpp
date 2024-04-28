@@ -237,8 +237,8 @@ void Server_msg::notonchannel_msg(User* user, std::string& channel_name)
 void Server_msg::err_keyset_msg(User* user, std::string& channel_name)
 {
 	std::string msg = ":irc.42.com " ;
-	msg += ERR_KEYSET " ";
-	msg += user->get_nickname() + " ";
+	msg += ERR_KEYSET;
+	msg += " " + user->get_nickname() + " ";
 	msg += channel_name + " :Channel key already set\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
@@ -249,6 +249,15 @@ void Server_msg::err_chanoprivneeded_msg(User* user, std::string const& channel_
 	msg += ERR_CHANOPRIVSNEEDED " ";
 	msg += user->get_nickname() + " ";
 	msg += channel_name + " :You're not channel operator\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::err_nochanmodes(User* user, std::string const& channel_name)
+{
+	std::string msg = ":irc.42.com " ;
+	msg += ERR_NOCHANMODES ;
+	msg += " " + user->get_nickname() + " ";
+	msg += channel_name + " :Channel doesn't support modes\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -280,9 +289,10 @@ void Server_msg::err_nosuchnick_msg(User* user,std::string& nick)
 void Server_msg::err_useronchannel_msg(User* user, std::string const& channel_name, std::string const& nick)
 {
 	std::string msg = ":irc.42.com " ;
-	msg += ERR_USERONCHANNEL " ";
-	msg += user->get_nickname() + " ";
-	msg += nick +" " + channel_name+ " :is already on channel\r\n";
+	msg += ERR_USERONCHANNEL ;
+	msg += " " + user->get_nickname() + " ";
+	msg += nick + " " + channel_name + " :is already on channel\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::nosuchnick_msg(User* user, std::string& user_name)
