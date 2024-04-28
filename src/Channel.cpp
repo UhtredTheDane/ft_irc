@@ -315,11 +315,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 						std::cout << "We found a valid option :" << options_types[i]<< std::endl;
 						(this->*options_ptr[i])( user, line, &param, &validparam, &validoptions);
 						break;
-					}std::cout << " Sending response to a mode command" << std::endl;
-			response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
-			response += " MODE " + line[1] + " " + validoptions + " " + validparam;
-			response += "\r\n";
-			std::cout << response << std::endl; 
+					}
 					i++;
 				}
 				if(i == 5)

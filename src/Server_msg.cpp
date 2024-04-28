@@ -2,6 +2,7 @@
 #include "../include/reply_macros.hpp"
 #include "../include/reply_macros_error.hpp"
 
+
 void Server_msg::welcome_msg(User* user)
 {
 	std::string msg = ":irc.42.com 001 " + user->get_nickname();
@@ -62,7 +63,7 @@ void Server_msg::pong_msg(User* user)
 
 void Server_msg::print_send(int client_socket, std::string msg, int length, int param)
 {
-	std::cout << "\033[32m" << msg << "\033[0m";
+	std::cout << "\033[32m"<< "[SENT]" << msg << "\033[0m";
 		send(client_socket, msg.c_str(), length, param);
 }
 
@@ -154,13 +155,14 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 	{
 		if((*it2)->get_nickname() == split_line[2])
 		{
+			std::cout << (*it2)->get_nickname() << "==" << split_line[2] << std::endl; 
 			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
 			print_send((*it2)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
 			return(0);
 		}
 			it2++;
-		}
-
+	}
+	std::cout << "je return -1 \n";
 	return(-1);
 }
 
@@ -180,6 +182,13 @@ void Server_msg::notregistred_msg(int socket)
 {
 	std::string msg = ":irc.42.com 451 :You have not registered\r\n";
 	print_send(socket, msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::nicknameinuse_msg(User* user, std::string oldnick,  std::string nick)
+{
+	std::string msg = ":irc.42.com 433 " + oldnick;
+	msg +=" :Nickname is already in use, new Nickname is : " + nick +"\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 
@@ -263,8 +272,8 @@ void Server_msg::err_unknowmode_msg(User* user,std::string& channel_name ,std::s
 void Server_msg::err_nosuchnick_msg(User* user,std::string& nick)
 {
 	std::string msg = ":irc.42.com " ;
-	msg += ERR_NOSUCHNICK " ";
-	msg += user->get_nickname() + " ";
+	msg += ERR_NOSUCHNICK;
+	msg += " " + user->get_nickname() + " ";
 	msg += nick + " :No such nick/channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
@@ -278,28 +287,28 @@ void Server_msg::err_useronchannel_msg(User* user, std::string const& channel_na
 
 void Server_msg::nosuchnick_msg(User* user, std::string& user_name)
 {
-	std::string msg = ":irc.42.com 401" + user->get_nickname() + " ";
+	std::string msg = ":irc.42.com 401 " + user->get_nickname() + " ";
 	msg += user_name + " :No such nick/channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::norecipient_msg(User* user, std::string& user_name)
 {
-	std::string msg = ":irc.42.com 411" + user->get_nickname() + " ";
+	std::string msg = ":irc.42.com 411 " + user->get_nickname() + " ";
 	msg += user_name + " :No recipient given\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::notexttosend_msg(User* user, std::string& user_name)
 {
-	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
+	std::string msg = ":irc.42.com 412 " + user->get_nickname() + " ";
 	msg += user_name + ":No text to print_send\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
 {
-	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
+	std::string msg = ":irc.42.com 412 " + user->get_nickname() + " ";
 	msg += channel_name + ":Cannot print_send to channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }

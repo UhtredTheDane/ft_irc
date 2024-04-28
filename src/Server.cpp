@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/26 18:50:39 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/28 13:53:55 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,14 +120,14 @@ void Server::check_connection()
 	if ((fd_client = accept(fd_socket, (struct sockaddr *) &(serv_addr), (socklen_t*)&addrlen)) != -1)
 	{
 		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
-		std::cout << "adding new client " << std::endl;
+		// std::cout << "adding new client " << std::endl;
 		pollfd new_pollfd;
 		bzero(&new_pollfd, sizeof(pollfd));
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
 		add_user(fd_client);
-		std::cout << "fd client: " << fd_client << std::endl;
+		// std::cout << "fd client: " << fd_client << std::endl;
 	}
 	else
 	{

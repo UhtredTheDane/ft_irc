@@ -20,6 +20,7 @@
 #include <sys/socket.h>
 #include "../include/reply_macros.hpp"
 #include "../include/reply_macros_error.hpp"
+# include "Server_msg.hpp"
 
 class Channel
 {
