@@ -157,13 +157,19 @@ void Server_handler::invite_request(User* user)
 	std::string reply;
 
 	std::cout << "Handling an invite request" << std::endl;
-	try
-	{
+
 		if(this->split_line.size() != 3)
 			msg.needmoreparams_msg(user,this->raw_msg);
 		else
 		{
-			chan = this->serv->get_channels().at(this->split_line[2]);//channel exist 
+			try
+			{
+				chan = this->serv->get_channels().at(this->split_line[2]);//channel exist 
+			}
+			catch(const std::exception& e)
+			{
+				msg.nosuchchannel_msg(user,split_line[2]);
+			}
 			if(!chan->IsOption(1))
 			{
 				//channel is not invite only
@@ -193,12 +199,6 @@ void Server_handler::invite_request(User* user)
 			
 		}
 		
-	}
-	catch(const std::exception& e)
-	{
-		msg.nosuchchannel_msg(user,split_line[2]);
-	}
-
 }
 
 void Server_handler::user_request(User* user)
