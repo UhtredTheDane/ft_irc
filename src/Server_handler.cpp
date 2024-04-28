@@ -200,13 +200,18 @@ void Server_handler::mode_request(User* user)
 void Server_handler::kick_request(User* user)
 {
 	int i = 0;
+	Channel *curent_chan;
+	if(split_line.size() < 3)
+			throw(Err_NeedMoreParams(split_line[0]));
 	try
 	{
-		if(split_line.size() < 3)
-			throw(Err_NeedMoreParams(split_line[0]));
-		Channel *curent_chan = serv->get_channels().at(split_line[1]);
-	std::cout << "bonjour 1\n";
-		for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
+		curent_chan = serv->get_channels().at(split_line[1]);
+	}
+	catch(std::out_of_range& oor)
+	{
+		throw(Err_NoSuchChannel(split_line[1]));
+	}
+	for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 	{
 		if(user == *it)
 		{
@@ -217,7 +222,6 @@ void Server_handler::kick_request(User* user)
 	if(i == 0)
 		throw(Err_chanoprivsneeded(curent_chan->get_name()));
 	i = 0;
-	std::cout << "bonjour2\n";
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
 	{		
 		if(user == *it)
@@ -228,26 +232,28 @@ void Server_handler::kick_request(User* user)
 	}
 	if(i == 0)
 		throw(Err_NotOnChannel(this->split_line[1]));/*ERR_NOTONCHANNEL*/;
-	std::cout << "bonjour3\n";
 	if(msg.kick_msg(user, curent_chan,split_line) == -1)
-			throw(Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
-	}
-	catch(std::out_of_range& oor)
 	{
-				throw(Err_NoSuchChannel(split_line[1]));
+		std::cout << "je throw\n";
+		throw(Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
 	}
-
 }
 
 void Server_handler::privmsg_request(User* user)
 {
+	Channel *curent_chan;
+	if(split_line.size() < 3)
+			throw(Err_NeedMoreParams(split_line[0]));
 	try
 	{
-		if(split_line.size() < 3)
-			throw(Err_NeedMoreParams(split_line[0]));
-		if(split_line[1][0] == '#')
-		{
-			Channel *curent_chan = serv->get_channels().at(split_line[1]);	
+		curent_chan = serv->get_channels().at(split_line[1]);
+	}
+	catch (std::out_of_range& oor)
+	{
+		throw(Err_CannotSendToChan(split_line[1]));
+	}
+	if(split_line[1][0] == '#')
+	{	
 			std::map<int, User*> users_map = serv->get_users();
 			Message c_msg(split_line[2], user);
 			curent_chan->add_message(&c_msg);
@@ -255,18 +261,14 @@ void Server_handler::privmsg_request(User* user)
 			{
 				throw(Err_CannotSendToChan(split_line[1]));
 			}
-		}
-		else
-		{
-			std::map<int, User*> users_map = serv->get_users();
-			if(msg.priv_msg(user, split_line, users_map) == -1)
-				throw(Err_NoSuchNick(split_line[1]));
-		}
 	}
-	catch (std::out_of_range& oor)
+	else
 	{
-		throw(Err_CannotSendToChan(split_line[1]));
+		std::map<int, User*> users_map = serv->get_users();
+		if(msg.priv_msg(user, split_line, users_map) == -1)
+		throw(Err_NoSuchNick(split_line[1]));
 	}
+
 }
 
 void Server_handler::part_request(User* user)
