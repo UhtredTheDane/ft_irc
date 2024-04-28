@@ -85,37 +85,64 @@ void Server_handler::nick_request(User* user)
 
 void Server_handler::topic_request(User* user)
 {
-	Channel *chan;
+	Channel *chan = NULL;
 	std::string arg;
+	std::string response = "";
 
 	std::cout << "command send : " << this->raw_msg << std::endl;
 	try
 	{
-		if(IsValidChannelName(split_line[1]))
+		if(chan->IsValidChannelName(split_line[1]))
 			chan = this->serv->get_channels().at(this->split_line[1]);
 		if(chan->IsOption(5))
 		{	
 			if(split_line.size() == 2)
 			{
+				response = ":ircserv.42.fr ";
+				response += RPL_TOPIC ;
+				response += " "+ user->get_nickname() + " " + chan->get_name() + " " + chan->get_theme();
+				response += "\r\n";
+				std::cout << "Response :"<< response << std::endl; 
+				send(user->get_socket(), response.c_str(), response.length(), 0);
 				//send the topic of the channel	
 			}
 			if(split_line.size() > 2)
 			{
-				if(split_line[2].compare(":") && split_line.size() == 3 )
+				
+				if(split_line.size() == 3 && split_line[2].size() == 1) 
 				{
+					std::cout << user->get_nickname() << " asked to remove the topic" << std::endl;
+					response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
+					response += " TOPIC " + chan->get_name() + " :";
+					response += "\r\n";
+					std::cout << response << std::endl;
+					chan->send_all(response);
+					//send(user->get_socket(), response.c_str(), response.length(), 0);
 					//delete the topic 
 				}
 				else
 				{
+					std::vector<std::string>::iterator it = split_line.begin() + 2;
+					while(it != split_line.end())
+					{
+						arg += *it + " ";
+						it++;
+					}
+					chan->set_topic(arg);
+					std::cout << "Le topic " << arg << std::endl;
 					
-					std::string::iterator it;
-					while()
+					response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
+					response += " TOPIC " + chan->get_name() + " " + arg;
+					response += "\r\n";
+					std::cout << response << std::endl; 
+					chan->send_all(response);
+					//send(user->get_socket(), response.c_str(), response.length(), 0);
 				}
 			}
 		}
 		else
 		{
-			//TOpic option is not on
+			std::cout << "TOpic option is not on" << std::endl;
 		}
 	}
 	catch(std::exception& e)
