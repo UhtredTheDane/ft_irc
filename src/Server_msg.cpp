@@ -154,13 +154,14 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 	{
 		if((*it2)->get_nickname() == split_line[2])
 		{
+			std::cout << (*it2)->get_nickname() << "==" << split_line[2] << std::endl; 
 			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
 			print_send((*it2)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
 			return(0);
 		}
 			it2++;
-		}
-
+	}
+	std::cout << "je return -1 \n";
 	return(-1);
 }
 

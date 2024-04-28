@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/19 22:40:28 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/27 19:20:52 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ Server_handler::Server_handler(Server* serv)
 	request_types[8] = "PRIVMSG";
 	request_types[9] = "PART";
 	request_types[10] = "INVITE";
-
 	requests_ptr[0] = &Server_handler::capls_request;
 	requests_ptr[1] = &Server_handler::pass_request;
 	requests_ptr[2] = &Server_handler::nick_request;
@@ -50,9 +49,7 @@ Server_msg* Server_handler::get_msg(void)
 void Server_handler::capls_request(User* user)
 {
 	if (user->get_isRegistered() == 0)
-	{
 		user->set_isRegistered(1);
-	}
 }
 
 void Server_handler::pass_request(User* user)
@@ -60,7 +57,7 @@ void Server_handler::pass_request(User* user)
 	if((!serv->check_password(split_line[1])) || (!user->get_isRegistered()) == 1)
 	{
 		user->set_isRegistered(0);
-		throw (Server_handler::Err_PasswordIncorrect());
+		throw (Err_PasswordIncorrect());
 	}
 	user->set_isPasswordValid(true);
 }
@@ -78,7 +75,7 @@ void Server_handler::nick_request(User* user)
 	}
 	else
 	{
-		throw(Server_handler::Err_NotRegistred(user->get_socket()));
+		throw(Err_NotRegistred(user->get_socket()));
 	}
 }
 
@@ -111,13 +108,13 @@ void Server_handler::invite_request(User* user)
 					else
 					{
 						std::cout << "target not connected to the server" << std::endl;
-						throw(Server_handler::Err_NotOnChannel(this->split_line[1]));
+						throw(Err_NotOnChannel(this->split_line[1]));
 					}	
 				}
 				else
 				{
 					std::cout << "user already in the channel " << std::endl;
-					throw(Server_handler::Err_useronchannel(this->split_line[1],this->split_line[2]));
+					throw(Err_useronchannel(this->split_line[1],this->split_line[2]));
 				}
 			
 		}
@@ -133,7 +130,7 @@ void Server_handler::invite_request(User* user)
 void Server_handler::user_request(User* user)
 {
 	if(split_line.size() < 4)
-			throw(Server_handler::Err_NeedMoreParams("USER"));
+			throw(Err_NeedMoreParams("USER"));
 	if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		user->set_username(split_line[1]);
@@ -149,8 +146,7 @@ void Server_handler::user_request(User* user)
 	}
 	else
 	{
-		std::cout << "user\n";
-		throw(Server_handler::Err_NotRegistred(user->get_socket()));
+		throw(Err_NotRegistred(user->get_socket()));
 	}
 
 }
@@ -163,9 +159,7 @@ void Server_handler::pong_request(User* user)
 void Server_handler::join_request(User* user)
 {
 	if (split_line.size() < 2)
-	{
-		throw(Server_handler::Err_NeedMoreParams(split_line[0]));
-	}
+		throw(Err_NeedMoreParams(split_line[0]));
 	std::stringstream list_name(split_line[1]);
 	std::string channel_name;
 	Channel* current_chan;
@@ -181,17 +175,11 @@ void Server_handler::join_request(User* user)
 			return ;
 		}
 		if (current_chan->IsOption(1))
-		{
 			throw(Err_InviteOnlyChan(channel_name));
-		}
 		else if (current_chan->IsOption(2) && !current_chan->check_key(split_line[2]))
-		{
 			throw(Err_BadChannelKey(channel_name));
-		}
 		else if (current_chan->IsOption(4) && current_chan->is_full())
-		{
 			throw(Err_ChannelIsFull(channel_name));
-		}
 		current_chan->add_user(user);
 		msg.join_msg(user, current_chan);
 	}
@@ -215,9 +203,10 @@ void Server_handler::kick_request(User* user)
 	try
 	{
 		if(split_line.size() < 3)
-			throw(Server_handler::Err_NeedMoreParams(split_line[0]));
+			throw(Err_NeedMoreParams(split_line[0]));
 		Channel *curent_chan = serv->get_channels().at(split_line[1]);
-	for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
+	std::cout << "bonjour 1\n";
+		for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 	{
 		if(user == *it)
 		{
@@ -226,8 +215,9 @@ void Server_handler::kick_request(User* user)
 		it++;
 	}
 	if(i == 0)
-		throw(Server_handler::Err_chanoprivsneeded(curent_chan->get_name()));
+		throw(Err_chanoprivsneeded(curent_chan->get_name()));
 	i = 0;
+	std::cout << "bonjour2\n";
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
 	{		
 		if(user == *it)
@@ -237,13 +227,14 @@ void Server_handler::kick_request(User* user)
 		it++;
 	}
 	if(i == 0)
-		throw(Server_handler::Err_NotOnChannel(this->split_line[1]));/*ERR_NOTONCHANNEL*/;
+		throw(Err_NotOnChannel(this->split_line[1]));/*ERR_NOTONCHANNEL*/;
+	std::cout << "bonjour3\n";
 	if(msg.kick_msg(user, curent_chan,split_line) == -1)
-			throw(Server_handler::Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
+			throw(Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
 	}
 	catch(std::out_of_range& oor)
 	{
-				throw(Server_handler::Err_NoSuchChannel(split_line[1]));
+				throw(Err_NoSuchChannel(split_line[1]));
 	}
 
 }
@@ -253,7 +244,7 @@ void Server_handler::privmsg_request(User* user)
 	try
 	{
 		if(split_line.size() < 3)
-			throw(Server_handler::Err_NeedMoreParams(split_line[0]));
+			throw(Err_NeedMoreParams(split_line[0]));
 		if(split_line[1][0] == '#')
 		{
 			Channel *curent_chan = serv->get_channels().at(split_line[1]);	
@@ -262,21 +253,19 @@ void Server_handler::privmsg_request(User* user)
 			curent_chan->add_message(&c_msg);
 			if(msg.chan_msg(user, curent_chan, split_line) == -1)
 			{
-				throw(Server_handler::Err_CannotSendToChan(split_line[1]));
+				throw(Err_CannotSendToChan(split_line[1]));
 			}
 		}
 		else
 		{
 			std::map<int, User*> users_map = serv->get_users();
 			if(msg.priv_msg(user, split_line, users_map) == -1)
-			{
-				throw(Server_handler::Err_NoSuchNick(split_line[1]));
-			}
+				throw(Err_NoSuchNick(split_line[1]));
 		}
 	}
 	catch (std::out_of_range& oor)
 	{
-		throw(Server_handler::Err_CannotSendToChan(split_line[1]));
+		throw(Err_CannotSendToChan(split_line[1]));
 	}
 }
 
@@ -290,7 +279,7 @@ void Server_handler::part_request(User* user)
 		}
 		catch (std::out_of_range& oor)
 		{
-			throw (Server_handler::Err_NoSuchChannel(split_line[1]));
+			throw (Err_NoSuchChannel(split_line[1]));
 		}
 }
 
@@ -307,7 +296,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 		 {
 		 	i = 0;
 			split_line.clear();
-			throw(Server_handler::Err_NotRegistred(user->get_socket()));
+			throw(Err_NotRegistred(user->get_socket()));
 		 }
 		else if (!split_line[0].compare(request_types[i]))
 		{
@@ -315,7 +304,7 @@ void Server_handler::processing_request(User* user, std::string& request)
 			{
 				(this->*requests_ptr[i])(user);
 			}
-			catch (ExceptionInterface& e)
+			catch (AException& e)
 			{
 				e.handle(user, &msg);
 			}
@@ -348,9 +337,8 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 				{
 				processing_request(user, token);
 				}
-				catch (Server_handler::Err_NotRegistred& e)
+				catch (Err_NotRegistred& e)
 				{
-					std::cout << "buffer deleted\n";
 					user->set_isRegistered(0);
 					get_msg()->notregistred_msg(client_socket);
 				}
@@ -358,9 +346,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 			}
 		}
 		else
-		{
 			user->buffer += request;
-		}
 	}
 	catch(std::out_of_range& oor)
 	{
@@ -371,141 +357,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 {
 	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
-	{
 			if((*it)->get_nickname() == name)
-			{
 				return *it;
-			}
-	}
 	return(NULL);
-}
-
-Server_handler::Err_NeedMoreParams::Err_NeedMoreParams(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_NeedMoreParams::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_InviteOnlyChan::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_ChannelIsFull::Err_ChannelIsFull(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_ChannelIsFull::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_BadChannelKey::Err_BadChannelKey(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_BadChannelKey::get_channel(void)
-{
-	return (channel);
-}
-
-Server_handler::Err_NoSuchChannel::Err_NoSuchChannel(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_NoSuchChannel::get_channel(void)
-{
-	return (str);
-}
-
-Server_handler::Err_CannotSendToChan::Err_CannotSendToChan(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_CannotSendToChan::get_channel(void)
-{
-	return (str);
-}
-
-Server_handler::Err_NoSuchNick::Err_NoSuchNick(std::string str) : str(str)
-{
-	
-}
-
-std::string Server_handler::Err_NoSuchNick::get_channel(void)
-{
-	return (str);
-}
-
-Server_handler::Err_NotOnChannel::Err_NotOnChannel(std::string str) : str(str)
-{
-	
-}
-
-Server_handler::Err_useronchannel::Err_useronchannel(std::string nick, std::string channel) : channel(channel), nick(nick)
-{
-
-}	
-
-std::string Server_handler::Err_useronchannel::getNick()
-{
-	return (nick);
-}
-
-std::string Server_handler::Err_useronchannel::get_channel()
-{
-	return (channel);
-}
-
-Server_handler::Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel) : channel(channel), nick(nick)
-{
-
-}	
-
-std::string Server_handler::Err_UserNotInChannel::getNick()
-{
-	return (nick);
-}
-
-std::string Server_handler::Err_UserNotInChannel::get_channel()
-{
-	return (channel);
-}
-
-std::string Server_handler::Err_NotOnChannel::get_channel(void)
-{
-	return (str);
-}
-Server_handler::Err_chanoprivsneeded::Err_chanoprivsneeded(std::string channel) : channel(channel)
-{
-	
-}
-
-std::string Server_handler::Err_chanoprivsneeded::get_channel(void)
-{
-	return (channel);
-}
-
-
-Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) : socket(socket)
-{
-
-}	
-
-int Server_handler::Err_NotRegistred::get_socket()
-{
-	return (socket);
 }
