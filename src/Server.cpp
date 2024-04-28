@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/28 17:05:13 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/28 17:43:42 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void Server::check_connection()
 	{
 		if (fcntl(fd_client, F_SETFL, O_NONBLOCK) == -1)
 		{        
-		throw std::runtime_error("Error try to set socket to non blocking");
+			throw std::runtime_error("Error try to set socket to non blocking");
 		}
 		pollfd new_pollfd;
 		bzero(&new_pollfd, sizeof(pollfd));
@@ -137,11 +137,6 @@ void Server::check_connection()
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
 		add_user(fd_client);
-		// std::cout << "fd client: " << fd_client << std::endl;
-	}
-	else
-	{
-        throw std::runtime_error("Error while accepting the request");
 	}
 }
 User *Server::findUserByName(std::string name)

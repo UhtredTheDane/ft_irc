@@ -286,28 +286,28 @@ void Server_msg::err_useronchannel_msg(User* user, std::string const& channel_na
 
 void Server_msg::nosuchnick_msg(User* user, std::string& user_name)
 {
-	std::string msg = ":irc.42.com 401" + user->get_nickname() + " ";
+	std::string msg = ":irc.42.com 401 " + user->get_nickname() + " ";
 	msg += user_name + " :No such nick/channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::norecipient_msg(User* user, std::string& user_name)
 {
-	std::string msg = ":irc.42.com 411" + user->get_nickname() + " ";
+	std::string msg = ":irc.42.com 411 " + user->get_nickname() + " ";
 	msg += user_name + " :No recipient given\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::notexttosend_msg(User* user, std::string& user_name)
 {
-	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
-	msg += user_name + ":No text to print_send\r\n";
+	std::string msg = ":irc.42.com 412 " + user->get_nickname() + " ";
+	msg += user_name + " :No text to print\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
 {
-	std::string msg = ":irc.42.com 412" + user->get_nickname() + " ";
-	msg += channel_name + ":Cannot print_send to channel\r\n";
+	std::string msg = ":irc.42.com 404 " + user->get_nickname() + " ";
+	msg += channel_name + " :Cannot print to channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }

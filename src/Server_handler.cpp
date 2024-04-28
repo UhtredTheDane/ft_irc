@@ -165,6 +165,10 @@ void Server_handler::join_request(User* user)
 	Channel* current_chan;
 	while (getline(list_name, channel_name, ','))
 	{
+		if(channel_name[0] != '#')
+		{
+			throw(Err_NoSuchChannel(channel_name));
+		}
 		try
 		{	
 			current_chan = serv->get_channels().at(channel_name);
@@ -234,7 +238,6 @@ void Server_handler::kick_request(User* user)
 		throw(Err_NotOnChannel(this->split_line[1]));/*ERR_NOTONCHANNEL*/;
 	if(msg.kick_msg(user, curent_chan,split_line) == -1)
 	{
-		std::cout << "je throw\n";
 		throw(Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
 	}
 }
