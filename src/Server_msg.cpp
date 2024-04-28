@@ -182,6 +182,13 @@ void Server_msg::notregistred_msg(int socket)
 	print_send(socket, msg.c_str(), msg.length(), 0);
 }
 
+void Server_msg::nicknameinuse_msg(User* user, std::string oldnick,  std::string nick)
+{
+	std::string msg = ":irc.42.com 433 " + oldnick;
+	msg +=" :Nickname is already in use, new Nickname is : " + nick +"\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
 
 void Server_msg::nosuchchannel_msg(User* user, std::string& channel_name)
 {

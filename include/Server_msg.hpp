@@ -45,6 +45,8 @@ class Server_msg{
 			void nosuchnick_msg(User* user, std::string& user_name);
 			void norecipient_msg(User* user, std::string& user_name);
 			void notexttosend_msg(User* user, std::string& user_name);
+			void nicknameinuse_msg(User* user, std::string oldnick,  std::string nick);
+
 	private:
 };
 

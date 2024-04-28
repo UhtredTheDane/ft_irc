@@ -90,6 +90,20 @@ User *findUserByName(std::vector<User *> v,std::string name);
 			private:
 				int socket;
 		};
+		// class Err_NicknameInUse : public ExceptionInterface
+		// {
+		// 	public:
+		// 		Err_NicknameInUse(std::string nick);
+		// 		std::string get_nick(void);
+		// 		void handle(User* user, Server_msg* msg)
+		// 		{
+		// 			std::string strtest = get_nick();
+		// 			msg->nicknameinuse_msg(user, strtest);
+		// 		};
+		// 		virtual ~Err_NicknameInUse(void) throw(){};
+		// 	private:
+		// 		std::string nick;
+		// };
 		class Err_NeedMoreParams : public ExceptionInterface
 		{
 			public:

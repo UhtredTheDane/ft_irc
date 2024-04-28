@@ -71,7 +71,10 @@ void Server_handler::nick_request(User* user)
 	if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		while (serv->is_on_serv(split_line[1]))
+		{
+			msg.nicknameinuse_msg(user, split_line[1], split_line[1] + "_");
 			split_line[1] += "_";
+		}
 		user->set_nickname(split_line[1]);
 	}
 	else
@@ -497,6 +500,7 @@ std::string Server_handler::Err_chanoprivsneeded::get_channel(void)
 {
 	return (channel);
 }
+
 
 Server_handler::Err_NotRegistred::Err_NotRegistred(int socket) : socket(socket)
 {
