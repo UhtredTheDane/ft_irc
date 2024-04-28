@@ -49,7 +49,6 @@ Server_msg* Server_handler::get_msg(void)
 }
 void Server_handler::capls_request(User* user)
 {
-	std::cout << "bonjour" << std::endl;
 	if (user->get_isRegistered() == 0)
 	{
 		user->set_isRegistered(1);
@@ -79,7 +78,6 @@ void Server_handler::nick_request(User* user)
 	}
 	else
 	{
-		std::cout << "nick\n";
 		throw(Server_handler::Err_NotRegistred(user->get_socket()));
 	}
 }
@@ -344,7 +342,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 			while((delim_pos = user->buffer.find(delimiter)) != std::string::npos)
 			{
 				token = user->buffer.substr(0, delim_pos);
-				std::cout << "\033[34m" << token << "\033[0m" << std::endl;
+				std::cout << "\033[34m" << "[RECEIVED]" << token << "\033[0m" << std::endl;
 				this->raw_msg = token;
 				try
 				{

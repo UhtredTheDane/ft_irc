@@ -62,7 +62,7 @@ void Server_msg::pong_msg(User* user)
 
 void Server_msg::print_send(int client_socket, std::string msg, int length, int param)
 {
-	std::cout << "\033[32m" << msg << "\033[0m";
+	std::cout << "\033[32m"<< "[SENT]" << msg << "\033[0m";
 		send(client_socket, msg.c_str(), length, param);
 }
 
