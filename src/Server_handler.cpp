@@ -51,13 +51,19 @@ Server_msg* Server_handler::get_msg(void)
 }
 void Server_handler::capls_request(User* user)
 {
+	if((user->get_isRegistered()) == 2)
+		throw (Err_AlreadyRegistred());
 	if (user->get_isRegistered() == 0)
 		user->set_isRegistered(1);
 }
 
 void Server_handler::pass_request(User* user)
 {
-	if((!serv->check_password(split_line[1])) || (!user->get_isRegistered()) == 1)
+	if(user->get_isRegistered() == 0)
+		throw(Err_NotRegistred(user->get_socket()));
+	if((user->get_isRegistered()) == 2)
+		throw (Err_AlreadyRegistred());
+	if((!serv->check_password(split_line[1])) && user->get_isRegistered() == 1)
 	{
 		user->set_isRegistered(0);
 		throw (Err_PasswordIncorrect());
@@ -67,7 +73,11 @@ void Server_handler::pass_request(User* user)
 
 void Server_handler::nick_request(User* user)
 {
-	if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
+	if(user->get_isRegistered() == 0)
+		throw(Err_NotRegistred(user->get_socket()));
+	else if((user->get_isRegistered()) == 2)
+		throw (Err_AlreadyRegistred());
+	else if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		while (serv->is_on_serv(split_line[1]))
 		{
@@ -75,10 +85,6 @@ void Server_handler::nick_request(User* user)
 			split_line[1] += "_";
 		}
 		user->set_nickname(split_line[1]);
-	}
-	else
-	{
-		throw(Err_NotRegistred(user->get_socket()));
 	}
 }
 
@@ -204,9 +210,13 @@ void Server_handler::invite_request(User* user)
 
 void Server_handler::user_request(User* user)
 {
-	if(split_line.size() < 4)
+	if(user->get_isRegistered() == 0)
+		throw(Err_NotRegistred(user->get_socket()));
+	else if((user->get_isRegistered()) == 2)
+		throw (Err_AlreadyRegistred());
+	else if(split_line.size() < 4)
 			throw(Err_NeedMoreParams("USER"));
-	if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
+	else if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		user->set_username(split_line[1]);
 		user->set_hostname(split_line[2]);
@@ -219,11 +229,6 @@ void Server_handler::user_request(User* user)
 		msg.myinfo_msg(user);
 		user->set_isRegistered(2);
 	}
-	else
-	{
-		throw(Err_NotRegistred(user->get_socket()));
-	}
-
 }
 
 void Server_handler::pong_request(User* user)
