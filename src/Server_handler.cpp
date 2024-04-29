@@ -51,28 +51,35 @@ Server_msg* Server_handler::get_msg(void)
 }
 void Server_handler::capls_request(User* user)
 {
-	if((user->get_isRegistered()) == 2)
+	if(split_line.size() < 2)
+			throw(Err_NeedMoreParams("CAP"));
+	else if(split_line[1] != "LS")
+		throw(Err_NotRegistred(user->get_socket()));
+	else if((user->get_isRegistered()) == 2)
 		throw (Err_AlreadyRegistred());
-	if (user->get_isRegistered() == 0)
+	else if (user->get_isRegistered() == 0)
 		user->set_isRegistered(1);
+	else
+		user->reset_userinfo();
 }
 
 void Server_handler::pass_request(User* user)
 {
-	if(user->get_isRegistered() == 0)
+	if(split_line.size() < 2)
+		throw(Err_NeedMoreParams("PASS"));
+	else if(user->get_isRegistered() == 0)
 		throw(Err_NotRegistred(user->get_socket()));
-	if((user->get_isRegistered()) == 2)
+	else if((user->get_isRegistered()) == 2)
 		throw (Err_AlreadyRegistred());
-	if((!serv->check_password(split_line[1])) && user->get_isRegistered() == 1)
-	{
-		user->set_isRegistered(0);
+	else if((!serv->check_password(split_line[1])) && user->get_isRegistered() == 1)
 		throw (Err_PasswordIncorrect());
-	}
 	user->set_isPasswordValid(true);
 }
 
 void Server_handler::nick_request(User* user)
 {
+	if(split_line.size() < 2)
+		throw(Err_NeedMoreParams("NICK"));
 	if(user->get_isRegistered() == 0)
 		throw(Err_NotRegistred(user->get_socket()));
 	else if((user->get_isRegistered()) == 2)
@@ -214,7 +221,7 @@ void Server_handler::user_request(User* user)
 		throw(Err_NotRegistred(user->get_socket()));
 	else if((user->get_isRegistered()) == 2)
 		throw (Err_AlreadyRegistred());
-	else if(split_line.size() < 4)
+	else if(split_line.size() < 5)
 			throw(Err_NeedMoreParams("USER"));
 	else if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
@@ -229,6 +236,8 @@ void Server_handler::user_request(User* user)
 		msg.myinfo_msg(user);
 		user->set_isRegistered(2);
 	}
+	else
+		throw(Err_NotRegistred(user->get_socket()));
 }
 
 void Server_handler::pong_request(User* user)
@@ -372,10 +381,10 @@ void Server_handler::processing_request(User* user, std::string& request)
 {
 	std::stringstream coco(request);
 	std::string word;
-
+	int i;
 	while (getline(coco, word, ' '))
 		split_line.push_back(word);
-	for (int i = 0; i < 12; ++i)
+	for (i = 0; i < 12; ++i)
 	{
 		 if(i > 3 && user->get_isRegistered() != 2)
 		 {
@@ -396,6 +405,8 @@ void Server_handler::processing_request(User* user, std::string& request)
 			break;
 		}
 	}
+	if(i == 12)
+		throw(Err_UnknownCommand(request));
 	split_line.clear();
 }
 
@@ -426,6 +437,10 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 				{
 					user->set_isRegistered(0);
 					get_msg()->notregistred_msg(client_socket);
+				}
+				catch(Err_UnknownCommand& e)
+				{
+					e.handle(user, &msg);
 				}
 				user->buffer.erase(0, delim_pos + delimiter.length());
 			}

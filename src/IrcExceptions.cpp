@@ -31,6 +31,16 @@ void Err_NeedMoreParams::handle(User* user, Server_msg* msg)
 	msg->needmoreparams_msg(user, get_channel());
 }
 
+Err_UnknownCommand::Err_UnknownCommand(std::string channel)
+{
+	this->channel = channel;
+}
+
+void Err_UnknownCommand::handle(User* user, Server_msg* msg)
+{
+	msg->unknowncommand_msg(user, get_channel());
+}
+
 Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel)
 {
 	this->channel = channel;
