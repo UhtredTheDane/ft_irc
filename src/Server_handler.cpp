@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 
 # include "../include/Server_handler.hpp"
-#include "../include/reply_macros.hpp"
-#include "../include/reply_macros_error.hpp"
+
 
 Server_handler::Server_handler(Server* serv)
 {
 	this->serv = serv;
-	msg = Server_msg();
+	msg = Server_msg(serv);
+	
 	request_types[0] = "CAP";
 	request_types[1] = "PASS";
 	request_types[2] = "NICK";

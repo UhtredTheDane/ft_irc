@@ -205,3 +205,22 @@ void Server::run_server()
 		}
 	}
 }
+Channel *Server::findChannelByName(std::string name)
+{
+	Channel * target;
+
+	target = NULL;
+	std::map<std::string, Channel*> mapChan;
+	mapChan = get_channels();
+
+	for (std::map<std::string, Channel*>::iterator it = mapChan.begin(); it != mapChan.end(); ++it)
+	{
+		if (it->second->get_name() == name)
+		{
+			target = it->second;
+			return target;
+		}
+	}
+	return NULL;
+}
+

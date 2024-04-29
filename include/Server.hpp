@@ -23,11 +23,13 @@
 # include <poll.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include "Channel.hpp"
 # include "Server_handler.hpp"
 # include <map>
-#include "signal.hpp"
+# include "signal.hpp"
 
 class Server_handler;
+class Channel;
 
 class Server
 {
@@ -46,6 +48,7 @@ class Server
 		void check_connection();
 		void check_incoming_package();
 		User *findUserByName(std::string name);
+		Channel *findChannelByName(std::string name);
 		
 	private:
 	

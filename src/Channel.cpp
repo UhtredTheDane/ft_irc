@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/Channel.hpp"
-# include <iostream>
+
 
 Channel::Channel(std::string& name, User* user_admin)
 {

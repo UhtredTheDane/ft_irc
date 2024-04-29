@@ -17,12 +17,14 @@
 # include <string>
 # include "User.hpp"
 # include "Channel.hpp"
-# include "Server_msg.hpp"
-# include "Server.hpp"
+# include "../include/reply_macros.hpp"
+# include "../include/reply_macros_error.hpp"
 # include "IrcExceptions.hpp"
 
 
+
 class Server;
+class Server_msg;
 
 class Server_handler
 {
@@ -30,7 +32,7 @@ class Server_handler
 	private:
 			
 			Server* serv;
-			Server_msg msg;
+			Server_msg &msg;
 			std::string raw_msg;
 			std::vector<std::string> split_line;
 			std::string request_types[12];

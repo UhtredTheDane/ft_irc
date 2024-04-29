@@ -1,7 +1,18 @@
 #include "../include/Server_msg.hpp"
-#include "../include/reply_macros.hpp"
-#include "../include/reply_macros_error.hpp"
 
+
+Server_msg::Server_msg(Server *serv)
+{
+	this->serv = serv;
+}
+Server_msg::~Server_msg()
+{
+	return;
+}
+Serv *Server_msg::getServ()
+{
+	return (this->serv);
+}
 
 void Server_msg::welcome_msg(User* user)
 {
@@ -67,11 +78,18 @@ void Server_msg::print_send(int client_socket, std::string msg, int length, int 
 		send(client_socket, msg.c_str(), length, param);
 }
 
-void Server_msg::join_msg(User *user, Channel* channel)
+void Server_msg::join_msg(User *user, std::string &channel_name)
 {
 	std::string msg;
 	int msg_len;
+	Channel *channel;
 
+	channel = this->getServ().findChannelByName(channel_name);
+	if(!channel)
+	{
+		std::cout << "problem with channel name" << std::endl;
+		return;
+	}
 	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost JOIN :" + channel->get_name() + "\r\n";
 	msg_len = msg.length();
 	for (std::vector<User*>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
@@ -92,19 +110,26 @@ void Server_msg::join_msg(User *user, Channel* channel)
 	print_send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::mode_msg(User* user, Channel* channel)
+void Server_msg::mode_msg(User* user, std::string &channel_name)
 {
 	std::string msg = ":" + user->get_servername();
-	msg += " 324 " + user->get_username() + " " + channel->get_name() + " +" ;
+	msg += " 324 " + user->get_username() + " " + channel_name + " +" ;
 	msg += "\r\n";
 	int msg_len = msg.length();
 	print_send(user->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-void Server_msg::leave_msg(User* user, Channel* channel)
+void Server_msg::leave_msg(User* user, std::string &channel_name)
 {
 	std::string msg;
-	
+	Channel *channel;
+
+	channel = this->getServ().findChannelByName(channel_name);
+	if(!channel)
+	{
+		std::cout << "problem with channel name" << std::endl;
+		throw();
+	}
 	msg += ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost PART " + channel->get_name();
 	std::string str = channel->get_name();
 	str[0] = ':';

@@ -16,11 +16,16 @@
 # include <vector>
 # include "User.hpp"
 # include "Message.hpp"
+# include "Server_msg.hpp"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "../include/reply_macros.hpp"
 #include "../include/reply_macros_error.hpp"
-# include "Server_msg.hpp"
+
+# include <iostream>
+
+
 
 
 class Channel
