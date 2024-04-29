@@ -145,6 +145,7 @@ void Channel::o_request(User *user, std::vector<std::string> line,int *param,std
 	{
 		if(line[*param].c_str() && !this->take_privilege(user ,line[*param]))
 		{
+			//if(!IsInChannel(findUserByName(users,line[param])))
 			*validoptions += "o";
 			*validparam += line[*param] + " ";
 
@@ -264,8 +265,9 @@ void Channel::t_request(User *user, std::vector<std::string> line,int *param,std
 		
 void Channel::update_mod(User *user, std::vector<std::string> line)
 {
-	/* ERR_NEEDMOREPARAMS              ERR_KEYSET
-    	ERR_CHANOPRIVSNEEDED
+	/*              ERR_KEYSET ERR_NOCHANMODES 
+            
+                     
     	ERR_USERNOTINCHANNEL           ERR_UNKNOWNMODE*/
 	std::string options;
 	int param = -1;
@@ -276,23 +278,24 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 	validparam = "";
 	validoptions = "";
 	response = "";
-	if(line.size() < 3 || !IsValidChannelName(line[1]))
+	if(line.size() < 3)
+		//throw(Err_NeedMoreParams()); ERR_NEEDMOREPARAMS 
+	if(!IsValidChannelName(line[1]))
 		return;
+	
 	if(!IsMod(user))
 	{
-		std::cout << user->get_nickname() << " is not mod of " << line[1] << std::endl;
+		throw(Err_chanoprivsneeded(line[1])); //ERR_CHANOPRIVSNEEDED
+		//std::cout << user->get_nickname() << " is not mod of " << line[1] << std::endl;
 		// USER IS NOT MOD ERR_NOCHANMODES :ircserv.42.fr 482 lloisel_ #bob :You're not channel operator\r\n
-		std::cout << " Sending response to a mode command" << std::endl;
-		response = ":ircserv.42.fr " ;
-		response += ERR_CHANOPRIVSNEEDED;
-		response += " " + user->get_nickname()+ " "+ line[1] +" :You're not channel operator\r\n";
-		std::cout << response << std::endl; 
-		send(user->get_socket(),response.c_str(),response.length(),0);
-		return;
+		//std::cout << " Sending response to a mode command" << std::endl;
+		//response = ":ircserv.42.fr " ;
+		//response += ERR_CHANOPRIVSNEEDED;
+		//response += " " + user->get_nickname()+ " "+ line[1] +" :You're not channel operator\r\n";
+	//	std::cout << response << std::endl; 
+		//send(user->get_socket(),response.c_str(),response.length(),0);
+		//return;
 	}
-	
-	if(!IsValidChannelName(line[1]))
-		std::cout << "Channel name is not valid" << std::endl;
 	options = line[2];
 	if (line.size() >= 4)
 		param = 3;
@@ -320,7 +323,7 @@ void Channel::update_mod(User *user, std::vector<std::string> line)
 				}
 				if(i == 5)
 				{
-					//invalid option
+					throw(Err_UnknowedMode(*current,get_name()));
 				}
 				current ++;
 			}
@@ -352,7 +355,7 @@ int  Channel::give_privilege(User *user,std::string name)
 	u = findUserByName(users,name);
 	std::cout << "On essaye de donner des droits a : "<< name << '"' << std::endl;
 	if(!u)
-		return(1);
+		throw(Err_UserNotInChannel(name,this->get_name()));
 	if(findUserByName(admin_users,name))
 	{
 		std::cout << user->get_nickname() << " is already mod" << std::endl;
@@ -424,7 +427,7 @@ int Channel::IsMod(User *user)
 int Channel::IsInChannel(User *user)
 {
 	std::vector<User *>::iterator it;
-	it = std::find(users.begin(),admin_users.end(),user);
+	it = std::find(users.begin(),users.end(),user);
 	if(it != users.end())
 		return 1;
 	return 0;

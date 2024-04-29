@@ -22,6 +22,7 @@
 #include "../include/reply_macros_error.hpp"
 # include "Server_msg.hpp"
 
+
 class Channel
 {
 	enum Chanmod { i = 1 , k = 2 , o = 3 , l = 4 , t = 5};

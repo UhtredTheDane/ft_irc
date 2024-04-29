@@ -111,6 +111,15 @@ class Err_NoChanModes : public AException
 		Err_NoChanModes(std::string channel);
 		void handle(User* user, Server_msg* msg);
 };
+class Err_UnknowedMode : public AException
+{
+	public:
+		Err_UnknowedMode(char c,std::string channel);
+		void handle(User* user, Server_msg* msg);
+		char getChar();
+	private :
+		char c;
+};
 
 #endif
 

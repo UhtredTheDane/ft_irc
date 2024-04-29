@@ -322,3 +322,10 @@ void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
 	msg += channel_name + ":Cannot print_send to channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
+void Server_msg::err_UnknowedMode(User* user,char c, std::string& channel_name)
+{
+	std::string msg = ":irc.42.com ";
+	msg += ERR_UNKNOWNMODE;
+	msg += " " + user->get_nickname() + " " + c + " :is unknown mode char to me for " + channel_name + "\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
