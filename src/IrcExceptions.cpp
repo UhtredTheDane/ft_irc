@@ -130,7 +130,7 @@ Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel
 
 void Err_UserNotInChannel::handle(User* user, Server_msg* msg)
 {
-	msg->err_useronchannel_msg(user, get_channel(), get_nick());
+	msg->err_usernotinchannel_msg(user, get_channel(), get_nick());
 }
 Err_KeySet::Err_KeySet(std::string channel)
 {
