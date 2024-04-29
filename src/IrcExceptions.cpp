@@ -142,4 +142,38 @@ void Err_UserNotInChannel::handle(User* user, Server_msg* msg)
 {
 	msg->err_usernotinchannel_msg(user, get_channel(), get_nick());
 }
+Err_KeySet::Err_KeySet(std::string channel)
+{
+	this->channel = channel;
+}
+
+void Err_KeySet::handle(User* user, Server_msg* msg)
+{
+	msg->err_keyset_msg(user, get_channel());
+}
+Err_NoChanModes::Err_NoChanModes(std::string channel)
+{
+	this->channel = channel;
+}
+
+void Err_NoChanModes::handle(User* user, Server_msg* msg)
+{
+	msg->err_nochanmodes(user, get_channel());
+}
+
+Err_UnknowedMode::Err_UnknowedMode(char c,std::string channel)
+{
+	this->c = c ;
+	this->channel = channel;
+}
+
+void Err_UnknowedMode::handle(User* user, Server_msg* msg)
+{
+	msg->err_UnknowedMode(user, getChar(),get_channel());
+}
+char Err_UnknowedMode::getChar()
+{
+	return( this->c);
+}
+
 

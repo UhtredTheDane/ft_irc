@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/28 17:43:42 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:25:07 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,15 @@ Server::Server(int port, std::string password)
 	//Configuration du socket du serveur
 	fd_socket = socket(AF_INET, SOCK_STREAM, 0); // sys/socket.h
 	if (fd_socket == -1)
+	{
+		delete(handler);
         throw std::runtime_error("Error creating server socket");
+	}
 	//rendre la socket serveur non bloquante
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
-	{        
+	{     
+		delete(handler);
+   		close(fd_socket);
 		throw std::runtime_error("Error try to set socket to non blocking");
 	}
 	//struct sockaddr_in serv_addr; //netinet/in.h
@@ -38,11 +43,15 @@ Server::Server(int port, std::string password)
 	serv_addr.sin_port = htons(port);
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	if (bind(fd_socket, (struct sockaddr *)&(serv_addr), sizeof(serv_addr)) < 0)
-	{
+	{		
+		delete(handler);
+		close(fd_socket);
 		throw std::runtime_error("Error while binding");
 	}
     if (listen(fd_socket, 5) == -1)
 	{
+		delete(handler);
+		close(fd_socket);
         throw std::runtime_error("Error while listening to socket");
 	}
 	poll_fds = new std::vector<pollfd>(1);

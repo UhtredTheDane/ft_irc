@@ -122,7 +122,6 @@ int Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::stri
 	{
 		if(*it != user)
 		{
-
 			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
 			print_send((*it)->get_socket(), p_msg.c_str(), p_msg.length(), 0);
 			return(0);
@@ -155,14 +154,11 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 	{
 		if((*it2)->get_nickname() == split_line[2])
 		{
-			std::cout << (*it2)->get_nickname() << "==" << split_line[2] << std::endl; 
 			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
-			print_send((*it2)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
-			return(std::cout << "erreur test\n", 0);
+			curent_chan->send_all(k_msg);
 		}
 			it2++;
 	}
-	std::cout << "je return -1 \n";
 	return(-1);
 }
 
@@ -243,8 +239,8 @@ void Server_msg::notonchannel_msg(User* user, std::string& channel_name)
 void Server_msg::err_keyset_msg(User* user, std::string& channel_name)
 {
 	std::string msg = ":irc.42.com " ;
-	msg += ERR_KEYSET " ";
-	msg += user->get_nickname() + " ";
+	msg += ERR_KEYSET;
+	msg += " " + user->get_nickname() + " ";
 	msg += channel_name + " :Channel key already set\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
@@ -255,6 +251,15 @@ void Server_msg::err_chanoprivneeded_msg(User* user, std::string const& channel_
 	msg += ERR_CHANOPRIVSNEEDED " ";
 	msg += user->get_nickname() + " ";
 	msg += channel_name + " :You're not channel operator\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::err_nochanmodes(User* user, std::string const& channel_name)
+{
+	std::string msg = ":irc.42.com " ;
+	msg += ERR_NOCHANMODES ;
+	msg += " " + user->get_nickname() + " ";
+	msg += channel_name + " :Channel doesn't support modes\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -286,9 +291,10 @@ void Server_msg::err_nosuchnick_msg(User* user,std::string& nick)
 void Server_msg::err_useronchannel_msg(User* user, std::string const& channel_name, std::string const& nick)
 {
 	std::string msg = ":irc.42.com " ;
-	msg += ERR_USERONCHANNEL " ";
-	msg += user->get_nickname() + " ";
-	msg += nick +" " + channel_name+ " :is already on channel\r\n";
+	msg += ERR_USERONCHANNEL ;
+	msg += " " + user->get_nickname() + " ";
+	msg += nick + " " + channel_name + " :is already on channel\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::nosuchnick_msg(User* user, std::string& user_name)
@@ -316,5 +322,12 @@ void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
 {
 	std::string msg = ":irc.42.com 404 " + user->get_nickname() + " ";
 	msg += channel_name + " :Cannot print to channel\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+void Server_msg::err_UnknowedMode(User* user,char c, std::string& channel_name)
+{
+	std::string msg = ":irc.42.com ";
+	msg += ERR_UNKNOWNMODE;
+	msg += " " + user->get_nickname() + " " + c + " :is unknown mode char to me for " + channel_name + "\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }

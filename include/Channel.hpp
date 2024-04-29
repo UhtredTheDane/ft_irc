@@ -22,6 +22,8 @@
 #include "../include/reply_macros_error.hpp"
 # include "Server_msg.hpp"
 
+
+
 class Channel
 {
 	enum Chanmod { i = 1 , k = 2 , o = 3 , l = 4 , t = 5};
@@ -29,9 +31,7 @@ class Channel
 	private:
 
 		//const std::string  _options = "ikolt";
-		std::string options_types[5];
-		//std::string options_ptr[5];
-		void (Channel::*options_ptr[5])(User*,std::vector<std::string>,int *,std::string *,std::string *);
+	
 		std::string theme;
 		std::string password;
 		int limit_user;
@@ -59,12 +59,9 @@ class Channel
 
 		
 		void set_topic(std::string topic);
-		void update_mod(User *user, std::vector<std::string> line);
-		void i_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
-		void o_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
-		void l_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
-		void k_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
-		void t_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions);
+		void set_limit_user(int const nb);
+		void set_password(std::string const str) ;
+		
 		void send_all(std::string str);
 		int give_privilege(User *user,std::string name);
 		int take_privilege(User *user,std::string name);
@@ -80,6 +77,12 @@ class Channel
 		int IsOption(int option);
 		bool is_full(void);
 		bool check_key(std::string& key);
+
+		class AlreadyMod : public std::exception
+		{
+			public :
+				virtual ~AlreadyMod(void) throw(){};
+		};
 			
 			
 };

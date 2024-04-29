@@ -35,12 +35,24 @@ class Server_handler
 			std::vector<std::string> split_line;
 			std::string request_types[12];
 			void (Server_handler::*requests_ptr[12])(User*);
+
+			std::string options_types[5];
+			void (Server_handler::*options_ptr[5])(User*,std::vector<std::string>,int *,std::string *,std::string *,Channel *target_chan);
 	
 	public:
 
 		Server_handler(Server* serv);
 		void request_handler(int client_socket, std::string &request);
 		void processing_request(User* user, std::string& request);
+
+
+		void update_mod(User *user, std::vector<std::string> line,Channel *target_chan);
+		void i_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan);
+		void o_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan);
+		void l_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan);
+		void k_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan);
+		void t_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan);
+
 		void capls_request(User* user);
 		void pass_request(User* user);
 		void nick_request(User* user);
