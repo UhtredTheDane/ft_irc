@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/04/30 13:20:02 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 14:53:37 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ User::User(int fd) : nickname(""), username( ""),
 	buffer = "";
 	socket = fd;
 	isRegistered = 0;
+	correctnick = 0;
 	isPasswordValid = false;
 }
 
@@ -73,6 +74,16 @@ void User::set_isRegistered(int i)
 std::string const & User::get_hostname(void) const
 {
 	return(hostname);
+}
+
+void User::set_correctnick(bool i)
+{
+	correctnick = i;
+}
+
+bool const & User::get_correctnick(void) const
+{
+	return(correctnick);
 }
 
 std::string const & User::get_nickname(void) const
