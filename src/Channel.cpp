@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 16:14:33 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/19 22:39:20 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:19:13 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ int  Channel::give_privilege(User *user,std::string name)
 	}
 	for(std::vector<User *>::iterator it  = admin_users.begin(); it != admin_users.end();it ++)
 	{
-			std::cout << (*it)->get_nickname() << std::endl;
+		std::cout << (*it)->get_nickname() << std::endl;
 	}
 	return 0;
 }
@@ -167,10 +167,10 @@ User *Channel::findUserByName(std::vector<User *> v,std::string name)
 {
 	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
 	{
-			if((*it)->get_nickname() == name)
-			{
-				return *it;
-			}
+		if((*it)->get_nickname() == name)
+		{
+			return *it;
+		}
 	}
 	return(NULL);
 }
@@ -217,10 +217,10 @@ void Channel::erase_invite(User* user)
 {
 	for(std::vector<User *>::iterator it  = invite.begin(); it != invite.end();it ++)
 	{
-			if((*it)->get_nickname() == user->get_nickname())
-			{
-				invite.erase(it);
-			}
+		if((*it)->get_nickname() == user->get_nickname())
+		{
+			invite.erase(it);
+		}
 	}
 }
 void Channel::set_topic(std::string str)

@@ -6,7 +6,7 @@
 /*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 16:07:38 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/27 19:20:52 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:19:50 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ Server_msg* Server_handler::get_msg(void)
 void Server_handler::capls_request(User* user)
 {
 	if(split_line.size() < 2)
-			throw(Err_NeedMoreParams("CAP"));
+		throw(Err_NeedMoreParams("CAP"));
 	else if(split_line[1] != "LS")
 		throw(Err_NotRegistred(user->get_socket()));
 	else if((user->get_isRegistered()) == 2)
@@ -150,7 +150,7 @@ void Server_handler::topic_request(User* user)
 			throw(Err_chanoprivsneeded(chan->get_name()));
 		if(split_line.size() > 2)
 		{
-			
+
 			if(split_line.size() == 3 && split_line[2].size() == 1 && split_line[2][0] == ':') 
 			{
 				std::cout << user->get_nickname() << " asked to remove the topic" << std::endl;
@@ -173,7 +173,7 @@ void Server_handler::topic_request(User* user)
 				}
 				chan->set_topic(arg);
 				std::cout << "Le topic " << arg << std::endl;
-				
+
 				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
 				response += " TOPIC " + chan->get_name() + " " + arg;
 				response += "\r\n";
@@ -240,7 +240,7 @@ void Server_handler::invite_request(User* user)
 			std::cout << "user already in the channel " << std::endl;
 			throw(Err_useronchannel(this->split_line[1],this->split_line[2]));
 		}
-		
+
 	}
 }
 
@@ -251,7 +251,7 @@ void Server_handler::user_request(User* user)
 	else if((user->get_isRegistered()) == 2)
 		throw (Err_AlreadyRegistred());
 	else if(split_line.size() < 5)
-			throw(Err_NeedMoreParams("USER"));
+		throw(Err_NeedMoreParams("USER"));
 	else if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		user->set_username(split_line[1]);
@@ -346,7 +346,7 @@ void Server_handler::o_request(User *user, std::vector<std::string> line,int *pa
 		{
 			//impossible to remove privilege
 		} 
-						
+
 	}
 	else if(line[2][0] == '+')
 	{
@@ -365,8 +365,8 @@ void Server_handler::o_request(User *user, std::vector<std::string> line,int *pa
 			}
 			catch(Channel::AlreadyMod &e)
 			{
-					std::cout << "wtf" << std::endl;
-					return;
+				std::cout << "wtf" << std::endl;
+				return;
 			}
 			catch(Err_UserNotInChannel &e)
 			{
@@ -470,13 +470,13 @@ void Server_handler::t_request(User *user, std::vector<std::string> line,int *pa
 	}
 
 }
-		
+
 void Server_handler::update_mod(User *user, std::vector<std::string> line,Channel *target_chan)
 {
 	/*              ERR_KEYSET ERR_NOCHANMODES 
-            
-                     
-    	ERR_USERNOTINCHANNEL           ERR_UNKNOWNMODE*/
+
+
+			ERR_USERNOTINCHANNEL           ERR_UNKNOWNMODE*/
 	std::string options;
 	int param = -1;
 	std::string response;
@@ -525,7 +525,7 @@ void Server_handler::update_mod(User *user, std::vector<std::string> line,Channe
 				}
 				current ++;
 			}
-			
+
 		}
 		else
 		{
@@ -566,7 +566,7 @@ void Server_handler::kick_request(User* user)
 	int i = 0;
 	Channel *curent_chan;
 	if(split_line.size() < 3)
-			throw(Err_NeedMoreParams(split_line[0]));
+		throw(Err_NeedMoreParams(split_line[0]));
 	try
 	{
 		curent_chan = serv->get_channels().at(split_line[1]);
@@ -579,7 +579,7 @@ void Server_handler::kick_request(User* user)
 	{
 		if(user == *it)
 		{
-		i = 1;
+			i = 1;
 		}
 		it++;
 	}
@@ -606,7 +606,7 @@ void Server_handler::privmsg_request(User* user)
 {
 	Channel *curent_chan;
 	if(split_line.size() < 3)
-			throw(Err_NeedMoreParams(split_line[0]));
+		throw(Err_NeedMoreParams(split_line[0]));
 	try
 	{
 		curent_chan = serv->get_channels().at(split_line[1]);
@@ -617,35 +617,35 @@ void Server_handler::privmsg_request(User* user)
 	}
 	if(split_line[1][0] == '#')
 	{	
-			std::map<int, User*> users_map = serv->get_users();
-			Message c_msg(split_line[2], user);
-			//curent_chan->add_message(&c_msg);
-			if(msg.chan_msg(user, curent_chan, split_line) == -1)
-			{
-				throw(Err_CannotSendToChan(split_line[1]));
-			}
+		std::map<int, User*> users_map = serv->get_users();
+		Message c_msg(split_line[2], user);
+		//curent_chan->add_message(&c_msg);
+		if(msg.chan_msg(user, curent_chan, split_line) == -1)
+		{
+			throw(Err_CannotSendToChan(split_line[1]));
+		}
 	}
 	else
 	{
 		std::map<int, User*> users_map = serv->get_users();
 		if(msg.priv_msg(user, split_line, users_map) == -1)
-		throw(Err_NoSuchNick(split_line[1]));
+			throw(Err_NoSuchNick(split_line[1]));
 	}
 
 }
 
 void Server_handler::part_request(User* user)
 {
-		try
-		{
-			Channel *current_chan = serv->get_channels().at(split_line[1]);
-			msg.leave_msg(user, current_chan);
-			current_chan->delete_user(user);
-		}
-		catch (std::out_of_range& oor)
-		{
-			throw (Err_NoSuchChannel(split_line[1]));
-		}
+	try
+	{
+		Channel *current_chan = serv->get_channels().at(split_line[1]);
+		msg.leave_msg(user, current_chan);
+		current_chan->delete_user(user);
+	}
+	catch (std::out_of_range& oor)
+	{
+		throw (Err_NoSuchChannel(split_line[1]));
+	}
 }
 
 void Server_handler::processing_request(User* user, std::string& request)
@@ -657,12 +657,12 @@ void Server_handler::processing_request(User* user, std::string& request)
 		split_line.push_back(word);
 	for (i = 0; i < 12; ++i)
 	{
-		 if(i > 3 && user->get_isRegistered() != 2)
-		 {
-		 	i = 0;
+		if(i > 3 && user->get_isRegistered() != 2)
+		{
+			i = 0;
 			split_line.clear();
 			throw(Err_NotRegistred(user->get_socket()));
-		 }
+		}
 		else if (!split_line[0].compare(request_types[i]))
 		{
 			try
@@ -702,7 +702,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 				this->raw_msg = token;
 				try
 				{
-				processing_request(user, token);
+					processing_request(user, token);
 				}
 				catch (Err_NotRegistred& e)
 				{
@@ -728,7 +728,7 @@ void Server_handler::request_handler(int client_socket, std::string& request)
 User *Server_handler::findUserByName(std::vector<User *> v,std::string name)
 {
 	for(std::vector<User *>::iterator it  = v.begin(); it != v.end();it ++)
-			if((*it)->get_nickname() == name)
-				return *it;
+		if((*it)->get_nickname() == name)
+			return *it;
 	return(NULL);
 }

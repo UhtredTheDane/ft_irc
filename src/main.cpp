@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:31:03 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/28 17:05:23 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:20:25 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ int main(int argc, char **argv)
 	set_signal();
 	try
 	{
-	Server serv(atoi(argv[1]), argv[2]);
-	serv.run_server();
+		Server serv(atoi(argv[1]), argv[2]);
+		serv.run_server();
 	}
 	catch(std::exception &e)
 	{

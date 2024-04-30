@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   IrcExceptions.hpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/30 13:16:24 by agengemb          #+#    #+#             */
+/*   Updated: 2024/04/30 13:16:47 by agengemb         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef IRCEXCEPTIONS_HPP
 # define IRCEXCEPTIONS_HPP
 
@@ -36,7 +48,7 @@ class Err_UnknownCommand : public AException
 		Err_UnknownCommand(std::string channel);
 		void handle(User* user, Server_msg* msg);
 };
-		
+
 class Err_InviteOnlyChan : public AException
 {
 	public:

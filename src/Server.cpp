@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/29 18:25:07 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:19:33 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ Server::Server(int port, std::string password)
 	if (fd_socket == -1)
 	{
 		delete(handler);
-        throw std::runtime_error("Error creating server socket");
+		throw std::runtime_error("Error creating server socket");
 	}
 	//rendre la socket serveur non bloquante
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
 	{     
 		delete(handler);
-   		close(fd_socket);
+		close(fd_socket);
 		throw std::runtime_error("Error try to set socket to non blocking");
 	}
 	//struct sockaddr_in serv_addr; //netinet/in.h
@@ -48,11 +48,11 @@ Server::Server(int port, std::string password)
 		close(fd_socket);
 		throw std::runtime_error("Error while binding");
 	}
-    if (listen(fd_socket, 5) == -1)
+	if (listen(fd_socket, 5) == -1)
 	{
 		delete(handler);
 		close(fd_socket);
-        throw std::runtime_error("Error while listening to socket");
+		throw std::runtime_error("Error while listening to socket");
 	}
 	poll_fds = new std::vector<pollfd>(1);
 	bzero(&poll_fds->at(0), sizeof(pollfd));
@@ -124,7 +124,7 @@ bool Server::is_on_serv(std::string& nickname)
 	}
 	catch (std::out_of_range& oor)
 	{
-		
+
 	}
 	return (false);
 }
@@ -168,15 +168,15 @@ User *Server::findUserByName(std::string name)
 	return target;
 }
 /*
-void Server::reply(User *user, int client_socket)
-{
-	msg.welcome_msg(user, client_socket);
-	msg.yourhost_msg(user, client_socket);
-	msg.created_msg(user, client_socket);
-	msg.myinfo_msg(user, client_socket);
-	//msg.whois_msg(user, client_socket);
+   void Server::reply(User *user, int client_socket)
+   {
+   msg.welcome_msg(user, client_socket);
+   msg.yourhost_msg(user, client_socket);
+   msg.created_msg(user, client_socket);
+   msg.myinfo_msg(user, client_socket);
+//msg.whois_msg(user, client_socket);
 }
-*/
+ */
 void Server::check_incoming_package()
 {
 	char buffer[1024];
