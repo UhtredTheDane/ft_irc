@@ -100,11 +100,15 @@ void Server_handler::nick_request(User* user)
 		throw (Err_AlreadyRegistred());
 	else if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
-		while (serv->is_on_serv(split_line[1]))
+		if(serv->is_on_serv(split_line[1]))
 		{
-			split_line[1] += "_";
+			msg.nicknameinuse_msg(user, split_line[1]);
 		}
-		user->set_nickname(split_line[1]);
+		else
+		{
+			user->set_nickname(split_line[1]);
+			creation_done(user);
+		}
 	}
 }
 
@@ -252,21 +256,29 @@ void Server_handler::user_request(User* user)
 		throw (Err_AlreadyRegistred());
 	else if(split_line.size() < 5)
 		throw(Err_NeedMoreParams("USER"));
-	else if(!user->get_nickname().empty() && user->get_isPasswordValid() && user->get_isRegistered() == 1)
+	else if(user->get_isPasswordValid() && user->get_isRegistered() == 1 )
 	{
 		user->set_username(split_line[1]);
 		user->set_hostname(split_line[2]);
 		user->set_servername(split_line[3]);
 		user->set_realname(split_line[3]);
 		user->set_identifier();
+		creation_done(user);
+	}
+	else
+		throw(Err_NotRegistred(user->get_socket()));
+}
+void Server_handler::creation_done(User* user)
+{
+	if(!user->get_username().empty() && !user->get_hostname().empty() 
+		&& !user->get_servername().empty() && !user->get_realname().empty() && !user->get_nickname().empty())
+		{
+		user->set_isRegistered(2);
 		msg.welcome_msg(user);
 		msg.yourhost_msg(user);
 		msg.created_msg(user);
 		msg.myinfo_msg(user);
-		user->set_isRegistered(2);
-	}
-	else
-		throw(Err_NotRegistred(user->get_socket()));
+		}
 }
 
 void Server_handler::pong_request(User* user)
@@ -307,8 +319,6 @@ void Server_handler::join_request(User* user)
 	}
 }
 
-
-
 void Server_handler::i_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan)
 {
 	(void)user;
@@ -327,6 +337,7 @@ void Server_handler::i_request(User *user, std::vector<std::string> line,int *pa
 		std::cout << "Set invite only restriction" << std::endl;
 	}
 }
+
 void Server_handler::o_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan)
 {
 	if(*param == -1 || *param >= (int)line.size())
@@ -375,6 +386,7 @@ void Server_handler::o_request(User *user, std::vector<std::string> line,int *pa
 		}
 	}				
 }
+
 void Server_handler::l_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan)
 {
 	if(*param == -1 || *param >= (int)line.size())
@@ -416,6 +428,7 @@ void Server_handler::l_request(User *user, std::vector<std::string> line,int *pa
 		}
 	}
 }
+
 void Server_handler::k_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan)
 {
 	if(*param == -1 || *param >= (int)line.size())
@@ -448,6 +461,7 @@ void Server_handler::k_request(User *user, std::vector<std::string> line,int *pa
 		}
 	}
 }
+
 void Server_handler::t_request(User *user, std::vector<std::string> line,int *param,std::string *validparam,std::string *validoptions,Channel *target_chan)
 {
 	(void)param;
@@ -608,6 +622,8 @@ void Server_handler::privmsg_request(User* user)
 	int i = 0;
 	if(split_line.size() < 3)
 		throw(Err_NeedMoreParams(split_line[0]));
+	if(split_line[1][0] == '#')
+	{
 	try
 	{
 		curent_chan = serv->get_channels().at(split_line[1]);
@@ -616,9 +632,6 @@ void Server_handler::privmsg_request(User* user)
 	{
 		throw(Err_CannotSendToChan(split_line[1]));
 	}
-
-	if(split_line[1][0] == '#')
-	{
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
 	{		
 		if(user == *it)

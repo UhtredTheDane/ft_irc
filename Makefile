@@ -28,10 +28,10 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm -f $(OBJ) $(DEP)
+	rm -rf $(OBJ) $(DEP)
 
 fclean: clean
-	rm -r $(NAME)
+	rm -rf $(NAME)
 
 re: fclean all
 

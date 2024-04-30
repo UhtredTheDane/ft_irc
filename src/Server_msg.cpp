@@ -12,7 +12,7 @@ void Server_msg::welcome_msg(User* user)
 
 void Server_msg::yourhost_msg(User* user)
 {
-	std::string msg = ":irc.42.com 002 " + user->get_nickname() + "Your host is "; 
+	std::string msg = ":irc.42.com 002 " + user->get_nickname() + " Your host is "; 
 	msg += user->get_servername() + ", running version 0.02\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
@@ -118,11 +118,18 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 void Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line)
 {
 	std::string p_msg;
+	std::string arg =  "";
+    std::vector<std::string>::iterator it = split_line.begin() + 2;
+    while(it != split_line.end())
+     {
+        arg += *it + " ";
+        it++;
+    }
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
 	{
 		if(*it != user)
 		{
-			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
+			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + arg + "\r\n";
 			print_send((*it)->get_socket(), p_msg.c_str(), p_msg.length(), 0);
 		}
 		it++;
@@ -132,11 +139,18 @@ void Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::str
 int Server_msg::priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map)
 {
 	std::string c_msg;
+	std::string arg =  "";
+    std::vector<std::string>::iterator it = split_line.begin() + 2;
+    while(it != split_line.end())
+     {
+        arg += *it + " ";
+        it++;
+    }
 	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 	{
 		if (it->second->get_nickname() == split_line[1])
 		{
-			c_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + split_line[2] + "\r\n";
+			c_msg = ":" + user->get_nickname() + " PRIVMSG " + it->second->get_nickname()+ " " + arg + "\r\n";
 			print_send(it->first, c_msg.c_str(), c_msg.length(), 0);
 			return(0);
 		}
@@ -148,11 +162,18 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 {
 
 	std::string k_msg;
+	std::string arg =  "";
+    std::vector<std::string>::iterator it = split_line.begin() + 3;
+    while(it != split_line.end())
+     {
+        arg += *it + " ";
+        it++;
+    }	
 	for (std::vector<User*>::iterator it2 = curent_chan->get_users()->begin(); it2 != curent_chan->get_users()->end();)
 	{
 		if((*it2)->get_nickname() == split_line[2])
 		{
-			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
+			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + arg + "\r\n";
 			curent_chan->send_all(k_msg);
 		}
 			it2++;
@@ -174,7 +195,7 @@ void Server_msg::alreadyregistred_msg(User* user)
 
 void Server_msg::unknowncommand_msg(User* user, std::string& command)
 {
-	std::string msg = ":irc.42.com 461 " + command + " :Unknown command\r\n";
+	std::string msg = ":irc.42.com 461 *" + command + " :Unknown command\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -184,10 +205,10 @@ void Server_msg::notregistred_msg(int socket)
 	print_send(socket, msg.c_str(), msg.length(), 0);
 }
 
-void Server_msg::nicknameinuse_msg(User* user, std::string oldnick,  std::string nick)
+void Server_msg::nicknameinuse_msg(User* user, std::string nick)
 {
-	std::string msg = ":irc.42.com 433 " + oldnick;
-	msg +=" :Nickname is already in use, new Nickname is : " + nick +"\r\n";
+	std::string msg = ":irc.42.com 433 * " + nick;
+	msg +=" :Nickname is already in use\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -318,8 +339,8 @@ void Server_msg::notexttosend_msg(User* user, std::string& user_name)
 
 void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
 {
-	std::string msg = ":irc.42.com 404 " + user->get_nickname() + " ";
-	msg += channel_name + " :Cannot print to channel\r\n";
+	std::string msg = ":irc.42.com 404 ";
+	msg += channel_name + " :Cannot send to channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 void Server_msg::err_UnknowedMode(User* user,char c, std::string& channel_name)

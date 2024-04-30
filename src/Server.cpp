@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/30 13:43:25 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 14:28:48 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,9 @@ bool Server::is_on_serv(std::string& nickname)
 		for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 		{
 			if (it->second->get_nickname() == nickname)
+			{
 				return (true);
+			}
 		}
 	}
 	catch (std::out_of_range& oor)

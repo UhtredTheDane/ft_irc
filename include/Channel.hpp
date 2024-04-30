@@ -41,7 +41,7 @@ class Channel
 	std::vector<User*> invite;
 	std::vector<Message*> msgs;
 	std::string name;
-
+	
 	public:
 	Channel(void);
 	Channel(std::string& theme, User* admin_user);
@@ -76,7 +76,6 @@ class Channel
 	int IsMod(User *user);
 	int IsInChannel(User *user);
 	int IsOption(int option);
-	bool is_invite(User* user);
 	bool is_full(void);
 	bool check_key(std::string& key);
 
@@ -85,5 +84,7 @@ class Channel
 		public :
 			virtual ~AlreadyMod(void) throw(){};
 	};
+
+
 };
 #endif
