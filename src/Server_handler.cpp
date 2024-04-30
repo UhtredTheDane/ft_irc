@@ -115,10 +115,9 @@ void Server_handler::nick_request(User* user)
 void Server_handler::topic_request(User* user)
 {
 	Channel *chan = NULL;
-	std::string arg;
+	std::string arg = "";
 	std::string response = "";
 
-	std::cout << "command send : " << this->raw_msg << std::endl;
 	if(split_line.size() < 2)
 		throw(Err_NeedMoreParams(this->raw_msg));
 	if(chan->IsValidChannelName(split_line[1]))
@@ -132,22 +131,25 @@ void Server_handler::topic_request(User* user)
 			// no such chan;
 		}
 	}
-	else
-	{
-		//invalid channel name
-	}
 	if(!chan->IsInChannel(user))
 		throw(Err_NotOnChannel(chan->get_name()));
 	if(chan->IsOption(5))
 	{	
 		if(split_line.size() == 2)
 		{
-			response = ":ircserv.42.fr ";
-			response += RPL_TOPIC ;
-			response += " "+ user->get_nickname() + " " + chan->get_name() + " " + chan->get_theme() +"\r\n";
-			std::cout << "Response :"<< response << std::endl; 
+			if(chan->get_theme().size() > 0)
+			{
+				response = ":ircserv.42.fr ";
+				response += RPL_TOPIC ;
+				response += " "+ user->get_nickname() + " " + chan->get_name() + " " + chan->get_theme() +"\r\n"; 
+			}
+			else
+			{
+				response = ":ircserv.42.fr ";
+				response += RPL_NOTOPIC ;
+				response += /*" " + user->get_nickname()*/ + " " + chan->get_name() + " :No topic is set\r\n";
+			}
 			send(user->get_socket(), response.c_str(), response.length(), 0);
-			//send the topic of the channel	
 			return;
 		}
 		if(!chan->IsMod(user))
@@ -158,14 +160,10 @@ void Server_handler::topic_request(User* user)
 			if(split_line.size() == 3 && split_line[2].size() == 1 && split_line[2][0] == ':') 
 			{
 				std::cout << user->get_nickname() << " asked to remove the topic" << std::endl;
-				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
-				response += " TOPIC " + chan->get_name() + " :\r\n";
-				chan->set_topic(NULL);
-				std::cout << response << std::endl;
+				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost" + " TOPIC " + chan->get_name() + " :\r\n";
+				chan->set_topic("");
 				chan->send_all(response);
 				return;
-				//send(user->get_socket(), response.c_str(), response.length(), 0);
-				//delete the topic 
 			}
 			else
 			{
@@ -176,30 +174,21 @@ void Server_handler::topic_request(User* user)
 					it++;
 				}
 				chan->set_topic(arg);
-				std::cout << "Le topic " << arg << std::endl;
-
 				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
-				response += " TOPIC " + chan->get_name() + " " + arg;
-				response += "\r\n";
-				std::cout << response << std::endl; 
+				response += " TOPIC " + chan->get_name() + " " + arg + "\r\n";
 				chan->send_all(response);
 				return;
-				//send(user->get_socket(), response.c_str(), response.length(), 0);
 			}
 		}
 	}
 	else
-	{
 		throw(Err_NoChanModes(chan->get_name()));
-	}
 }
 void Server_handler::invite_request(User* user)
 {
 	User *target;
 	Channel *chan;
 	std::string reply;
-
-	std::cout << "Handling an invite request" << std::endl;
 
 	if(this->split_line.size() < 3)
 		throw(Err_NeedMoreParams(this->raw_msg));//throw need more param
@@ -218,33 +207,23 @@ void Server_handler::invite_request(User* user)
 			throw(Err_NotOnChannel(chan->get_name()));
 		if(!chan->IsMod(user))
 			throw(Err_chanoprivsneeded(chan->get_name()));
-		if(!chan->IsOption(1))
-		{
-			//channel is not invite only
-		}
+		
 		target = chan->findUserByName(*chan->get_users(),this->split_line[1]) ;//user in the channel
 		if(!target)
 		{
 			target = this->serv->findUserByName(this->split_line[1]);//user exist
 			if(target)
-			{
-				std::cout << "sending invite " << std::endl; 	
+			{	
 				reply = ":" + user->get_nickname() + "!" + "" + " INVITE " + target->get_nickname() + " "+ chan->get_name() + "\r\n";
-				chan->invite_user(target);
+				if(!chan->IsOption(1))
+					chan->invite_user(target);
 				send(target->get_socket(),reply.c_str(),reply.length(),0);
 			}
 			else
-			{
-				std::cout << "target not connected to the server" << std::endl;
 				throw(Err_NoSuchNick(this->split_line[1]));
-			}	
 		}
 		else
-		{
-			std::cout << "user already in the channel " << std::endl;
 			throw(Err_useronchannel(this->split_line[1],this->split_line[2]));
-		}
-
 	}
 }
 
@@ -353,11 +332,6 @@ void Server_handler::o_request(User *user, std::vector<std::string> line,int *pa
 			std::cout << "Removing user privilege" << std::endl;
 			*param = *param + 1 ;
 		}
-		else
-		{
-			//impossible to remove privilege
-		} 
-
 	}
 	else if(line[2][0] == '+')
 	{
@@ -399,10 +373,6 @@ void Server_handler::l_request(User *user, std::vector<std::string> line,int *pa
 			target_chan->set_limit_user(-1);
 			std::cout << "Removing user limit restriction" << std::endl;
 		}
-		else
-		{
-			//user n'a pas les droits ou le mod est deja off
-		}
 	}
 	else if(line[2][0] == '+')
 	{
@@ -440,10 +410,6 @@ void Server_handler::k_request(User *user, std::vector<std::string> line,int *pa
 			*validoptions += "k";
 			target_chan->set_password(NULL);
 			std::cout << "Removing password restriction" << std::endl;
-		}
-		else
-		{
-			//user a pas les droits ou le mod est deja off
 		}
 	}
 	else if(line[2][0] == '+')
@@ -487,37 +453,29 @@ void Server_handler::t_request(User *user, std::vector<std::string> line,int *pa
 
 void Server_handler::update_mod(User *user, std::vector<std::string> line,Channel *target_chan)
 {
-	/*              ERR_KEYSET ERR_NOCHANMODES 
-
-
-			ERR_USERNOTINCHANNEL           ERR_UNKNOWNMODE*/
 	std::string options;
 	int param = -1;
-	std::string response;
-	std::string validoptions;
-	std::string validparam;
+	std::string response = "";
+	std::string validoptions = "";
+	std::string validparam = "";
+	std::string::iterator current;
 
-	validparam = "";
-	validoptions = "";
-	response = "";
-	if(line.size() < 3)
+	if(line.size() < 2)
 		throw(Err_NeedMoreParams(this->raw_msg)); //ERR_NEEDMOREPARAMS 
 	if(!target_chan->IsValidChannelName(line[1]))
 		return;
+	if(line.size() == 2)
+		return;
 	if(!target_chan->IsMod(user))
-	{
 		throw(Err_chanoprivsneeded(line[1])); //ERR_CHANOPRIVSNEEDED
-	}
 	options = line[2];
 	if (line.size() >= 4)
 		param = 3;
 	if(options.size() >= 2)
 	{
-		std::string::iterator current = options.begin();
-		std::cout << options << std::endl;
-
 		if(options[0] == '-' || options[0] == '+')
 		{
+			current = options.begin();
 			validoptions += options[0];
 			current++;
 			while (current != options.end())
@@ -527,36 +485,22 @@ void Server_handler::update_mod(User *user, std::vector<std::string> line,Channe
 				{
 					if(*(options_types[i].c_str()) == *current)
 					{	
-						std::cout << "We found a valid option :" << options_types[i]<< std::endl;
 						(this->*options_ptr[i])( user, line, &param, &validparam, &validoptions,target_chan);
 						break;
 					}
 					i++;
 				}
 				if(i == 5)
-				{
 					throw(Err_UnknowedMode(*current,target_chan->get_name()));
-				}
 				current ++;
 			}
-
-		}
-		else
-		{
-			// pas de plus ou de moins 
 		}
 		if(validoptions.size() > 1)
 		{
-			std::cout << " Sending response to a mode command" << std::endl;
 			response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
-			response += " MODE " + line[1] + " " + validoptions + " " + validparam;
-			response += "\r\n";
-			std::cout << response << std::endl; 
+			response += " MODE " + line[1] + " " + validoptions + " " + validparam + "\r\n";
 			target_chan->send_all(response);
-
 		}
-		else
-			std::cout << " No valid options " << std::endl;
 	}
 }
 
@@ -565,6 +509,8 @@ void Server_handler::update_mod(User *user, std::vector<std::string> line,Channe
 
 void Server_handler::mode_request(User* user)
 {
+	if(split_line.size() < 2)
+		throw(Err_NeedMoreParams(this->raw_msg));
 	try
 	{
 		Channel* target_chan = serv->get_channels().at(split_line[1]);
@@ -572,6 +518,7 @@ void Server_handler::mode_request(User* user)
 	}
 	catch (std::out_of_range& oor)
 	{
+		throw (Err_NoSuchChannel(split_line[1]));
 	}
 }
 
@@ -660,16 +607,18 @@ void Server_handler::privmsg_request(User* user)
 
 void Server_handler::part_request(User* user)
 {
-	try
-	{
-		Channel *current_chan = serv->get_channels().at(split_line[1]);
-		msg.leave_msg(user, current_chan);
-		current_chan->delete_user(user);
-	}
-	catch (std::out_of_range& oor)
-	{
-		throw (Err_NoSuchChannel(split_line[1]));
-	}
+		if(split_line.size() < 2)
+			throw(Err_NeedMoreParams(this->raw_msg));
+		try
+		{
+			Channel *current_chan = serv->get_channels().at(split_line[1]);
+			msg.leave_msg(user, current_chan);
+			current_chan->delete_user(user);
+		}
+		catch (std::out_of_range& oor)
+		{
+			throw (Err_NoSuchChannel(split_line[1]));
+		}
 }
 
 void Server_handler::processing_request(User* user, std::string& request)
