@@ -109,7 +109,8 @@ void Server_handler::nick_request(User* user)
 			user->set_nickname(split_line[1]);
 			creation_done(user);
 		}
-	}
+	}	
+	std::cout << user->get_nickname() << std::endl;
 }
 
 void Server_handler::topic_request(User* user)
@@ -241,17 +242,18 @@ void Server_handler::user_request(User* user)
 		user->set_hostname(split_line[2]);
 		user->set_servername(split_line[3]);
 		user->set_realname(split_line[3]);
-		user->set_identifier();
 		creation_done(user);
 	}
 	else
 		throw(Err_NotRegistred(user->get_socket()));
 }
+
 void Server_handler::creation_done(User* user)
 {
 	if(!user->get_username().empty() && !user->get_hostname().empty() 
 		&& !user->get_servername().empty() && !user->get_realname().empty() && !user->get_nickname().empty())
 		{
+		user->set_identifier();
 		user->set_isRegistered(2);
 		msg.welcome_msg(user);
 		msg.yourhost_msg(user);

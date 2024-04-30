@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/04/30 14:53:37 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 17:03:01 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,13 @@ void User::reset_userinfo()
 	set_hostname(""); 
 	set_servername(""); 
 	set_realname(""); 
+	set_identifier(); 
 	set_isPasswordValid(false);
 }
 
 User::~User()
 {
-	std::cout << "Destruction du User : " << nickname << std::endl;
+	// std::cout << "Destruction du User : " << nickname << std::endl;
 }
 
 int User::get_socket(void) const
@@ -142,5 +143,6 @@ void User::set_servername(std::string servername)
 }
 void User::set_identifier(void)
 {
+	std::cout << "le nick = " << nickname << std::endl;
 	this->identifier = nickname + "!" + username + "@" + hostname;
 }
