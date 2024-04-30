@@ -29,6 +29,13 @@ class Err_NeedMoreParams : public AException
 		Err_NeedMoreParams(std::string channel);
 		void handle(User* user, Server_msg* msg);
 };
+
+class Err_UnknownCommand : public AException
+{
+	public:
+		Err_UnknownCommand(std::string channel);
+		void handle(User* user, Server_msg* msg);
+};
 		
 class Err_InviteOnlyChan : public AException
 {

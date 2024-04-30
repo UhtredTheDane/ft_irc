@@ -122,7 +122,6 @@ int Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::stri
 	{
 		if(*it != user)
 		{
-
 			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
 			print_send((*it)->get_socket(), p_msg.c_str(), p_msg.length(), 0);
 			return(0);
@@ -155,14 +154,11 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 	{
 		if((*it2)->get_nickname() == split_line[2])
 		{
-			std::cout << (*it2)->get_nickname() << "==" << split_line[2] << std::endl; 
 			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + split_line[3] + "\r\n";
-			print_send((*it2)->get_socket(), k_msg.c_str(), k_msg.length(), 0);
-			return(0);
+			curent_chan->send_all(k_msg);
 		}
 			it2++;
 	}
-	std::cout << "je return -1 \n";
 	return(-1);
 }
 
@@ -174,7 +170,13 @@ void Server_msg::passwordincorrect_msg(User* user)
 
 void Server_msg::alreadyregistred_msg(User* user)
 {
-	std::string msg = ":irc.42.com 451 * :You may not reregister\r\n";
+	std::string msg = ":irc.42.com 462 * :You may not reregister\r\n";
+	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
+}
+
+void Server_msg::unknowncommand_msg(User* user, std::string& command)
+{
+	std::string msg = ":irc.42.com 461 " + command + " :Unknown command\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -312,14 +314,14 @@ void Server_msg::norecipient_msg(User* user, std::string& user_name)
 void Server_msg::notexttosend_msg(User* user, std::string& user_name)
 {
 	std::string msg = ":irc.42.com 412 " + user->get_nickname() + " ";
-	msg += user_name + ":No text to print_send\r\n";
+	msg += user_name + " :No text to print\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
 void Server_msg::cannotsendtochan_msg(User* user, std::string& channel_name)
 {
-	std::string msg = ":irc.42.com 412 " + user->get_nickname() + " ";
-	msg += channel_name + ":Cannot print_send to channel\r\n";
+	std::string msg = ":irc.42.com 404 " + user->get_nickname() + " ";
+	msg += channel_name + " :Cannot print to channel\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 void Server_msg::err_UnknowedMode(User* user,char c, std::string& channel_name)

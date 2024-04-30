@@ -6,10 +6,10 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:47 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/04/17 17:05:49 by agengemb         ###   ########.fr       */
-/*   Updated: 2024/03/17 17:14:35 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/29 14:51:40 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef USER_H
 # define USER_H
@@ -55,6 +55,7 @@ class User
 		void set_isPasswordValid(bool value);
 		
 		void show_userinfo();
+		void reset_userinfo();
 		void set_socket(int socket);
     	void set_nickname( std::string nickname );
     	void set_username( std::string username );
