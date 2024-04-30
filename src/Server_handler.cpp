@@ -159,7 +159,6 @@ void Server_handler::topic_request(User* user)
 
 			if(split_line.size() == 3 && split_line[2].size() == 1 && split_line[2][0] == ':') 
 			{
-				std::cout << user->get_nickname() << " asked to remove the topic" << std::endl;
 				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost" + " TOPIC " + chan->get_name() + " :\r\n";
 				chan->set_topic("");
 				chan->send_all(response);
@@ -307,13 +306,11 @@ void Server_handler::i_request(User *user, std::vector<std::string> line,int *pa
 	{
 		*validoptions += "i";
 		target_chan->remove_mod(user,1);
-		std::cout << "Removing invite only restriction" << std::endl;
 	}
 	else if(line[2][0] == '+')
 	{
 		*validoptions += "i";
 		target_chan->set_mod(user,1);
-		std::cout << "Set invite only restriction" << std::endl;
 	}
 }
 
@@ -325,11 +322,8 @@ void Server_handler::o_request(User *user, std::vector<std::string> line,int *pa
 	{
 		if(line[*param].c_str() && target_chan->take_privilege(user ,line[*param]) == 0)
 		{
-			//if(!IsInChannel(findUserByName(users,line[param])))
 			*validoptions += "o";
 			*validparam += line[*param] + " ";
-
-			std::cout << "Removing user privilege" << std::endl;
 			*param = *param + 1 ;
 		}
 	}
@@ -343,14 +337,12 @@ void Server_handler::o_request(User *user, std::vector<std::string> line,int *pa
 					*validoptions += "o";
 					*validparam += line[*param] + " ";
 					*param = *param + 1 ;
-					std::cout << "Set privilege to a user" << std::endl;
 				}
 				else
 					throw(Err_UserNotInChannel(line[*param],target_chan->get_name()));
 			}
 			catch(Channel::AlreadyMod &e)
 			{
-				std::cout << "wtf" << std::endl;
 				return;
 			}
 			catch(Err_UserNotInChannel &e)
@@ -371,7 +363,6 @@ void Server_handler::l_request(User *user, std::vector<std::string> line,int *pa
 		{
 			*validoptions += "l";
 			target_chan->set_limit_user(-1);
-			std::cout << "Removing user limit restriction" << std::endl;
 		}
 	}
 	else if(line[2][0] == '+')
@@ -383,11 +374,9 @@ void Server_handler::l_request(User *user, std::vector<std::string> line,int *pa
 				if(!target_chan->set_mod(user,4))
 				{
 					int nb = std::atoi(line[*param].c_str());
-					std::cout << nb << "\n";
 					target_chan->set_limit_user (nb) ;
 					*validparam += line[*param] + " ";
 					*param = *param + 1 ;
-					std::cout << "Set user limit restriction" << std::endl;
 					*validoptions += "l";
 				}
 			}
@@ -409,7 +398,6 @@ void Server_handler::k_request(User *user, std::vector<std::string> line,int *pa
 		{
 			*validoptions += "k";
 			target_chan->set_password(NULL);
-			std::cout << "Removing password restriction" << std::endl;
 		}
 	}
 	else if(line[2][0] == '+')
@@ -422,7 +410,6 @@ void Server_handler::k_request(User *user, std::vector<std::string> line,int *pa
 				target_chan->set_password(line[*param]);
 				*validparam += line[*param] + " ";
 				*param = *param + 1 ;
-				std::cout << "Set password restriction" << std::endl;
 			}
 		}
 	}
@@ -437,7 +424,6 @@ void Server_handler::t_request(User *user, std::vector<std::string> line,int *pa
 		if(!target_chan->remove_mod(user,5))
 		{
 			*validoptions += "t";
-			std::cout << "Removing topic restriction" << std::endl;
 		}
 	}
 	else if(line[2][0] == '+')
@@ -445,7 +431,6 @@ void Server_handler::t_request(User *user, std::vector<std::string> line,int *pa
 		if(!target_chan->set_mod(user,5))
 		{
 			*validoptions += "t";
-			std::cout << "Setting topic restriction" << std::endl;
 		}
 	}
 

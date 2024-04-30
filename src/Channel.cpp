@@ -82,10 +82,8 @@ bool Channel::is_full(void)
 
 bool Channel::check_key(std::string& key)
 {
-	std::cout << "password: " << password << " et key: " << key << std::endl;
 	bool res;
 	res = key.compare(password) == 0;
-	std::cout << "res: " << res << std::endl;
 	return (res);
 }
 
@@ -114,26 +112,20 @@ int  Channel::give_privilege(User *user,std::string name)
 {
 	User *u;
 
+	(void)user;
 	if(name.c_str())
 		u = findUserByName(users,name);
 	else
 		return (1);
-	std::cout << "On essaye de donner des droits a : "<< name << '"' << std::endl;
 	if(!u)
 		return (1);
 	if(findUserByName(admin_users,name))
 	{
-		std::cout << user->get_nickname() << " is already mod" << std::endl;
 		throw(AlreadyMod());
 	}
 	else
 	{
-		std::cout << "giving privilege to " << u->get_nickname() << std::endl;
 		this->admin_users.push_back(u);
-	}
-	for(std::vector<User *>::iterator it  = admin_users.begin(); it != admin_users.end();it ++)
-	{
-		std::cout << (*it)->get_nickname() << std::endl;
 	}
 	return 0;
 }
@@ -142,6 +134,7 @@ int Channel::take_privilege(User *user,std::string name)
 {
 	User *u;
 
+	(void)user;
 	u = findUserByName(admin_users,name);
 	if(admin_users.size() > 1)
 	{
@@ -149,17 +142,14 @@ int Channel::take_privilege(User *user,std::string name)
 		{
 			if(*it == u)
 			{
-				std::cout << "taking privilege to " << user->get_nickname() << std::endl;
 				it = admin_users.erase(it);
 				return 0;
 			}
 		}
-		std::cout << u->get_nickname() << " is not a moderator of a channel" << std::endl;
 		return 1;
 	}
 	else
 	{
-		std::cout << "You tried to erase the last admin of a channel" << std::endl;
 		return 1;
 	}
 }
@@ -210,7 +200,7 @@ void Channel::invite_user(User *user)
 	}
 	else
 	{
-		std::cout << "User already in the channel " << std::endl;
+
 	}
 }
 
