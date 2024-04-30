@@ -111,7 +111,7 @@ void Server_handler::nick_request(User* user)
 void Server_handler::topic_request(User* user)
 {
 	Channel *chan = NULL;
-	std::string arg;
+	std::string arg = "";
 	std::string response = "";
 
 	std::cout << "command send : " << this->raw_msg << std::endl;
@@ -138,12 +138,21 @@ void Server_handler::topic_request(User* user)
 	{	
 		if(split_line.size() == 2)
 		{
-			response = ":ircserv.42.fr ";
-			response += RPL_TOPIC ;
-			response += " "+ user->get_nickname() + " " + chan->get_name() + " " + chan->get_theme() +"\r\n";
-			std::cout << "Response :"<< response << std::endl; 
+			if(chan->get_theme().size() > 0)
+			{
+				response = ":ircserv.42.fr ";
+				response += RPL_TOPIC ;
+				response += " "+ user->get_nickname() + " " + chan->get_name() + " " + chan->get_theme() +"\r\n";
+				std::cout << "Response :"<< response << std::endl; 
+			}
+			else
+			{
+				response = ":ircserv.42.fr ";
+				response += RPL_NOTOPIC ;
+				response += /*" " + user->get_nickname()*/ + " " + chan->get_name() + " :No topic is set\r\n";
+				std::cout << "Response :"<< response << std::endl; 
+			}
 			send(user->get_socket(), response.c_str(), response.length(), 0);
-			//send the topic of the channel	
 			return;
 		}
 		if(!chan->IsMod(user))
@@ -156,12 +165,10 @@ void Server_handler::topic_request(User* user)
 				std::cout << user->get_nickname() << " asked to remove the topic" << std::endl;
 				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
 				response += " TOPIC " + chan->get_name() + " :\r\n";
-				chan->set_topic(NULL);
+				chan->set_topic("");
 				std::cout << response << std::endl;
 				chan->send_all(response);
 				return;
-				//send(user->get_socket(), response.c_str(), response.length(), 0);
-				//delete the topic 
 			}
 			else
 			{
@@ -172,8 +179,6 @@ void Server_handler::topic_request(User* user)
 					it++;
 				}
 				chan->set_topic(arg);
-				std::cout << "Le topic " << arg << std::endl;
-				
 				response = ":" + user->get_nickname() + "!" + user->get_nickname() + "@localhost";
 				response += " TOPIC " + chan->get_name() + " " + arg;
 				response += "\r\n";
