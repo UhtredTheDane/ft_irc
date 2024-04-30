@@ -456,7 +456,7 @@ void Server_handler::t_request(User *user, std::vector<std::string> line,int *pa
 		
 void Server_handler::update_mod(User *user, std::vector<std::string> line,Channel *target_chan)
 {
-	/*              ERR_KEYSET ERR_NOCHANMODES 
+	/*                
             
                      
     	ERR_USERNOTINCHANNEL           ERR_UNKNOWNMODE*/
