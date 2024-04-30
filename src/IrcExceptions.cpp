@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   IrcExceptions.cpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/30 13:16:17 by agengemb          #+#    #+#             */
+/*   Updated: 2024/04/30 13:16:20 by agengemb         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/IrcExceptions.hpp"
 
 void Err_PasswordIncorrect::handle(User* user, Server_msg* msg)
@@ -29,6 +41,16 @@ Err_NeedMoreParams::Err_NeedMoreParams(std::string channel)
 void Err_NeedMoreParams::handle(User* user, Server_msg* msg)
 {
 	msg->needmoreparams_msg(user, get_channel());
+}
+
+Err_UnknownCommand::Err_UnknownCommand(std::string channel)
+{
+	this->channel = channel;
+}
+
+void Err_UnknownCommand::handle(User* user, Server_msg* msg)
+{
+	msg->unknowncommand_msg(user, get_channel());
 }
 
 Err_InviteOnlyChan::Err_InviteOnlyChan(std::string channel)
@@ -130,6 +152,40 @@ Err_UserNotInChannel::Err_UserNotInChannel(std::string nick, std::string channel
 
 void Err_UserNotInChannel::handle(User* user, Server_msg* msg)
 {
-	msg->err_useronchannel_msg(user, get_channel(), get_nick());
+	msg->err_usernotinchannel_msg(user, get_channel(), get_nick());
 }
+Err_KeySet::Err_KeySet(std::string channel)
+{
+	this->channel = channel;
+}
+
+void Err_KeySet::handle(User* user, Server_msg* msg)
+{
+	msg->err_keyset_msg(user, get_channel());
+}
+Err_NoChanModes::Err_NoChanModes(std::string channel)
+{
+	this->channel = channel;
+}
+
+void Err_NoChanModes::handle(User* user, Server_msg* msg)
+{
+	msg->err_nochanmodes(user, get_channel());
+}
+
+Err_UnknowedMode::Err_UnknowedMode(char c,std::string channel)
+{
+	this->c = c ;
+	this->channel = channel;
+}
+
+void Err_UnknowedMode::handle(User* user, Server_msg* msg)
+{
+	msg->err_UnknowedMode(user, getChar(),get_channel());
+}
+char Err_UnknowedMode::getChar()
+{
+	return( this->c);
+}
+
 

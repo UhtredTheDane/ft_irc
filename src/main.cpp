@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 16:31:03 by agengemb          #+#    #+#             */
-/*   Updated: 2024/02/16 02:57:41 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:20:25 by agengemb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,14 @@ int main(int argc, char **argv)
 		return (1);
 	}
 	set_signal();
-	Server serv(atoi(argv[1]), argv[2]);
-	serv.run_server();
+	try
+	{
+		Server serv(atoi(argv[1]), argv[2]);
+		serv.run_server();
+	}
+	catch(std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 	return (0);
 }

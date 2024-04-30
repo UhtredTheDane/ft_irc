@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/04/03 17:21:04 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:20:02 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,17 @@ void User::show_userinfo()
 	std::cout << "servername : " << servername << std::endl;
 	std::cout << "realname : " << realname << std::endl;
 }
+
+void User::reset_userinfo()
+{
+	set_nickname(""); 
+	set_username(""); 
+	set_hostname(""); 
+	set_servername(""); 
+	set_realname(""); 
+	set_isPasswordValid(false);
+}
+
 User::~User()
 {
 	std::cout << "Destruction du User : " << nickname << std::endl;

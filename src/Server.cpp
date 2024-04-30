@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/26 18:50:39 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:43:25 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,23 +25,40 @@ Server::Server(int port, std::string password)
 
 	//Configuration du socket du serveur
 	fd_socket = socket(AF_INET, SOCK_STREAM, 0); // sys/socket.h
-
+	if (fd_socket == -1)
+	{
+		delete(handler);
+		throw std::runtime_error("Error creating server socket");
+	}
 	//rendre la socket serveur non bloquante
-	fcntl(fd_socket, F_SETFL, fcntl(fd_socket, F_GETFL) | O_NONBLOCK);
-
+	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
+	{     
+		delete(handler);
+		close(fd_socket);
+		throw std::runtime_error("Error try to set socket to non blocking");
+	}
 	//struct sockaddr_in serv_addr; //netinet/in.h
 	bzero(&(serv_addr), sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	if (bind(fd_socket, (struct sockaddr *)&(serv_addr), sizeof(serv_addr)) < 0)
-		std::cout << "lancer une erreur" << std::endl;
-	listen(fd_socket, 5);
-
+	{		
+		delete(handler);
+		close(fd_socket);
+		throw std::runtime_error("Error while binding");
+	}
+	if (listen(fd_socket, 5) == -1)
+	{
+		delete(handler);
+		close(fd_socket);
+		throw std::runtime_error("Error while listening to socket");
+	}
 	poll_fds = new std::vector<pollfd>(1);
 	bzero(&poll_fds->at(0), sizeof(pollfd));
 	poll_fds->at(0).fd = fd_socket;
 	poll_fds->at(0).events = POLLIN;
+
 }
 
 Server::~Server(void)
@@ -51,6 +68,10 @@ Server::~Server(void)
 		close(it->fd);
 	}
 	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		delete it->second;
+	}
+	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 	{
 		delete it->second;
 	}
@@ -107,7 +128,7 @@ bool Server::is_on_serv(std::string& nickname)
 	}
 	catch (std::out_of_range& oor)
 	{
-		
+
 	}
 	return (false);
 }
@@ -119,19 +140,16 @@ void Server::check_connection()
 
 	if ((fd_client = accept(fd_socket, (struct sockaddr *) &(serv_addr), (socklen_t*)&addrlen)) != -1)
 	{
-		fcntl(fd_client, F_SETFL, fcntl(fd_client, F_GETFL) | O_NONBLOCK);
-		std::cout << "adding new client " << std::endl;
+		if (fcntl(fd_client, F_SETFL, O_NONBLOCK) == -1)
+		{        
+			throw std::runtime_error("Error try to set socket to non blocking");
+		}
 		pollfd new_pollfd;
 		bzero(&new_pollfd, sizeof(pollfd));
 		new_pollfd.events = POLLIN | POLLOUT;
 		new_pollfd.fd = fd_client;
 		poll_fds->push_back(new_pollfd);
 		add_user(fd_client);
-		std::cout << "fd client: " << fd_client << std::endl;
-	}
-	else
-	{
-		//std::cout << "error accept" << std::endl;
 	}
 }
 User *Server::findUserByName(std::string name)
@@ -154,15 +172,15 @@ User *Server::findUserByName(std::string name)
 	return target;
 }
 /*
-void Server::reply(User *user, int client_socket)
-{
-	msg.welcome_msg(user, client_socket);
-	msg.yourhost_msg(user, client_socket);
-	msg.created_msg(user, client_socket);
-	msg.myinfo_msg(user, client_socket);
-	//msg.whois_msg(user, client_socket);
+   void Server::reply(User *user, int client_socket)
+   {
+   msg.welcome_msg(user, client_socket);
+   msg.yourhost_msg(user, client_socket);
+   msg.created_msg(user, client_socket);
+   msg.myinfo_msg(user, client_socket);
+//msg.whois_msg(user, client_socket);
 }
-*/
+ */
 void Server::check_incoming_package()
 {
 	char buffer[1024];

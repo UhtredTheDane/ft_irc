@@ -1,7 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   IrcExceptions.hpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agengemb <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/30 13:16:24 by agengemb          #+#    #+#             */
+/*   Updated: 2024/04/30 13:16:47 by agengemb         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef IRCEXCEPTIONS_HPP
 # define IRCEXCEPTIONS_HPP
 
 # include "AException.hpp"
+
+class Server_msg;
+class AException;
 
 class Err_PasswordIncorrect : public AException
 {
@@ -26,7 +41,14 @@ class Err_NeedMoreParams : public AException
 		Err_NeedMoreParams(std::string channel);
 		void handle(User* user, Server_msg* msg);
 };
-		
+
+class Err_UnknownCommand : public AException
+{
+	public:
+		Err_UnknownCommand(std::string channel);
+		void handle(User* user, Server_msg* msg);
+};
+
 class Err_InviteOnlyChan : public AException
 {
 	public:
@@ -95,6 +117,27 @@ class Err_UserNotInChannel : public AException
 	public:
 		Err_UserNotInChannel(std::string nick, std::string channel);
 		void handle(User* user, Server_msg* msg);
+};
+class Err_KeySet : public AException
+{
+	public:
+		Err_KeySet(std::string channel);
+		void handle(User* user, Server_msg* msg);
+};
+class Err_NoChanModes : public AException
+{
+	public:
+		Err_NoChanModes(std::string channel);
+		void handle(User* user, Server_msg* msg);
+};
+class Err_UnknowedMode : public AException
+{
+	public:
+		Err_UnknowedMode(char c,std::string channel);
+		void handle(User* user, Server_msg* msg);
+		char getChar();
+	private :
+		char c;
 };
 
 #endif
