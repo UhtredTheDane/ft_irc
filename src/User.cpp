@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:21:44 by yaainouc          #+#    #+#             */
-/*   Updated: 2024/04/29 14:53:47 by yaainouc         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:20:02 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ void User::reset_userinfo()
 	set_hostname(""); 
 	set_servername(""); 
 	set_realname(""); 
-	set_isPasswordValid(0);
 	set_isPasswordValid(false);
 }
 

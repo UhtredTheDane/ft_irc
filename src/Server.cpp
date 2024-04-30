@@ -6,7 +6,7 @@
 /*   By: yaainouc <yaainouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 16:19:58 by agengemb          #+#    #+#             */
-/*   Updated: 2024/04/30 13:19:33 by agengemb         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:43:25 by yaainouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,10 @@ Server::~Server(void)
 		close(it->fd);
 	}
 	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		delete it->second;
+	}
+	for (std::map<int, User*>::iterator it = users_map.begin(); it != users_map.end(); ++it)
 	{
 		delete it->second;
 	}

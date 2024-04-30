@@ -115,7 +115,7 @@ void Server_msg::leave_msg(User* user, Channel* channel)
 		print_send((*it)->get_socket(), msg.c_str(), msg_len, 0);
 }
 
-int Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line)
+void Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::string> split_line)
 {
 	std::string p_msg;
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
@@ -124,11 +124,9 @@ int Server_msg::chan_msg(User* user, Channel *curent_chan, std::vector<std::stri
 		{
 			p_msg = ":" + user->get_identifier() + " PRIVMSG " + curent_chan->get_name()+ " " + split_line[2] + "\r\n";
 			print_send((*it)->get_socket(), p_msg.c_str(), p_msg.length(), 0);
-			return(0);
 		}
 		it++;
 	}
-	return(-1);
 }
 
 int Server_msg::priv_msg(User* user, std::vector<std::string> split_line, std::map<int, User*> users_map)
@@ -164,7 +162,7 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 
 void Server_msg::passwordincorrect_msg(User* user)
 {
-	std::string msg = ":irc.42.com 464 :Password incorrect\r\n";
+	std::string msg = ":irc.42.com 464 * :Password incorrect\r\n";
 	print_send(user->get_socket(), msg.c_str(), msg.length(), 0);
 }
 
@@ -182,7 +180,7 @@ void Server_msg::unknowncommand_msg(User* user, std::string& command)
 
 void Server_msg::notregistred_msg(int socket)
 {
-	std::string msg = ":irc.42.com 451 :You have not registered\r\n";
+	std::string msg = ":irc.42.com 451 * :You have not registered\r\n";
 	print_send(socket, msg.c_str(), msg.length(), 0);
 }
 

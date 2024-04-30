@@ -605,6 +605,7 @@ void Server_handler::kick_request(User* user)
 void Server_handler::privmsg_request(User* user)
 {
 	Channel *curent_chan;
+	int i = 0;
 	if(split_line.size() < 3)
 		throw(Err_NeedMoreParams(split_line[0]));
 	try
@@ -615,15 +616,25 @@ void Server_handler::privmsg_request(User* user)
 	{
 		throw(Err_CannotSendToChan(split_line[1]));
 	}
+
 	if(split_line[1][0] == '#')
-	{	
+	{
+	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
+	{		
+		if(user == *it)
+		{
+			i = 1;
+		}
+		it++;
+	}
+	if(i == 0)
+	{
+		throw(Err_NotOnChannel(this->split_line[1]));
+	}
 		std::map<int, User*> users_map = serv->get_users();
 		Message c_msg(split_line[2], user);
 		//curent_chan->add_message(&c_msg);
-		if(msg.chan_msg(user, curent_chan, split_line) == -1)
-		{
-			throw(Err_CannotSendToChan(split_line[1]));
-		}
+		msg.chan_msg(user, curent_chan, split_line);
 	}
 	else
 	{
@@ -676,9 +687,9 @@ void Server_handler::processing_request(User* user, std::string& request)
 			break;
 		}
 	}
+	split_line.clear();
 	if(i == 12)
 		throw(Err_UnknownCommand(request));
-	split_line.clear();
 }
 
 void Server_handler::request_handler(int client_socket, std::string& request)
