@@ -19,8 +19,10 @@ extern bool close_serv;
 
 Server::Server(int port, std::string password)
 {
-	handler = new Server_handler(this);
+	if (port < 6665 || (port > 6669 && port != 6697))
+		throw (std::runtime_error("Wrong port number, must be 6697 or between 6665 and 6669"));
 	this->port = port;
+	handler = new Server_handler(this);
 	this->password = password;
 
 	//Configuration du socket du serveur
@@ -28,14 +30,14 @@ Server::Server(int port, std::string password)
 	if (fd_socket == -1)
 	{
 		delete(handler);
-		throw std::runtime_error("Error creating server socket");
+		throw (std::runtime_error("Error creating server socket"));
 	}
 	//rendre la socket serveur non bloquante
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
 	{     
 		delete(handler);
 		close(fd_socket);
-		throw std::runtime_error("Error try to set socket to non blocking");
+		throw std::runtime_error(("Error try to set socket to non blocking"));
 	}
 	//struct sockaddr_in serv_addr; //netinet/in.h
 	bzero(&(serv_addr), sizeof(serv_addr));
@@ -46,19 +48,18 @@ Server::Server(int port, std::string password)
 	{		
 		delete(handler);
 		close(fd_socket);
-		throw std::runtime_error("Error while binding");
+		throw (std::runtime_error("Error while binding"));
 	}
 	if (listen(fd_socket, 5) == -1)
 	{
 		delete(handler);
 		close(fd_socket);
-		throw std::runtime_error("Error while listening to socket");
+		throw (std::runtime_error("Error while listening to socket"));
 	}
 	poll_fds = new std::vector<pollfd>(1);
 	bzero(&poll_fds->at(0), sizeof(pollfd));
 	poll_fds->at(0).fd = fd_socket;
 	poll_fds->at(0).events = POLLIN;
-
 }
 
 Server::~Server(void)
@@ -144,7 +145,7 @@ void Server::check_connection()
 	{
 		if (fcntl(fd_client, F_SETFL, O_NONBLOCK) == -1)
 		{        
-			throw std::runtime_error("Error try to set socket to non blocking");
+			throw (std::runtime_error("Error try to set socket to non blocking"));
 		}
 		pollfd new_pollfd;
 		bzero(&new_pollfd, sizeof(pollfd));
@@ -154,6 +155,7 @@ void Server::check_connection()
 		add_user(fd_client);
 	}
 }
+
 User *Server::findUserByName(std::string name)
 {
 	User * target;
@@ -173,16 +175,7 @@ User *Server::findUserByName(std::string name)
 
 	return target;
 }
-/*
-   void Server::reply(User *user, int client_socket)
-   {
-   msg.welcome_msg(user, client_socket);
-   msg.yourhost_msg(user, client_socket);
-   msg.created_msg(user, client_socket);
-   msg.myinfo_msg(user, client_socket);
-//msg.whois_msg(user, client_socket);
-}
- */
+
 void Server::check_incoming_package()
 {
 	char buffer[1024];
