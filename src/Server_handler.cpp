@@ -241,7 +241,6 @@ void Server_handler::user_request(User* user)
 		user->set_hostname(split_line[2]);
 		user->set_servername(split_line[3]);
 		user->set_realname(split_line[3]);
-		user->set_identifier();
 		creation_done(user);
 	}
 	else
@@ -252,6 +251,7 @@ void Server_handler::creation_done(User* user)
 	if(!user->get_username().empty() && !user->get_hostname().empty() 
 		&& !user->get_servername().empty() && !user->get_realname().empty() && !user->get_nickname().empty())
 		{
+			user->set_identifier();
 		user->set_isRegistered(2);
 		msg.welcome_msg(user);
 		msg.yourhost_msg(user);
@@ -293,8 +293,11 @@ void Server_handler::join_request(User* user)
 			throw(Err_BadChannelKey(channel_name));
 		else if (current_chan->IsOption(4) && current_chan->is_full())
 			throw(Err_ChannelIsFull(channel_name));
-		current_chan->add_user(user);
-		msg.join_msg(user, current_chan);
+		if (!current_chan->IsInChannel(user))
+		{
+			current_chan->add_user(user);
+			msg.join_msg(user, current_chan);
+		}
 	}
 }
 

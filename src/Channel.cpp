@@ -197,6 +197,7 @@ int Channel::IsInChannel(User *user)
 		return 1;
 	return 0;
 }
+
 int Channel::IsValidChannelName(std::string name)
 {
 	return(name.size() > 2 && (name[0] == '#' || name[0] == '&'));
@@ -226,10 +227,12 @@ bool Channel::erase_invite(User* user)
 	}
 	return (false);
 }
+
 void Channel::set_topic(std::string str)
 {
 	this->theme = str;
 }
+
 void Channel::send_all(std::string str)
 {
 	std::vector<User*>::iterator it = this->users.begin();

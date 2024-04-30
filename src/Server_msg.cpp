@@ -77,7 +77,10 @@ void Server_msg::join_msg(User *user, Channel* channel)
 	for (std::vector<User*>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
 	{
 			if (user != *it)
+			{
 				print_send((*it)->get_socket(), msg.c_str(), msg_len, 0);
+				std::cout << (*it)->get_nickname() << std::endl;
+			}
 	}
 	msg += ":" + user->get_servername() + " 353 " + user->get_nickname() + " = " + channel->get_name() + " :@";
 	for (std::vector<User *>::iterator it = channel->get_users()->begin(); it != channel->get_users()->end(); ++it)
@@ -175,8 +178,10 @@ int Server_msg::kick_msg(User* user, Channel *curent_chan, std::vector<std::stri
 		{
 			k_msg = ":" + user->get_identifier() + " KICK " + curent_chan->get_name() + " " + split_line[2] + " " + arg + "\r\n";
 			curent_chan->send_all(k_msg);
+			curent_chan->get_users()->erase(it2);
+			return (0);
 		}
-			it2++;
+			++it2;
 	}
 	return(-1);
 }
