@@ -101,9 +101,7 @@ void Server_handler::nick_request(User* user)
 	else if(user->get_isPasswordValid() && user->get_isRegistered() == 1)
 	{
 		if(serv->is_on_serv(split_line[1]))
-		{
 			msg.nicknameinuse_msg(user, split_line[1]);
-		}
 		else
 		{
 			user->set_nickname(split_line[1]);
