@@ -1,0 +1,4 @@
+CAP LS
+PASS pass
+NICK bob
+USER bbob bbob bbob :Bob Dylan

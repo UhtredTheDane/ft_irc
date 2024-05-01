@@ -1,0 +1,20 @@
+CAP LS
+PASS pass
+NICK bob
+USER bbob bbob bbob :Bob Dylan
+JOIN #BOB
+MODE #BOB +i
+INVITE
+INVITE lloisel #BOB
+INVITE lloisel BOB
+INVITE lloisel JEANN
+INVITE jean #BOB
+INVITE jean BOB
+INVITE jean JEAN
+MODE #BOB -i
+INVITE lloisel #BOB
+INVITE lloisel BOB
+INVITE lloisel JEANN
+INVITE jean #BOB
+INVITE jean BOB
+INVITE jean JEANN
