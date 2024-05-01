@@ -48,7 +48,8 @@ class Channel
 	~Channel(void);
 
 	void add_user(User *user);
-	void delete_user(User* to_delete);
+	void delete_user(int socket);
+	void delete_admin(int socket);
 	void add_message(Message *message);
 	void invite_user(User *user);
 	bool erase_invite(User* user);

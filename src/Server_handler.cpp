@@ -593,7 +593,7 @@ void Server_handler::part_request(User* user)
 		{
 			Channel *current_chan = serv->get_channels().at(split_line[1]);
 			msg.leave_msg(user, current_chan);
-			current_chan->delete_user(user);
+			current_chan->delete_user(user->get_socket());
 		}
 		catch (std::out_of_range& oor)
 		{

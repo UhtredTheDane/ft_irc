@@ -34,16 +34,30 @@ void Channel::add_user(User *user)
 	users.push_back(user);
 }
 
-void Channel::delete_user(User* to_delete)
+void Channel::delete_admin(int socket)
+{
+	for (std::vector<User*>::iterator it =  admin_users.begin(); it !=  admin_users.end(); ++it)
+	{
+		if (socket == (*it)->get_socket())
+		{
+			admin_users.erase(it);
+			break;
+		}
+	}
+
+}
+
+void Channel::delete_user(int socket)
 {
 	for (std::vector<User*>::iterator it = users.begin(); it != users.end(); ++it)
 	{
-		if (to_delete->get_socket() == (*it)->get_socket())
+		if (socket == (*it)->get_socket())
 		{
 			users.erase(it);
 			break;
 		}
 	}
+
 }
 
 void Channel::add_message(Message* msg)
@@ -232,10 +246,12 @@ void Channel::send_all(std::string str)
 		it++;
 	}
 }
+
 void Channel::set_limit_user(int const nb)
 {
 	this->limit_user = nb;
 }
+
 void Channel::set_password(std::string const str)
 {
 	this->password = str;

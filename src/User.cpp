@@ -43,7 +43,7 @@ void User::reset_userinfo()
 
 User::~User()
 {
-	std::cout << "Destruction du User : " << nickname << std::endl;
+
 }
 
 int User::get_socket(void) const

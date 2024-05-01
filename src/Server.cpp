@@ -186,8 +186,13 @@ void Server::check_incoming_package()
 		while (it->fd != fd_socket && (it->revents & POLLIN) && (bytes_nb = recv(it->fd, buffer, 1024, 0)) != -1)
 		{	
 			if (bytes_nb == 0)
-			{
-				close(it->fd);			
+			{		
+				for (std::map<std::string, Channel *>::iterator itChan = channels.begin(); itChan != channels.end(); ++itChan)
+				{
+					itChan->second->delete_admin(it->fd);
+					itChan->second->delete_user(it->fd);
+				}
+				close(it->fd);
 				delete_user(it->fd);
 				it = poll_fds->erase(it);
 				break;

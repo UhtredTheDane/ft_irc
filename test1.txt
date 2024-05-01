@@ -1,4 +1,0 @@
-CAP LS
-PASS pass
-NICK lloisel_
-USER lloisel lloisel lloisel :Luca Loisel
