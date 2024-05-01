@@ -527,9 +527,7 @@ void Server_handler::kick_request(User* user)
 	for (std::vector<User*>::iterator it = curent_chan->get_admins()->begin(); it != curent_chan->get_admins()->end();)
 	{
 		if(user == *it)
-		{
 			i = 1;
-		}
 		it++;
 	}
 	if(i == 0)
@@ -538,17 +536,13 @@ void Server_handler::kick_request(User* user)
 	for (std::vector<User*>::iterator it = curent_chan->get_users()->begin(); it != curent_chan->get_users()->end();)
 	{		
 		if(user == *it)
-		{
 			i = 1;
-		}
 		it++;
 	}
 	if(i == 0)
 		throw(Err_NotOnChannel(this->split_line[1]));/*ERR_NOTONCHANNEL*/;
 	if(msg.kick_msg(user, curent_chan,split_line) == -1)
-	{
 		throw(Err_UserNotInChannel(split_line[2], split_line[1]))/*ERR_USERNOTINCHANNEL */;
-	}
 }
 
 void Server_handler::privmsg_request(User* user)
